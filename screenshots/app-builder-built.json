@@ -1,0 +1,38 @@
+{
+  "url": "http://127.0.0.1:8081/",
+  "viewports": {
+    "desktop": {
+      "width": 1280,
+      "height": 800,
+      "status": 200,
+      "title": "Pi Munshi",
+      "hasCanvas": false,
+      "bodyTextLen": 2777,
+      "bodyTextHash": "8a4fa366022a2988ce7b973cad1105a757e5ab74d6c61c43347b2e0b42c65925",
+      "bodyTextPrefix": "पि Pi Munshi पाई-मुंशी Second seat beside the Paytm rep. Closes ",
+      "horizontalOverflow": false,
+      "consoleErrors": [],
+      "pageErrors": [],
+      "screenshot": "/workspace/screenshots/app-builder-built.png"
+    },
+    "mobile": {
+      "width": 390,
+      "height": 844,
+      "status": 200,
+      "title": "Pi Munshi",
+      "hasCanvas": false,
+      "bodyTextLen": 1522,
+      "bodyTextHash": "79fe75d5d4c831d68430ccb10c1e4d26898f46e4fd6b30d23827668095fae2f8",
+      "bodyTextPrefix": "पि Pi Munshi पाई-मुंशी Second seat beside the Paytm rep. Closes ",
+      "horizontalOverflow": false,
+      "consoleErrors": [],
+      "pageErrors": [],
+      "screenshot": "/workspace/screenshots/app-builder-built-mobile.png"
+    }
+  },
+  "brandWarnings": [],
+  "authWarnings": [],
+  "verdictFile": "/workspace/screenshots/app-builder-built.json",
+  "divergesFromBaseline": false,
+  "baselineReasons": []
+}
