@@ -51,3 +51,4 @@ export function handlePaytmCredentialsStatus(): ApiResponse<any> {
     attestationSignature: status.testChecksum,
   };
 }
+

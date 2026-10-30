@@ -214,3 +214,4 @@ export class PaytmGatewayService {
 }
 
 export const paytmGateway = PaytmGatewayService.getInstance();
+

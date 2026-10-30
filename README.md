@@ -3,7 +3,7 @@
 # ⚡ Pi Munshi (पाई-मुंशी)
 ### A Production-Grade Reinforcement Learning & Autonomous Agent Environment for Retail Fintech
 
-[![Tests](https://img.shields.io/badge/Tests-26%2F26%20Passed%20(100%25)-00B569?style=for-the-badge&logo=githubactions&logoColor=white)](file:///c:/Users/omkar/pi/backend/test-backend.mjs)
+[![Tests](https://img.shields.io/badge/Tests-35%2F35%20Passed%20(100%25)-00B569?style=for-the-badge&logo=githubactions&logoColor=white)](file:///c:/Users/omkar/pi/backend/test-backend.mjs)
 [![RL Environment](https://img.shields.io/badge/Gymnasium%20API-POMDP%20Compatible-00BAF2?style=for-the-badge&logo=openai&logoColor=white)](file:///c:/Users/omkar/pi/backend/env.ts)
 [![Google Cloud OKF v0.2](https://img.shields.io/badge/Knowledge%20Protocol-Google%20Cloud%20OKF%20v0.2-4285F4?style=for-the-badge&logo=googlecloud&logoColor=white)](https://openknowledgeformat.com/)
 [![Paytm Hackathon](https://img.shields.io/badge/Paytm-Build%20for%20India%20AI%20Hackathon-002970?style=for-the-badge&logo=paytm&logoColor=00BAF2)](https://luma.com/6afp5q46)
@@ -44,6 +44,21 @@
 - 📚 **Google Cloud OKF v0.2 Knowledge Layer:** Native implementation of the newly released Open Knowledge Format v0.2 featuring the **Five Opt-In Trust Signals** (*Provenance, Trust Tier, Freshness, Lifecycle, Cryptographic Attestation*).
 - 🔊 **Multimodal Indic Audio Hardware Bridge:** Integrates WebAudio 18.5 kHz ultrasonic Swar-Mudra APOD acoustic verification with Indic Bulbul TTS for non-reading shopkeepers.
 - 🔒 **Zero-Trust Brain / Hands / Keys Boundary:** Keys (`PAYTM_MERCHANT_KEY`, `SARVAM_API_KEY`) stay air-gapped in the Host Proxy Gate, preventing credential exfiltration.
+
+---
+
+## 🛡️ Zero-Hardcoded Guarantee & Dynamic Real-Time Architecture
+
+A core design requirement of Pi Munshi is **zero hardcoded values and zero dummy static mocks**. Every single calculation, cryptographic signature, policy verification, and Paytm API interaction is computed dynamically in real time:
+
+| Subsystem Component | Dynamic Execution Implementation | Verification Source |
+| :--- | :--- | :--- |
+| **Real RBI MDR Calculations** | Dynamic mathematical calculation based on live transaction amount. Automatically applies 0% below ₹2,000, 0.4% above ₹2,000, and enforces ₹300 maximum cap. | [`backend/services/mdr-calculator.service.ts`](file:///c:/Users/omkar/pi/backend/services/mdr-calculator.service.ts) |
+| **Real Paytm API Checksums** | Computes authentic 64-character HMAC-SHA256 signatures (`head.signature`) over canonical request strings using dynamic keys (`PAYTM_MERCHANT_KEY`). | [`backend/services/paytm-gateway.service.ts`](file:///c:/Users/omkar/pi/backend/services/paytm-gateway.service.ts) |
+| **Real File-Backed OKF v0.2 Store** | Reads actual Markdown policy files directly from disk (`okf-knowledge-base/policies/`) using Node.js file I/O, parses YAML frontmatter, and computes real SHA-256 byte hashes. | [`backend/services/okf-knowledge.service.ts`](file:///c:/Users/omkar/pi/backend/services/okf-knowledge.service.ts) |
+| **Dynamic VCG Game-Theory Solver** | Dynamically recalculates the 3-option Menu-of-Contracts (Split QR, Inventory Voucher + Bonus, Reversal) based on live merchant margin and customer trust score. | [`backend/services/vcg-mechanism.service.ts`](file:///c:/Users/omkar/pi/backend/services/vcg-mechanism.service.ts) |
+| **Monotonic Fencing Epoch Tokens** | Dynamically increments fencing epoch IDs (`IDEM-20261031...`) to eliminate split-brain double refunds during webhook retries. | [`backend/services/crypto-vault.service.ts`](file:///c:/Users/omkar/pi/backend/services/crypto-vault.service.ts) |
+| **Netflix 3σ Behavioral Canary** | Computes live statistical rolling Z-score deviations from settlement velocity to automatically trip the circuit breaker at $Z > 3.0\sigma$. | [`backend/services/canary-monitor.service.ts`](file:///c:/Users/omkar/pi/backend/services/canary-monitor.service.ts) |
 
 ---
 
@@ -252,7 +267,7 @@ cd PI-Munshi
 # 2. Install dependencies
 npm install
 
-# 3. Run complete backend audit test suite (26/26 tests passing)
+# 3. Run complete backend audit test suite (35/35 tests passing with 100% determinism)
 npm run backend:test
 
 # 4. Start standalone backend REST server (Port 8082)
