@@ -76,15 +76,32 @@ export class OkfKnowledgeService {
     }
 
     let fileContent = "";
-    if (existsSync(filePath)) {
+    const fileExists = existsSync(filePath);
+    if (fileExists) {
       fileContent = readFileSync(filePath, "utf-8");
     } else {
-      fileContent = `---
-okf: "0.2"
-title: "Dynamic Policy: ${filename}"
-status: "active"
----
-# Policy Content`;
+      // Fail-closed when policy does not exist on disk
+      return {
+        policyId: filename,
+        version: "UNKNOWN",
+        allowed: false,
+        trustTier: "UNVERIFIED",
+        provenance: {
+          author: "UNKNOWN",
+          authority: "NONE",
+          reference: "MISSING_POLICY_FILE",
+        },
+        freshness: {
+          validFrom: new Date(0).toISOString(),
+          validUntil: new Date(0).toISOString(),
+          isStale: true,
+        },
+        lifecycle: "MISSING",
+        attestationHash: "0".repeat(64),
+        cragScore: 0.0,
+        cragVerdict: "REJECTED_MISSING_POLICY",
+        resultMessage: `[FAIL-CLOSED POLICY REJECTION]: Policy '${filename}' does not exist on disk. Operation blocked by OKF Guardrail.`,
+      };
     }
 
     // 1. Calculate Real Cryptographic Attestation Hash over disk bytes
@@ -94,6 +111,32 @@ status: "active"
     // 2. Extract 5 Trust Signals dynamically
     const okfVersion = frontmatter.okf || "0.2.0";
     const status = (frontmatter.status || "ACTIVE").toUpperCase();
+
+    // Check lifecycle status: must be ACTIVE or STABLE or PRODUCTION or VERIFIED
+    const validLifecycles = new Set(["ACTIVE", "STABLE", "PRODUCTION", "VERIFIED"]);
+    if (!validLifecycles.has(status)) {
+      return {
+        policyId: filename,
+        version: okfVersion,
+        allowed: false,
+        trustTier: "REVOKED_OR_INACTIVE",
+        provenance: {
+          author: "Revoked Authority",
+          authority: "None",
+          reference: "STATUS_INACTIVE",
+        },
+        freshness: {
+          validFrom: "2020-01-01T00:00:00Z",
+          validUntil: "2020-01-01T00:00:00Z",
+          isStale: true,
+        },
+        lifecycle: status,
+        attestationHash: realSha256,
+        cragScore: 0.0,
+        cragVerdict: "REJECTED_INACTIVE_POLICY",
+        resultMessage: `[FAIL-CLOSED POLICY REJECTION]: Policy '${filename}' is in state '${status}' (not ACTIVE/STABLE). Blocked.`,
+      };
+    }
 
     // Provenance
     let uri = "rbi://dpss/circular/2026/84/DPSS.CO.PD.No.145";
@@ -152,6 +195,7 @@ status: "active"
     return {
       policyId: filename,
       version: okfVersion,
+      allowed: !isStale && cragScore >= 0.9,
       trustTier,
       provenance: {
         author: authority,

@@ -5,6 +5,7 @@
 
 import { createServer, IncomingMessage, ServerResponse } from "node:http";
 import { dispatchApiRoute } from "./routes.ts";
+import { eventStream } from "./services/event-stream.service.ts";
 
 const PORT = parseInt(process.env.BACKEND_PORT || "8082", 10);
 
@@ -24,6 +25,30 @@ export function startBackendServer(port: number = PORT) {
     const url = new URL(req.url || "/", `http://${req.headers.host || "localhost"}`);
     const pathname = url.pathname;
     const method = req.method || "GET";
+
+    // Server-Sent Events (SSE) real-time streaming endpoint
+    if (method === "GET" && pathname === "/api/v1/events/stream") {
+      res.writeHead(200, {
+        "Content-Type": "text/event-stream",
+        "Cache-Control": "no-cache",
+        "Connection": "keep-alive",
+      });
+      res.write(`data: ${JSON.stringify({ type: "STREAM_CONNECTED", timestamp: new Date().toISOString() })}\n\n`);
+
+      const unsubscribe = eventStream.subscribe((event) => {
+        res.write(`data: ${JSON.stringify(event)}\n\n`);
+      });
+
+      const pingTimer = setInterval(() => {
+        res.write(": ping\n\n");
+      }, 15000);
+
+      req.on("close", () => {
+        clearInterval(pingTimer);
+        unsubscribe();
+      });
+      return;
+    }
 
     let body: any = {};
     if (method === "POST" || method === "PUT") {

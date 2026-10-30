@@ -76,6 +76,7 @@ export type OkfEvaluateRequest = {
 export type OkfEvaluateResponse = {
   policyId: string;
   version: string;
+  allowed: boolean;
   trustTier: string;
   provenance: {
     author: string;
@@ -90,7 +91,7 @@ export type OkfEvaluateResponse = {
   lifecycle: string;
   attestationHash: string;
   cragScore: number;
-  cragVerdict: "HIGH_CONFIDENCE_AUTHORITATIVE" | "AMBIGUOUS_POLICY_REVIEW" | "REJECTED_STALE_POLICY";
+  cragVerdict: "HIGH_CONFIDENCE_AUTHORITATIVE" | "AMBIGUOUS_POLICY_REVIEW" | "REJECTED_STALE_POLICY" | "REJECTED_MISSING_POLICY" | "REJECTED_INACTIVE_POLICY";
   resultMessage: string;
 };
 

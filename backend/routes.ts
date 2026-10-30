@@ -1,6 +1,6 @@
 /**
  * Pi Munshi Backend Router
- * Routes incoming HTTP requests to domain controllers.
+ * Routes incoming HTTP requests to domain controllers and persistent DB/Adapters.
  */
 
 import { handleCalculateMdr } from "./controllers/settlement.controller.ts";
@@ -9,10 +9,25 @@ import { handleOkfEvaluate } from "./controllers/okf.controller.ts";
 import { handleBrainCycle } from "./controllers/brain.controller.ts";
 import { handleGetWal, handleGetCanary } from "./controllers/governance.controller.ts";
 import { handlePaytmInitiate, handlePaytmRefund, handlePaytmCredentialsStatus } from "./controllers/paytm.controller.ts";
+import { paytmAdapter } from "./adapters/paytm.adapter.ts";
+import { sarvamAdapter } from "./adapters/sarvam.adapter.ts";
+import { soundboxAdapter } from "./adapters/soundbox.adapter.ts";
+import { dbRepo } from "./database/db.ts";
+import { approvalService } from "./services/approval.service.ts";
+import { memoryHandoffService } from "./services/memory-handoff.service.ts";
+import { eventStream } from "./services/event-stream.service.ts";
 
-export async function dispatchApiRoute(path: string, method: string, body: any): Promise<{ status: number; body: any }> {
-  const normPath = path.replace(/\/$/, "");
+export async function dispatchApiRoute(
+  path: string,
+  method: string,
+  body: any = {}
+): Promise<{ status: number; body: any }> {
+  const [pathname, queryString] = path.split("?");
+  const normPath = pathname.replace(/\/$/, "");
+  const searchParams = new URLSearchParams(queryString || "");
+  const mode = (searchParams.get("mode") || body?.mode || "DEMO") as "LIVE" | "DEMO";
 
+  // 1. Health & Discovery
   if (method === "GET" && (normPath === "/api/v1/health" || normPath === "/health")) {
     return {
       status: 200,
@@ -21,25 +36,81 @@ export async function dispatchApiRoute(path: string, method: string, body: any):
         service: "Pi Munshi Backend Gateway",
         rbiCompliant: true,
         okfVersion: "0.2.0",
+        activeSseClients: eventStream.getClientCount(),
         timestamp: new Date().toISOString(),
       },
     };
   }
 
-  // Paytm API Gateway Endpoints
-  if (method === "POST" && normPath === "/api/v1/paytm/initiate") {
-    const res = await handlePaytmInitiate(body);
+  // 2. Integration Health & Provider Status
+  if (method === "GET" && normPath === "/api/v1/providers/status") {
+    const paytmStatus = await paytmAdapter.getConnectionStatus();
+    const sarvamStatus = await sarvamAdapter.getConnectionStatus();
+    const soundboxStatus = await soundboxAdapter.getConnectionStatus();
+
+    return {
+      status: 200,
+      body: {
+        success: true,
+        mode,
+        providers: {
+          paytm: paytmStatus,
+          sarvam: sarvamStatus,
+          soundbox: soundboxStatus,
+        },
+        timestamp: new Date().toISOString(),
+      },
+    };
+  }
+
+  // 3. Merchants
+  if (method === "GET" && normPath === "/api/v1/merchants") {
+    const merchants = await dbRepo.listMerchants(mode);
+    return { status: 200, body: { success: true, mode, data: merchants } };
+  }
+
+  if (method === "GET" && normPath.startsWith("/api/v1/merchants/")) {
+    const merchantId = normPath.split("/").pop() || "";
+    const merchant = await dbRepo.getMerchant(merchantId, mode);
+    if (!merchant) {
+      return { status: 404, body: { success: false, error: "Merchant not found", mode } };
+    }
+    return { status: 200, body: { success: true, mode, data: merchant } };
+  }
+
+  // 4. Transactions (with idempotent deduplication)
+  if (method === "GET" && normPath === "/api/v1/transactions") {
+    const merchantId = searchParams.get("merchantId") || body.merchantId || "DEMO_MERCHANT_RAMESH";
+    const txns = await dbRepo.listTransactions(merchantId, mode);
+    return { status: 200, body: { success: true, mode, merchantId, data: txns } };
+  }
+
+  if (method === "POST" && normPath === "/api/v1/transactions/initiate") {
+    const res = await paytmAdapter.initiatePayment(
+      {
+        orderId: body.orderId || `ORD_${Date.now()}`,
+        merchantId: body.merchantId || "DEMO_MERCHANT_RAMESH",
+        amount: Number(body.amount || 100),
+        customerVpa: body.customerVpa,
+      },
+      mode
+    );
+
+    eventStream.broadcast("PAYMENT_INITIATED", { orderId: res.orderId, amount: body.amount, status: res.status }, mode);
     return { status: res.success ? 200 : 400, body: res };
   }
 
-  if (method === "POST" && normPath === "/api/v1/paytm/refund") {
-    const res = await handlePaytmRefund(body);
-    return { status: res.success ? 200 : 400, body: res };
+  // 5. Settlements & Consolidation
+  if (method === "GET" && normPath === "/api/v1/settlements") {
+    const merchantId = searchParams.get("merchantId") || body.merchantId || "DEMO_MERCHANT_RAMESH";
+    const settlements = await dbRepo.listSettlements(merchantId, mode);
+    return { status: 200, body: { success: true, mode, merchantId, data: settlements } };
   }
 
-  if (method === "GET" && normPath === "/api/v1/paytm/credentials-status") {
-    const res = handlePaytmCredentialsStatus();
-    return { status: 200, body: res };
+  if (method === "POST" && normPath === "/api/v1/settlements/consolidate") {
+    const merchantId = body.merchantId || "DEMO_MERCHANT_RAMESH";
+    const result = await memoryHandoffService.nightlyConsolidation(merchantId, mode);
+    return { status: 200, body: result };
   }
 
   if (method === "POST" && normPath === "/api/v1/settlement/calculate") {
@@ -47,6 +118,139 @@ export async function dispatchApiRoute(path: string, method: string, body: any):
     return { status: res.success ? 200 : 400, body: res };
   }
 
+  // 6. Disputes
+  if (method === "GET" && normPath === "/api/v1/disputes") {
+    const merchantId = searchParams.get("merchantId") || body.merchantId || "DEMO_MERCHANT_RAMESH";
+    const disputes = await dbRepo.listDisputes(merchantId, mode);
+    return { status: 200, body: { success: true, mode, merchantId, data: disputes } };
+  }
+
+  if (method === "POST" && normPath === "/api/v1/disputes/action") {
+    const { disputeId, action, resolutionNotes } = body;
+    let newStatus = "UNDER_REVIEW";
+    if (action === "SUBMIT_EVIDENCE") newStatus = "EVIDENCE_SUBMITTED";
+    if (action === "ACCEPT_CHARGEBACK") newStatus = "REFUNDED";
+    if (action === "CONTEST") newStatus = "WON";
+
+    await dbRepo.updateDispute(
+      disputeId,
+      {
+        status: newStatus,
+        evidence_submitted: action === "SUBMIT_EVIDENCE",
+        resolution_notes: resolutionNotes,
+      },
+      mode
+    );
+
+    eventStream.broadcast("DISPUTE_UPDATED", { disputeId, action, status: newStatus }, mode);
+    return { status: 200, body: { success: true, disputeId, status: newStatus, mode } };
+  }
+
+  // 7. Soundbox IoT & Chimes
+  if (method === "GET" && normPath === "/api/v1/soundbox/status") {
+    const deviceId = searchParams.get("deviceId") || body.deviceId || "DEMO_SB_RAMESH";
+    const heartbeat = await soundboxAdapter.pollHeartbeat(deviceId, mode);
+    return { status: 200, body: { success: true, mode, data: heartbeat } };
+  }
+
+  if (method === "POST" && normPath === "/api/v1/soundbox/chime") {
+    const { deviceId = "DEMO_SB_RAMESH", amount = 100, language = "hi" } = body;
+    const chimeRes = await soundboxAdapter.sendChime(deviceId, amount, language, mode);
+    eventStream.broadcast("SOUNDBOX_CHIME_TRIGGERED", { deviceId, amount, language }, mode);
+    return { status: chimeRes.success ? 200 : 400, body: chimeRes };
+  }
+
+  // 8. Human Approvals (Tamper-Proof)
+  if (method === "POST" && normPath === "/api/v1/approvals/create") {
+    const res = await approvalService.createRequest({
+      actionType: body.actionType,
+      merchantId: body.merchantId,
+      amount: Number(body.amount || 0),
+      params: body.params || {},
+      policyVersion: body.policyVersion || "0.2.0",
+      ttlMinutes: body.ttlMinutes,
+      mode,
+    });
+    return { status: 200, body: { success: true, data: res } };
+  }
+
+  if (method === "POST" && normPath === "/api/v1/approvals/review") {
+    const res = await approvalService.reviewRequest(
+      body.requestId,
+      body.decision,
+      body.reviewerId || "FSE_ARUN",
+      {
+        actionType: body.actionType,
+        merchantId: body.merchantId,
+        amount: Number(body.amount || 0),
+        params: body.params || {},
+        policyVersion: body.policyVersion || "0.2.0",
+      },
+      mode
+    );
+    return { status: res.success ? 200 : 400, body: res };
+  }
+
+  // 9. Merchant Memory & Safe FSE Handoff
+  if (method === "GET" && normPath.startsWith("/api/v1/memory/")) {
+    const merchantId = normPath.split("/").pop() || "DEMO_MERCHANT_RAMESH";
+    const memories = await memoryHandoffService.getMerchantMemory(merchantId, mode);
+    return { status: 200, body: { success: true, mode, merchantId, data: memories } };
+  }
+
+  if (method === "POST" && normPath === "/api/v1/memory/record") {
+    const res = await memoryHandoffService.recordMerchantMemory(
+      body.merchantId,
+      body.topic,
+      body.summary,
+      body.sentiment,
+      mode
+    );
+    return { status: 200, body: { success: true, mode, data: res } };
+  }
+
+  if (method === "POST" && normPath === "/api/v1/handoff/initiate") {
+    const res = await memoryHandoffService.initiateFseHandoff(
+      body.merchantId,
+      body.fromFseId,
+      body.toFseId,
+      body.contextSummary,
+      mode
+    );
+    return { status: 200, body: { success: true, mode, data: res } };
+  }
+
+  if (method === "POST" && normPath === "/api/v1/handoff/accept") {
+    const res = await memoryHandoffService.acceptFseHandoff(body.handoffId, body.toFseId, mode);
+    return { status: 200, body: { success: true, mode, data: res } };
+  }
+
+  // 10. Sarvam AI Voice STT / TTS / Translate
+  if (method === "POST" && normPath === "/api/v1/voice/transcribe") {
+    const res = await sarvamAdapter.transcribe(
+      body.audioBase64 ? Buffer.from(body.audioBase64, "base64") : Buffer.alloc(0),
+      body.languageCode || "hi-IN",
+      mode
+    );
+    return { status: 200, body: { success: true, mode, data: res } };
+  }
+
+  if (method === "POST" && normPath === "/api/v1/voice/synthesize") {
+    const res = await sarvamAdapter.synthesize(body.text, body.languageCode || "hi-IN", mode);
+    return { status: 200, body: { success: true, mode, data: res } };
+  }
+
+  if (method === "POST" && normPath === "/api/v1/voice/translate") {
+    const res = await sarvamAdapter.translate(
+      body.text,
+      body.sourceLang || "en-IN",
+      body.targetLang || "hi-IN",
+      mode
+    );
+    return { status: 200, body: { success: true, mode, data: res } };
+  }
+
+  // 11. Legacy / Core Controllers
   if (method === "POST" && normPath === "/api/v1/vcg/menu") {
     const res = handleVcgMenu(body);
     return { status: res.success ? 200 : 400, body: res };
@@ -72,22 +276,52 @@ export async function dispatchApiRoute(path: string, method: string, body: any):
     return { status: 200, body: res };
   }
 
+  if (method === "POST" && normPath === "/api/v1/paytm/initiate") {
+    const res = await handlePaytmInitiate(body);
+    return { status: res.success ? 200 : 400, body: res };
+  }
+
+  if (method === "POST" && normPath === "/api/v1/paytm/refund") {
+    const res = await handlePaytmRefund(body);
+    return { status: res.success ? 200 : 400, body: res };
+  }
+
+  if (method === "GET" && normPath === "/api/v1/paytm/credentials-status") {
+    const res = handlePaytmCredentialsStatus();
+    return { status: 200, body: res };
+  }
+
   return {
     status: 404,
     body: {
       success: false,
       error: `Route not found: ${method} ${path}`,
       availableRoutes: [
+        "GET  /api/v1/health",
+        "GET  /api/v1/providers/status",
+        "GET  /api/v1/merchants",
+        "GET  /api/v1/transactions",
+        "POST /api/v1/transactions/initiate",
+        "GET  /api/v1/settlements",
+        "POST /api/v1/settlements/consolidate",
         "POST /api/v1/settlement/calculate",
+        "GET  /api/v1/disputes",
+        "POST /api/v1/disputes/action",
+        "GET  /api/v1/soundbox/status",
+        "POST /api/v1/soundbox/chime",
+        "POST /api/v1/approvals/create",
+        "POST /api/v1/approvals/review",
+        "GET  /api/v1/memory/:merchantId",
+        "POST /api/v1/memory/record",
+        "POST /api/v1/handoff/initiate",
+        "POST /api/v1/handoff/accept",
+        "POST /api/v1/voice/transcribe",
+        "POST /api/v1/voice/synthesize",
         "POST /api/v1/vcg/menu",
         "POST /api/v1/okf/evaluate",
         "POST /api/v1/brain/cycle",
-        "POST /api/v1/paytm/initiate",
-        "POST /api/v1/paytm/refund",
-        "GET  /api/v1/paytm/credentials-status",
         "GET  /api/v1/governance/wal",
         "GET  /api/v1/governance/canary",
-        "GET  /api/v1/health",
       ],
     },
   };
