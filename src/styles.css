@@ -1,0 +1,70 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "IBM Plex Sans", "Noto Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Fraunces", "Iowan Old Style", Georgia, serif;
+
+  --color-ink: #07131a;
+  --color-ink-2: #0c1b24;
+  --color-panel: #122632;
+  --color-panel-2: #183140;
+  --color-line: #234556;
+  --color-fg: #e7f2f6;
+  --color-mist: #8eacbb;
+  --color-paper: #f3eee4;
+  --color-paper-ink: #1c1915;
+  --color-paper-soft: #6d6458;
+  --color-cyan: #00b4e6;
+  --color-cyan-2: #b8ecff;
+  --color-brass: #e0b15a;
+  --color-brass-ink: #2a1d08;
+  --color-signal: #ff6b6b;
+  --color-signal-ink: #2a1012;
+
+  --radius-card: 0.75rem;
+}
+
+@layer base {
+  button:not(:disabled),
+  [role="button"]:not(:disabled) {
+    cursor: pointer;
+  }
+
+  html,
+  body {
+    background: var(--color-ink);
+    color: var(--color-fg);
+    font-family: var(--font-sans);
+  }
+
+  ::selection {
+    background: var(--color-cyan);
+    color: var(--color-ink);
+  }
+}
+
+@utility font-display {
+  font-family: var(--font-display);
+}
+
+@utility mono {
+  font-family: ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+}
+
+.grille {
+  background-image: repeating-linear-gradient(
+    to bottom,
+    var(--color-line) 0 1px,
+    transparent 1px 5px
+  );
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
