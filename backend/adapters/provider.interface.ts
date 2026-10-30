@@ -74,3 +74,4 @@ export interface ISoundboxAdapter {
   }>;
   getConnectionStatus(): Promise<ProviderStatus>;
 }
+

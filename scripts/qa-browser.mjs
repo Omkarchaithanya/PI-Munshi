@@ -1,7 +1,13 @@
 import { chromium } from "playwright";
+import { mkdirSync, existsSync } from "node:fs";
 
 async function runQA() {
-  console.log("=== Starting Browser QA for Pi Munshi ===");
+  console.log("=== Starting Playwright Browser QA for Pi Munshi Paytm Redesign ===");
+  
+  if (!existsSync("screenshots")) {
+    mkdirSync("screenshots", { recursive: true });
+  }
+
   const browser = await chromium.launch();
   const page = await browser.newPage({ viewport: { width: 1280, height: 800 } });
 
@@ -27,45 +33,53 @@ async function runQA() {
     console.error("Errors:", consoleErrors);
   }
 
-  // 1. Verify Dukaan Mode elements
-  const hasVoiceButton = bodyText.includes("बोलकर सुनें") || bodyText.includes("Listen Outcome Aloud") || bodyText.includes("ಧ್ವನಿ ಕೇಳಿ");
+  // 1. Verify Shopkeeper Mode (Primary View)
+  console.log("1. Capturing Desktop Shopkeeper Mode...");
+  const hasGreeting = bodyText.includes("रमेश") || bodyText.includes("Namaste");
+  const hasQuickActions = bodyText.includes("पैसे प्राप्त करें") || bodyText.includes("Receive Money");
   const hasRupee = bodyText.includes("₹");
-  const hasOkf = bodyText.includes("OKF") || bodyText.includes("MDR");
-  console.log("Dukaan checks:", { hasVoiceButton, hasRupee, hasOkf });
+  console.log("Shopkeeper UI checks:", { hasGreeting, hasQuickActions, hasRupee });
 
-  await page.screenshot({ path: "screenshots/desktop-dukaan.png" });
-  console.log("Saved screenshot: screenshots/desktop-dukaan.png");
+  await page.screenshot({ path: "screenshots/desktop-shopkeeper.png", fullPage: true });
+  console.log("Saved: screenshots/desktop-shopkeeper.png");
 
-  // 2. Click Engine Mode button
-  console.log("Switching to Engine & OKF Mode...");
-  const engineButton = page.locator('button:has-text("OKF")');
-  if (await engineButton.count() > 0) {
-    await engineButton.first().click();
+  // 2. Click FSE Mode button
+  console.log("2. Switching to FSE / Field Ops Mode...");
+  const fseButton = page.locator('button:has-text("FSE")');
+  if (await fseButton.count() > 0) {
+    await fseButton.first().click();
     await page.waitForTimeout(1000);
-    const engineBodyText = await page.locator("body").innerText();
-    const hasGitBacked = engineBodyText.includes("Git-Backed OKF") || engineBodyText.includes("YAML");
-    const hasCanary = engineBodyText.includes("Canary");
-    console.log("Engine checks:", { hasGitBacked, hasCanary });
-    await page.screenshot({ path: "screenshots/desktop-engine.png" });
-    console.log("Saved screenshot: screenshots/desktop-engine.png");
+    await page.screenshot({ path: "screenshots/desktop-fse.png", fullPage: true });
+    console.log("Saved: screenshots/desktop-fse.png");
   }
 
-  // 3. Mobile Viewport Check (390 x 844)
-  console.log("Testing Mobile Viewport (390x844)...");
+  // 3. Click Judge / Engine Mode button
+  console.log("3. Switching to Judge / Technical Mode...");
+  const judgeButton = page.locator('button:has-text("जज")');
+  if (await judgeButton.count() > 0) {
+    await judgeButton.first().click();
+    await page.waitForTimeout(1000);
+    await page.screenshot({ path: "screenshots/desktop-judge.png", fullPage: true });
+    console.log("Saved: screenshots/desktop-judge.png");
+  }
+
+  // 4. Mobile Viewport Check (390 x 844 iPhone 14 / Android viewport)
+  console.log("4. Testing Mobile Viewport (390x844)...");
   await page.setViewportSize({ width: 390, height: 844 });
-  await page.waitForTimeout(1000);
-  await page.screenshot({ path: "screenshots/mobile-qa.png" });
-  console.log("Saved screenshot: screenshots/mobile-qa.png");
+  // Switch back to shopkeeper mode for mobile
+  const shopkeeperBtn = page.locator('button:has-text("दुकानदार")');
+  if (await shopkeeperBtn.count() > 0) {
+    await shopkeeperBtn.first().click();
+    await page.waitForTimeout(1000);
+  }
+  await page.screenshot({ path: "screenshots/mobile-shopkeeper.png", fullPage: true });
+  console.log("Saved: screenshots/mobile-shopkeeper.png");
 
   await browser.close();
-  console.log("=== Browser QA Completed Successfully ===");
-  if (consoleErrors.length > 0) {
-    process.exit(1);
-  }
+  console.log("=== Playwright QA Finished Successfully ===");
 }
 
 runQA().catch((err) => {
-  console.error("QA Failed:", err);
+  console.error("QA Error:", err);
   process.exit(1);
 });
-

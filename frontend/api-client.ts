@@ -1,6 +1,6 @@
 /**
  * Pi Munshi Frontend API Client
- * Connects the Paytm UI directly to the real backend services and endpoints.
+ * Connects the Paytm UI directly to the real backend services and database.
  */
 
 import { dispatchApiRoute } from "../backend/routes.ts";
@@ -14,7 +14,6 @@ import type {
   BrainCycleRequest,
   BrainCycleResponse,
   WalEntry,
-  ApiResponse,
 } from "../backend/types.ts";
 
 export class MunshiApiClient {
@@ -62,7 +61,61 @@ export class MunshiApiClient {
     const res = await dispatchApiRoute("/api/v1/governance/canary", "GET", {});
     return res.body.data;
   }
+
+  public async getProviderStatus(): Promise<any> {
+    const res = await dispatchApiRoute("/api/v1/providers/status", "GET", {});
+    return res.body.providers;
+  }
+
+  public async getTransactions(merchantId = "DEMO_MERCHANT_RAMESH", mode = "DEMO"): Promise<any[]> {
+    const res = await dispatchApiRoute(`/api/v1/transactions?merchantId=${merchantId}&mode=${mode}`, "GET", {});
+    return res.body.data || [];
+  }
+
+  public async initiateTransaction(orderId: string, amount: number, merchantId = "DEMO_MERCHANT_RAMESH", mode = "DEMO"): Promise<any> {
+    const res = await dispatchApiRoute("/api/v1/transactions/initiate", "POST", { orderId, amount, merchantId, mode });
+    return res.body;
+  }
+
+  public async getSettlements(merchantId = "DEMO_MERCHANT_RAMESH", mode = "DEMO"): Promise<any[]> {
+    const res = await dispatchApiRoute(`/api/v1/settlements?merchantId=${merchantId}&mode=${mode}`, "GET", {});
+    return res.body.data || [];
+  }
+
+  public async consolidateSettlement(merchantId = "DEMO_MERCHANT_RAMESH", mode = "DEMO"): Promise<any> {
+    const res = await dispatchApiRoute("/api/v1/settlements/consolidate", "POST", { merchantId, mode });
+    return res.body;
+  }
+
+  public async getDisputes(merchantId = "DEMO_MERCHANT_RAMESH", mode = "DEMO"): Promise<any[]> {
+    const res = await dispatchApiRoute(`/api/v1/disputes?merchantId=${merchantId}&mode=${mode}`, "GET", {});
+    return res.body.data || [];
+  }
+
+  public async updateDispute(disputeId: string, action: string, resolutionNotes: string, mode = "DEMO"): Promise<any> {
+    const res = await dispatchApiRoute("/api/v1/disputes/action", "POST", { disputeId, action, resolutionNotes, mode });
+    return res.body;
+  }
+
+  public async getSoundboxStatus(deviceId = "DEMO_SB_RAMESH", mode = "DEMO"): Promise<any> {
+    const res = await dispatchApiRoute(`/api/v1/soundbox/status?deviceId=${deviceId}&mode=${mode}`, "GET", {});
+    return res.body.data;
+  }
+
+  public async triggerSoundboxChime(amount: number, language = "hi", deviceId = "DEMO_SB_RAMESH", mode = "DEMO"): Promise<any> {
+    const res = await dispatchApiRoute("/api/v1/soundbox/chime", "POST", { deviceId, amount, language, mode });
+    return res.body;
+  }
+
+  public async getMemories(merchantId = "DEMO_MERCHANT_RAMESH", mode = "DEMO"): Promise<any[]> {
+    const res = await dispatchApiRoute(`/api/v1/memory/${merchantId}?mode=${mode}`, "GET", {});
+    return res.body.data || [];
+  }
+
+  public async initiateHandoff(fromFseId: string, toFseId: string, contextSummary: string, merchantId = "DEMO_MERCHANT_RAMESH", mode = "DEMO"): Promise<any> {
+    const res = await dispatchApiRoute("/api/v1/handoff/initiate", "POST", { merchantId, fromFseId, toFseId, contextSummary, mode });
+    return res.body;
+  }
 }
 
 export const munshiApi = MunshiApiClient.getInstance();
-
