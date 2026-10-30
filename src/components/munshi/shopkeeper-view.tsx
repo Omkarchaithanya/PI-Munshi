@@ -4,8 +4,6 @@ import {
   CreditCard,
   Building2,
   Volume2,
-  ArrowUpRight,
-  ShieldCheck,
   CheckCircle2,
   Clock,
   ChevronRight,
@@ -13,8 +11,12 @@ import {
   Wifi,
   Battery,
   RefreshCw,
-  Bell,
-  UserCheck,
+  Phone,
+  HelpCircle,
+  ShieldCheck,
+  Zap,
+  ArrowUpRight,
+  TrendingUp,
 } from "lucide-react";
 import { ReceiveMoneyModal } from "./modals/receive-money-modal";
 import { TransactionDetailModal } from "./modals/transaction-detail-modal";
@@ -36,8 +38,8 @@ export function ShopkeeperView({ lang }: ShopkeeperViewProps) {
 
   const [transactions, setTransactions] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [activeFilter, setActiveFilter] = useState<"ALL" | "SUCCESS" | "SETTLED">("ALL");
 
-  // Load real data from backend
   const loadData = async () => {
     try {
       const txns = await munshiApi.getTransactions("DEMO_MERCHANT_RAMESH", "DEMO");
@@ -51,280 +53,441 @@ export function ShopkeeperView({ lang }: ShopkeeperViewProps) {
 
   useEffect(() => {
     loadData();
-    // Poll every 10 seconds or update on demand
     const interval = setInterval(loadData, 10000);
     return () => clearInterval(interval);
   }, []);
 
-  const totalToday = transactions.reduce((acc, t) => acc + (t.status === "SUCCESS" ? Number(t.amount) : 0), 0);
+  const totalToday = transactions.reduce(
+    (acc, t) => acc + (t.status === "SUCCESS" ? Number(t.amount) : 0),
+    0
+  );
   const successCount = transactions.filter((t) => t.status === "SUCCESS").length;
 
-  return (
-    <div className="flex flex-col min-h-screen bg-[#F4F7FB] text-gray-900 pb-20">
-      {/* 1. Shopkeeper Greeting Banner */}
-      <section className="bg-gradient-to-b from-[#002970] to-[#001f54] text-white px-4 pt-4 pb-8 md:px-8">
-        <div className="max-w-4xl mx-auto flex flex-col md:flex-row md:items-center justify-between gap-4">
-          <div>
-            <div className="flex items-center gap-2 mb-1">
-              <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-[#00BAF2]/20 border border-[#00BAF2]/40 text-[#00BAF2] text-xs font-bold">
-                <Sparkles className="size-3" />
-                रमेश किराना स्टोर (Ramesh Kirana)
-              </span>
-              <span className="text-[11px] text-blue-200">UPI: ramesh.kirana@paytm</span>
-            </div>
-            <h1 className="text-xl md:text-2xl font-black tracking-tight">
-              {lang === "kn-IN"
-                ? "ನಮಸ್ಕಾರ, ರಮೇಶ್ ಜೀ! 🙏"
-                : lang === "en-IN"
-                ? "Namaste, Ramesh ji! 🙏"
-                : "नमस्ते, रमेश जी! 🙏"}
-            </h1>
-            <p className="text-xs text-blue-100/80 mt-0.5">
-              {lang === "kn-IN"
-                ? "ಇಲ್ಲಿ ನಿಮ್ಮ ಅಂಗಡಿಯ ಇಂದಿನ ಪಾವತಿ ಸಾರಾಂಶವಿದೆ."
-                : lang === "en-IN"
-                ? "Here is your shop's payment summary for today."
-                : "यहाँ है आपकी दुकान का आज का सुरक्षित डिजिटल पेमेंट सारांश।"}
-            </p>
-          </div>
+  const filteredTransactions = transactions.filter((t) => {
+    if (activeFilter === "SUCCESS") return t.status === "SUCCESS";
+    if (activeFilter === "SETTLED") return t.settlement_status === "SETTLED";
+    return true;
+  });
 
-          <div className="flex items-center gap-2">
-            <button
-              onClick={() => setReceiveModalOpen(true)}
-              className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#00BAF2] hover:bg-[#00a8dc] text-[#002970] font-black text-xs shadow-lg transition-transform active:scale-95"
-            >
-              <QrCode className="size-4" />
-              क्यूआर कोड दिखाएं (Show QR)
-            </button>
+  return (
+    <div className="w-full max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-5 space-y-6 pb-28">
+      {/* 1. GREETING & ACTION HEADER BANNER */}
+      <section className="rounded-3xl bg-gradient-to-r from-[#002970] via-[#002e6e] to-[#001738] p-5 sm:p-6 text-white shadow-lg border border-[#001f54] flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div>
+          <div className="flex flex-wrap items-center gap-2 mb-1.5">
+            <span className="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full bg-[#00BAF2]/20 border border-[#00BAF2]/40 text-[#00BAF2] text-xs font-bold">
+              <Sparkles className="size-3" />
+              रमेश किराना स्टोर (Ramesh Kirana)
+            </span>
+            <span className="text-xs text-blue-200/90 font-mono bg-white/10 px-2 py-0.5 rounded-md">
+              UPI: ramesh.kirana@paytm
+            </span>
           </div>
+          <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-white">
+            {lang === "kn-IN"
+              ? "ನಮಸ್ಕಾರ, ರಮೇಶ್ ಜೀ! 🙏"
+              : lang === "en-IN"
+              ? "Namaste, Ramesh ji! 🙏"
+              : "नमस्ते, रमेश जी! 🙏"}
+          </h1>
+          <p className="text-xs sm:text-sm text-blue-100/80 mt-1 max-w-xl">
+            {lang === "kn-IN"
+              ? "ಇಲ್ಲಿ ನಿಮ್ಮ ಅಂಗಡಿಯ ಇಂದಿನ ಪಾವತಿ, ಸೆಟಲ್ಮೆಂಟ್ ಮತ್ತು ಸೌಂಡ್‌ಬಾಕ್ಸ್ ಸ್ಥಿತಿ ಇದೆ."
+              : lang === "en-IN"
+              ? "Here is your shop's payment summary, settlement status, and Soundbox telemetry."
+              : "यहाँ है आपकी दुकान का आज का सुरक्षित डिजिटल पेमेंट सारांश, सेटलमेंट और साउंडबॉक्स स्थिति।"}
+          </p>
+        </div>
+
+        <div className="flex items-center gap-2.5 shrink-0">
+          <button
+            type="button"
+            onClick={() => setReceiveModalOpen(true)}
+            className="flex items-center gap-2 px-4 py-3 rounded-2xl bg-[#00BAF2] hover:bg-[#00a8dc] text-[#002970] font-black text-xs sm:text-sm shadow-md transition-all active:scale-95 cursor-pointer"
+          >
+            <QrCode className="size-4 sm:size-5" />
+            क्यूआर कोड दिखाएं (Show QR)
+          </button>
+          <button
+            type="button"
+            onClick={() => setSettlementModalOpen(true)}
+            className="flex items-center gap-1.5 px-4 py-3 rounded-2xl bg-white/10 hover:bg-white/20 border border-white/20 text-white font-bold text-xs sm:text-sm transition-all cursor-pointer"
+          >
+            <Zap className="size-4 text-amber-300" />
+            तुरंत सेटलमेंट
+          </button>
         </div>
       </section>
 
-      {/* Main Container */}
-      <main className="max-w-4xl mx-auto w-full px-4 -mt-4 space-y-5">
-        {/* 2. Today's Business Summary Card */}
-        <div className="rounded-3xl bg-white p-5 shadow-sm border border-gray-100">
-          <div className="flex items-center justify-between pb-3 border-b border-gray-50">
-            <div className="flex items-center gap-2">
-              <div className="size-2 rounded-full bg-emerald-500 animate-pulse" />
-              <span className="text-xs font-extrabold text-[#002970] uppercase tracking-wide">
-                आज का कुल कलेक्शन (Today's Business)
+      {/* 2. FOUR EQUAL-WIDTH QUICK ACTIONS IN ONE HORIZONTAL ROW */}
+      <section>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
+          {/* Quick Action 1: Receive Money */}
+          <button
+            type="button"
+            onClick={() => setReceiveModalOpen(true)}
+            className="flex items-center gap-3 p-3.5 sm:p-4 rounded-2xl bg-white border border-gray-100 shadow-[0_2px_12px_rgba(0,41,112,0.06)] hover:border-[#00BAF2] hover:shadow-md transition-all text-left group cursor-pointer"
+          >
+            <div className="size-11 sm:size-12 rounded-2xl bg-[#00BAF2]/15 text-[#002970] flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+              <QrCode className="size-5 sm:size-6 text-[#002970]" />
+            </div>
+            <div className="min-w-0">
+              <span className="block font-black text-xs sm:text-sm text-[#002970] truncate">
+                पैसे प्राप्त करें
+              </span>
+              <span className="block text-[11px] text-gray-500 truncate mt-0.5">
+                ऑल-इन-वन यूपीआई क्यूआर
               </span>
             </div>
-            <span className="text-[11px] text-gray-500 font-medium flex items-center gap-1">
-              <Clock className="size-3 text-gray-400" />
-              रियल-टाइम अपडेटेड
-            </span>
+          </button>
+
+          {/* Quick Action 2: View Payments */}
+          <button
+            type="button"
+            onClick={() => {
+              const el = document.getElementById("transactions-list");
+              el?.scrollIntoView({ behavior: "smooth" });
+            }}
+            className="flex items-center gap-3 p-3.5 sm:p-4 rounded-2xl bg-white border border-gray-100 shadow-[0_2px_12px_rgba(0,41,112,0.06)] hover:border-[#00BAF2] hover:shadow-md transition-all text-left group cursor-pointer"
+          >
+            <div className="size-11 sm:size-12 rounded-2xl bg-emerald-50 text-emerald-700 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+              <CreditCard className="size-5 sm:size-6 text-emerald-600" />
+            </div>
+            <div className="min-w-0">
+              <span className="block font-black text-xs sm:text-sm text-[#002970] truncate">
+                पेमेंट हिस्ट्री
+              </span>
+              <span className="block text-[11px] text-gray-500 truncate mt-0.5">
+                सभी डिजिटल लेन-देन
+              </span>
+            </div>
+          </button>
+
+          {/* Quick Action 3: Settlement */}
+          <button
+            type="button"
+            onClick={() => setSettlementModalOpen(true)}
+            className="flex items-center gap-3 p-3.5 sm:p-4 rounded-2xl bg-white border border-gray-100 shadow-[0_2px_12px_rgba(0,41,112,0.06)] hover:border-[#00BAF2] hover:shadow-md transition-all text-left group cursor-pointer"
+          >
+            <div className="size-11 sm:size-12 rounded-2xl bg-blue-50 text-[#002970] flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+              <Building2 className="size-5 sm:size-6 text-[#002970]" />
+            </div>
+            <div className="min-w-0">
+              <span className="block font-black text-xs sm:text-sm text-[#002970] truncate">
+                बैंक सेटलमेंट
+              </span>
+              <span className="block text-[11px] text-gray-500 truncate mt-0.5">
+                UTR एवं दैनिक निकासी
+              </span>
+            </div>
+          </button>
+
+          {/* Quick Action 4: Soundbox */}
+          <button
+            type="button"
+            onClick={() => setSoundboxModalOpen(true)}
+            className="flex items-center gap-3 p-3.5 sm:p-4 rounded-2xl bg-white border border-gray-100 shadow-[0_2px_12px_rgba(0,41,112,0.06)] hover:border-[#00BAF2] hover:shadow-md transition-all text-left group cursor-pointer"
+          >
+            <div className="size-11 sm:size-12 rounded-2xl bg-amber-50 text-amber-700 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+              <Volume2 className="size-5 sm:size-6 text-amber-600" />
+            </div>
+            <div className="min-w-0">
+              <span className="block font-black text-xs sm:text-sm text-[#002970] truncate">
+                साउंडबॉक्स 4.0
+              </span>
+              <span className="block text-[11px] text-emerald-600 font-bold truncate mt-0.5">
+                88% बैटरी • ऑनलाइन
+              </span>
+            </div>
+          </button>
+        </div>
+      </section>
+
+      {/* 3. CLEAN TWO-COLUMN DESKTOP DASHBOARD (65% LEFT / 35% RIGHT) */}
+      <section className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+        {/* ============================================================== */}
+        {/* LEFT COLUMN (lg:col-span-7 xl:col-span-8)                      */}
+        {/* ============================================================== */}
+        <div className="lg:col-span-7 xl:col-span-8 space-y-6">
+          {/* Today's Business Card */}
+          <div className="rounded-3xl bg-white p-5 sm:p-6 shadow-[0_2px_12px_rgba(0,41,112,0.05)] border border-gray-100">
+            <div className="flex items-center justify-between pb-3.5 border-b border-gray-100">
+              <div className="flex items-center gap-2">
+                <span className="size-2.5 rounded-full bg-emerald-500 animate-pulse" />
+                <h3 className="text-xs sm:text-sm font-black text-[#002970] uppercase tracking-wider">
+                  आज का कुल कारोबार (Today's Business)
+                </h3>
+              </div>
+              <span className="text-[11px] text-gray-500 font-medium flex items-center gap-1 bg-gray-50 px-2.5 py-1 rounded-full border border-gray-200/60">
+                <Clock className="size-3 text-gray-400" />
+                रियल-टाइम लाइव अपडेट
+              </span>
+            </div>
+
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-5">
+              {/* Total Today */}
+              <div className="p-3 rounded-2xl bg-[#F0F8FF]/80 border border-blue-100">
+                <span className="text-[11px] font-bold text-gray-500 uppercase tracking-wide block">
+                  कुल भुगतान प्राप्त
+                </span>
+                <span className="text-2xl sm:text-3xl font-black text-[#002970] mt-1 block">
+                  ₹{totalToday > 0 ? totalToday.toFixed(2) : "2,150.00"}
+                </span>
+                <span className="inline-flex items-center gap-1 text-[11px] text-emerald-700 font-bold mt-1 bg-emerald-100/70 px-2 py-0.5 rounded-md">
+                  <CheckCircle2 className="size-3" />
+                  {successCount > 0 ? successCount : 3} सफल लेन-देन
+                </span>
+              </div>
+
+              {/* Settled in Bank */}
+              <div className="p-3 rounded-2xl bg-white border border-gray-100">
+                <span className="text-[11px] font-bold text-gray-500 uppercase tracking-wide block">
+                  बैंक में जमा (Settled)
+                </span>
+                <span className="text-xl sm:text-2xl font-bold text-emerald-700 mt-1 block">
+                  ₹1,650.00
+                </span>
+                <span className="text-[10px] text-gray-500 font-mono block mt-1">
+                  UTR: 62998412...
+                </span>
+              </div>
+
+              {/* Pending Settlement */}
+              <div className="p-3 rounded-2xl bg-white border border-gray-100">
+                <span className="text-[11px] font-bold text-gray-500 uppercase tracking-wide block">
+                  लंबित सेटलमेंट (Pending)
+                </span>
+                <span className="text-xl sm:text-2xl font-bold text-amber-600 mt-1 block">
+                  ₹500.00
+                </span>
+                <span className="text-[10px] text-gray-500 block mt-1">
+                  आज रात 11:59 बजे
+                </span>
+              </div>
+
+              {/* MDR Fee */}
+              <div className="p-3 rounded-2xl bg-white border border-gray-100">
+                <span className="text-[11px] font-bold text-gray-500 uppercase tracking-wide block">
+                  MDR बैंक शुल्क
+                </span>
+                <span className="text-xl sm:text-2xl font-bold text-emerald-600 mt-1 block">
+                  ₹0.00
+                </span>
+                <span className="inline-block text-[10px] text-emerald-700 font-bold bg-emerald-50 px-1.5 py-0.5 rounded mt-1 border border-emerald-200">
+                  100% सरकारी सब्सिडी
+                </span>
+              </div>
+            </div>
           </div>
 
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-4">
-            <div>
-              <span className="text-[11px] text-gray-500 block">कुल प्राप्त राशि</span>
-              <span className="text-2xl font-black text-[#002970] mt-0.5 block">
-                ₹{totalToday > 0 ? totalToday.toFixed(2) : "2,150.00"}
-              </span>
-              <span className="text-[10px] text-emerald-600 font-bold bg-emerald-50 px-1.5 py-0.5 rounded">
-                {successCount > 0 ? successCount : 3} सफल लेन-देन
-              </span>
+          {/* Recent Payments Card (Readable Table/List) */}
+          <div id="transactions-list" className="rounded-3xl bg-white p-5 sm:p-6 shadow-[0_2px_12px_rgba(0,41,112,0.05)] border border-gray-100">
+            <div className="flex flex-wrap items-center justify-between gap-3 pb-3.5 border-b border-gray-100">
+              <div className="flex items-center gap-2">
+                <CreditCard className="size-4 text-[#00BAF2]" />
+                <h3 className="text-sm font-black text-[#002970] tracking-wide">
+                  हाल के भुगतान (Recent Payments)
+                </h3>
+              </div>
+
+              {/* Filter Pills */}
+              <div className="flex items-center gap-1.5">
+                {(["ALL", "SUCCESS", "SETTLED"] as const).map((filterKey) => (
+                  <button
+                    key={filterKey}
+                    type="button"
+                    onClick={() => setActiveFilter(filterKey)}
+                    className={`px-2.5 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                      activeFilter === filterKey
+                        ? "bg-[#002970] text-white"
+                        : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                    }`}
+                  >
+                    {filterKey === "ALL" ? "सभी" : filterKey === "SUCCESS" ? "सफल" : "सेटल"}
+                  </button>
+                ))}
+                <button
+                  type="button"
+                  onClick={loadData}
+                  className="p-1.5 rounded-lg text-gray-400 hover:text-[#002970] hover:bg-gray-100 transition-colors cursor-pointer"
+                  title="रीफ्रेश करें"
+                >
+                  <RefreshCw className="size-3.5" />
+                </button>
+              </div>
             </div>
 
-            <div>
-              <span className="text-[11px] text-gray-500 block">बैंक खाते में जमा (Settled)</span>
-              <span className="text-xl font-bold text-emerald-700 mt-0.5 block">₹1,650.00</span>
-              <span className="text-[10px] text-gray-500 font-mono">UTR: 62998412...</span>
-            </div>
+            {/* Structured Payment List */}
+            <div className="divide-y divide-gray-100 mt-2">
+              {filteredTransactions.length === 0 ? (
+                <div className="py-10 text-center text-xs text-gray-400 font-medium">
+                  कोई लेन-देन नहीं मिला।
+                </div>
+              ) : (
+                filteredTransactions.map((txn) => (
+                  <div
+                    key={txn.txn_id}
+                    onClick={() => setSelectedTxn(txn)}
+                    className="py-3.5 px-3 -mx-3 flex items-center justify-between hover:bg-[#F8FAFC] rounded-2xl transition-colors cursor-pointer group"
+                  >
+                    <div className="flex items-center gap-3.5">
+                      <div className="size-11 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0 border border-emerald-100 shadow-2xs">
+                        <CheckCircle2 className="size-5" />
+                      </div>
+                      <div>
+                        <div className="flex items-center gap-2">
+                          <span className="font-extrabold text-xs sm:text-sm text-gray-900 group-hover:text-[#002970] transition-colors">
+                            {txn.payer_vpa || "customer@paytm"}
+                          </span>
+                          <span className="text-[10px] font-bold text-blue-700 bg-blue-50 px-1.5 py-0.2 rounded border border-blue-200">
+                            UPI
+                          </span>
+                        </div>
+                        <span className="text-[11px] text-gray-400 mt-0.5 block">
+                          {new Date(txn.created_at || Date.now()).toLocaleTimeString("en-IN", {
+                            hour: "2-digit",
+                            minute: "2-digit",
+                          })}
+                          {" • "}
+                          RRN: {txn.rrn || "RRN-482910"}
+                        </span>
+                      </div>
+                    </div>
 
-            <div>
-              <span className="text-[11px] text-gray-500 block">लंबित सेटलमेंट (Pending)</span>
-              <span className="text-xl font-bold text-amber-600 mt-0.5 block">₹500.00</span>
-              <span className="text-[10px] text-gray-500">आज रात 11:59 बजे</span>
-            </div>
-
-            <div>
-              <span className="text-[11px] text-gray-500 block">MDR बैंक कटौती</span>
-              <span className="text-xl font-bold text-emerald-600 mt-0.5 block">₹0.00</span>
-              <span className="text-[10px] text-emerald-700 font-semibold bg-emerald-50 px-1.5 py-0.5 rounded">
-                100% सरकारी छूट
-              </span>
+                    <div className="flex items-center gap-3">
+                      <div className="text-right">
+                        <span className="font-black text-sm sm:text-base text-emerald-600 block">
+                          +₹{Number(txn.amount).toFixed(2)}
+                        </span>
+                        <span
+                          className={`inline-block text-[10px] font-bold px-1.5 py-0.5 rounded ${
+                            txn.settlement_status === "SETTLED"
+                              ? "bg-emerald-50 text-emerald-700"
+                              : "bg-amber-50 text-amber-700"
+                          }`}
+                        >
+                          {txn.settlement_status === "SETTLED" ? "खाते में जमा" : "आज रात जमा"}
+                        </span>
+                      </div>
+                      <ChevronRight className="size-4 text-gray-300 group-hover:text-[#002970] transition-transform group-hover:translate-x-0.5" />
+                    </div>
+                  </div>
+                ))
+              )}
             </div>
           </div>
         </div>
 
-        {/* 3. Quick Action Grid (4 Primary Cards) */}
-        <div>
-          <h3 className="text-xs font-bold text-gray-600 uppercase tracking-wider mb-2 px-1">
-            त्वरित कार्य (Quick Actions)
-          </h3>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-            {/* Action 1: Receive Money */}
-            <button
-              type="button"
-              onClick={() => setReceiveModalOpen(true)}
-              className="flex flex-col items-center justify-center p-4 rounded-2xl bg-white border border-gray-100 shadow-sm hover:border-[#00BAF2] hover:shadow-md transition-all active:scale-95 group text-center"
-            >
-              <div className="size-12 rounded-2xl bg-[#00BAF2]/15 text-[#002970] flex items-center justify-center mb-2 group-hover:scale-110 transition-transform">
-                <QrCode className="size-6 text-[#002970]" />
-              </div>
-              <span className="font-extrabold text-xs text-[#002970]">पैसे प्राप्त करें</span>
-              <span className="text-[10px] text-gray-500 mt-0.5">क्यूआर कोड खोलें</span>
-            </button>
+        {/* ============================================================== */}
+        {/* RIGHT COLUMN (lg:col-span-5 xl:col-span-4)                     */}
+        {/* ============================================================== */}
+        <div className="lg:col-span-5 xl:col-span-4 space-y-6">
+          {/* Ask Pi Munshi Voice Assistant Card */}
+          <VoiceAssistant lang={lang} />
 
-            {/* Action 2: View Payments */}
-            <button
-              type="button"
-              onClick={() => {
-                const el = document.getElementById("transactions-list");
-                el?.scrollIntoView({ behavior: "smooth" });
-              }}
-              className="flex flex-col items-center justify-center p-4 rounded-2xl bg-white border border-gray-100 shadow-sm hover:border-[#00BAF2] hover:shadow-md transition-all active:scale-95 group text-center"
-            >
-              <div className="size-12 rounded-2xl bg-emerald-50 text-emerald-700 flex items-center justify-center mb-2 group-hover:scale-110 transition-transform">
-                <CreditCard className="size-6 text-emerald-600" />
+          {/* Soundbox 4.0 Telemetry Card */}
+          <div className="rounded-3xl bg-white p-5 shadow-[0_2px_12px_rgba(0,41,112,0.05)] border border-gray-100">
+            <div className="flex items-center justify-between pb-3 border-b border-gray-100">
+              <div className="flex items-center gap-2">
+                <Volume2 className="size-4 text-[#00BAF2]" />
+                <h3 className="text-xs sm:text-sm font-black text-[#002970] uppercase tracking-wide">
+                  साउंडबॉक्स स्थिति (Soundbox 4.0)
+                </h3>
               </div>
-              <span className="font-extrabold text-xs text-[#002970]">पेमेंट हिस्ट्री</span>
-              <span className="text-[10px] text-gray-500 mt-0.5">सभी लेन-देन देखें</span>
-            </button>
+              <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-700 text-[10px] font-bold">
+                <span className="size-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                ऑनलाइन
+              </span>
+            </div>
 
-            {/* Action 3: Settlement */}
-            <button
-              type="button"
-              onClick={() => setSettlementModalOpen(true)}
-              className="flex flex-col items-center justify-center p-4 rounded-2xl bg-white border border-gray-100 shadow-sm hover:border-[#00BAF2] hover:shadow-md transition-all active:scale-95 group text-center"
-            >
-              <div className="size-12 rounded-2xl bg-blue-50 text-[#002970] flex items-center justify-center mb-2 group-hover:scale-110 transition-transform">
-                <Building2 className="size-6 text-[#002970]" />
-              </div>
-              <span className="font-extrabold text-xs text-[#002970]">बैंक सेटलमेंट</span>
-              <span className="text-[10px] text-gray-500 mt-0.5">UTR एवं खाता जांचें</span>
-            </button>
-
-            {/* Action 4: Soundbox */}
-            <button
-              type="button"
-              onClick={() => setSoundboxModalOpen(true)}
-              className="flex flex-col items-center justify-center p-4 rounded-2xl bg-white border border-gray-100 shadow-sm hover:border-[#00BAF2] hover:shadow-md transition-all active:scale-95 group text-center"
-            >
-              <div className="size-12 rounded-2xl bg-amber-50 text-amber-700 flex items-center justify-center mb-2 group-hover:scale-110 transition-transform">
+            <div className="mt-4 flex items-center gap-3.5">
+              <div className="size-13 rounded-2xl bg-amber-50 border border-amber-200/80 flex items-center justify-center text-amber-700 shrink-0">
                 <Volume2 className="size-6 text-amber-600" />
               </div>
-              <span className="font-extrabold text-xs text-[#002970]">साउंडबॉक्स जांच</span>
-              <span className="text-[10px] text-gray-500 mt-0.5">88% बैटरी • ऑनलाइन</span>
-            </button>
-          </div>
-        </div>
-
-        {/* 4. Voice-First Assistant Widget */}
-        <VoiceAssistant lang={lang} />
-
-        {/* 5. Soundbox Device Card */}
-        <div className="rounded-3xl bg-white p-5 shadow-sm border border-gray-100 flex flex-col md:flex-row md:items-center justify-between gap-4">
-          <div className="flex items-center gap-4">
-            <div className="size-14 rounded-2xl bg-[#00BAF2]/10 border border-[#00BAF2]/30 flex items-center justify-center text-[#002970] shrink-0">
-              <Volume2 className="size-7" />
-            </div>
-            <div>
-              <div className="flex items-center gap-2">
-                <h4 className="font-extrabold text-sm text-[#002970]">Paytm Soundbox 4.0 4G</h4>
-                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-bold">
-                  <span className="size-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                  कनेक्टेड
-                </span>
-              </div>
-              <div className="flex items-center gap-3 mt-1 text-xs text-gray-500">
-                <span className="flex items-center gap-1">
-                  <Battery className="size-3.5 text-emerald-600" />
-                  88% बैटरी
-                </span>
-                <span className="flex items-center gap-1">
-                  <Wifi className="size-3.5 text-blue-600" />
-                  4G VoLTE
-                </span>
-                <span className="text-[10px] text-gray-400">हार्टबीट: अभी-अभी</span>
-              </div>
-            </div>
-          </div>
-
-          <div className="flex items-center gap-2">
-            <button
-              onClick={() => {
-                playSwarChirp("100");
-                speak("पेटीएम पर एक सौ रुपये प्राप्त हुए।", lang);
-              }}
-              className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-800 font-bold text-xs transition-colors"
-            >
-              <Volume2 className="size-3.5" />
-              टेस्ट आवाज़ सुनें
-            </button>
-            <button
-              onClick={() => setSoundboxModalOpen(true)}
-              className="px-3 py-2 rounded-xl border border-[#00BAF2] text-[#002970] hover:bg-[#F0F9FF] font-bold text-xs transition-colors"
-            >
-              समस्या निवारण
-            </button>
-          </div>
-        </div>
-
-        {/* 6. Recent Payments List */}
-        <div id="transactions-list" className="rounded-3xl bg-white p-5 shadow-sm border border-gray-100">
-          <div className="flex items-center justify-between pb-3 border-b border-gray-50">
-            <h3 className="font-extrabold text-sm text-[#002970]">हाल के लेन-देन (Recent Payments)</h3>
-            <button
-              onClick={loadData}
-              className="text-xs text-[#00BAF2] hover:text-[#002970] font-bold flex items-center gap-1"
-            >
-              <RefreshCw className="size-3" />
-              रीफ्रेश
-            </button>
-          </div>
-
-          <div className="divide-y divide-gray-50 mt-1">
-            {transactions.length === 0 ? (
-              <div className="py-8 text-center text-xs text-gray-400">
-                आज कोई नया भुगतान नहीं हुआ है।
-              </div>
-            ) : (
-              transactions.map((txn) => (
-                <div
-                  key={txn.txn_id}
-                  onClick={() => setSelectedTxn(txn)}
-                  className="py-3 flex items-center justify-between hover:bg-gray-50/60 rounded-xl px-2 transition-colors cursor-pointer group"
-                >
-                  <div className="flex items-center gap-3">
-                    <div className="size-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0">
-                      <CheckCircle2 className="size-5" />
-                    </div>
-                    <div>
-                      <span className="font-bold text-xs text-gray-900 block group-hover:text-[#002970] transition-colors">
-                        {txn.payer_vpa || "customer@paytm"}
-                      </span>
-                      <span className="text-[11px] text-gray-400">
-                        {new Date(txn.created_at || Date.now()).toLocaleTimeString("en-IN", {
-                          hour: "2-digit",
-                          minute: "2-digit",
-                        })}
-                        {" • "}
-                        UPI भुगतान
-                      </span>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center gap-3">
-                    <div className="text-right">
-                      <span className="font-black text-sm text-emerald-600 block">
-                        +₹{Number(txn.amount).toFixed(2)}
-                      </span>
-                      <span className="text-[10px] text-gray-400">
-                        {txn.settlement_status === "SETTLED" ? "खाते में जमा" : "आज रात जमा"}
-                      </span>
-                    </div>
-                    <ChevronRight className="size-4 text-gray-300 group-hover:text-[#002970] transition-colors" />
-                  </div>
+              <div>
+                <h4 className="font-extrabold text-xs sm:text-sm text-[#002970]">
+                  Paytm Soundbox 4.0 4G
+                </h4>
+                <p className="text-[11px] text-gray-400 font-mono mt-0.5">IMEI: 860123456789012</p>
+                <div className="flex items-center gap-3 mt-1.5 text-xs text-gray-600">
+                  <span className="flex items-center gap-1 font-bold">
+                    <Battery className="size-3.5 text-emerald-600" />
+                    88% बैटरी
+                  </span>
+                  <span className="flex items-center gap-1 font-bold">
+                    <Wifi className="size-3.5 text-blue-600" />
+                    4G VoLTE
+                  </span>
                 </div>
-              ))
-            )}
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-2 mt-4 pt-3 border-t border-gray-100">
+              <button
+                type="button"
+                onClick={() => {
+                  playSwarChirp("100");
+                  speak("पेटीएम पर एक सौ रुपये प्राप्त हुए।", lang);
+                }}
+                className="py-2.5 px-3 rounded-xl bg-[#F0F8FF] hover:bg-[#E0F6FD] text-[#002970] font-black text-xs border border-blue-100 transition-colors flex items-center justify-center gap-1.5 cursor-pointer"
+              >
+                <Volume2 className="size-3.5" />
+                ध्वनि टेस्ट
+              </button>
+              <button
+                type="button"
+                onClick={() => setSoundboxModalOpen(true)}
+                className="py-2.5 px-3 rounded-xl border border-gray-200 hover:border-[#00BAF2] text-gray-700 font-bold text-xs hover:bg-gray-50 transition-colors flex items-center justify-center cursor-pointer"
+              >
+                समस्या निवारण
+              </button>
+            </div>
+          </div>
+
+          {/* Merchant Support / Field Executive Contact Card */}
+          <div className="rounded-3xl bg-white p-5 shadow-[0_2px_12px_rgba(0,41,112,0.05)] border border-gray-100">
+            <div className="flex items-center gap-2 pb-3 border-b border-gray-100">
+              <ShieldCheck className="size-4 text-[#00BAF2]" />
+              <h3 className="text-xs sm:text-sm font-black text-[#002970] uppercase tracking-wide">
+                मदद एवं फ़ील्ड सहायता (Support)
+              </h3>
+            </div>
+
+            <div className="mt-3.5 flex items-center gap-3">
+              <div className="size-11 rounded-2xl bg-blue-50 text-[#002970] flex items-center justify-center font-black text-sm shrink-0 border border-blue-200">
+                अरुण
+              </div>
+              <div className="min-w-0">
+                <span className="font-extrabold text-xs text-[#002970] block truncate">
+                  FSE अरुण शर्मा (आपका फ़ील्ड अधिकारी)
+                </span>
+                <span className="text-[11px] text-gray-500 block truncate">
+                  कोरमंगला क्षेत्र • 9123456780
+                </span>
+              </div>
+            </div>
+
+            <div className="mt-4 flex gap-2">
+              <button
+                type="button"
+                onClick={() => alert("फ़ील्ड अधिकारी अरुण शर्मा को कॉल किया जा रहा है: +91 9123456780")}
+                className="flex-1 py-2 px-3 rounded-xl bg-[#002970] hover:bg-[#001738] text-white font-bold text-xs transition-colors flex items-center justify-center gap-1.5 cursor-pointer shadow-sm"
+              >
+                <Phone className="size-3" />
+                कॉल करें
+              </button>
+              <button
+                type="button"
+                onClick={() => alert("Paytm मर्चेंट हेल्पडेस्क टिकट #TKT-884 दर्ज हो चुका है।")}
+                className="flex-1 py-2 px-3 rounded-xl border border-gray-200 hover:border-[#00BAF2] text-gray-700 font-bold text-xs hover:bg-gray-50 transition-colors flex items-center justify-center gap-1.5 cursor-pointer"
+              >
+                <HelpCircle className="size-3" />
+                हेल्प टिकट
+              </button>
+            </div>
           </div>
         </div>
-      </main>
+      </section>
 
       {/* Modals */}
       <ReceiveMoneyModal

@@ -113,3 +113,4 @@ export function TransactionDetailModal({ transaction, onClose, lang }: Transacti
     </div>
   );
 }
+
