@@ -118,9 +118,9 @@ export async function computeRealSettlement(
   const timestamp = new Date().toISOString();
 
   const canonicalString = `${mid}|${orderId}|${utr}|${orderAmount}|${timestamp}`;
-  const hmacSha256 = (await calculateSha256(canonicalString)).slice(0, 16);
+  const hmacSha256 = await calculateSha256(canonicalString);
 
-  const swarMudraPayload = `SM1:${orderId.slice(-6)}:${utr.slice(0, 6)}:${orderAmount}:${hmacSha256}`;
+  const swarMudraPayload = `SM1:${orderId.slice(-6)}:${utr.slice(0, 6)}:${orderAmount}:${hmacSha256.slice(0, 16)}`;
 
   return {
     orderAmount,

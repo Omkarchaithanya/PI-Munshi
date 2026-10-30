@@ -13,23 +13,23 @@
 import {
   evaluateMdrPolicy,
   evaluateDisputePolicy,
-  evaluateAutonomyPolicy,
   type CragEvaluationResult,
-} from "./okf-engine";
+} from "./okf-engine.ts";
 
 import {
-  calculateRealMdrSettlement,
-  solveVcgMenu,
+  computeRealSettlement,
+  computeVcgMenuContracts,
   calculateSha256,
-  generateFencingEpoch,
-  validateWithOutlinesFsm,
-  recordWalTransition,
-  evaluateBehavioralCanary,
+  runOutlinesFsmShield,
+  calculateDynamicCanary,
   type SettlementCalculation,
   type VcgContractMenu,
   type WalEntry,
   type CanaryStatus,
-} from "./backend";
+} from "./backend.ts";
+
+import { walLedger } from "../../../backend/services/wal-ledger.service.ts";
+import { cryptoVault } from "../../../backend/services/crypto-vault.service.ts";
 
 export type CognitionRung = 1 | 2 | 3;
 
@@ -173,18 +173,18 @@ return { mdrResult, okfPolicy };
     `.trim();
 
     if (plan.rung === 1) {
-      settlement = await calculateRealMdrSettlement(orderAmount);
+      settlement = await computeRealSettlement(orderAmount);
     } else if (plan.rung === 2) {
-      settlement = await calculateRealMdrSettlement(orderAmount);
-      cragEvaluation = evaluateMdrPolicy(orderAmount);
+      settlement = await computeRealSettlement(orderAmount);
+      cragEvaluation = evaluateMdrPolicy(orderAmount, "Pharmacy", false);
     } else {
-      settlement = await calculateRealMdrSettlement(orderAmount);
-      vcgMenu = solveVcgMenu(orderAmount, trustScore);
-      cragEvaluation = evaluateDisputePolicy(orderAmount, 12, "SUCCESS");
+      settlement = await computeRealSettlement(orderAmount);
+      vcgMenu = computeVcgMenuContracts(orderAmount, trustScore);
+      cragEvaluation = evaluateDisputePolicy(orderAmount, "ACOUSTIC_POD", trustScore);
     }
 
     // Record transition in Write-Ahead Log (WAL)
-    const walEntry = recordWalTransition(
+    const walEntry = walLedger.append(
       plan.intent,
       orderAmount,
       `Brain Cycle Plan Rung ${plan.rung} executed for ${obs.merchantId}`
@@ -215,10 +215,10 @@ return { mdrResult, okfPolicy };
       amount: obs.orderAmount || 3500,
       idempotencyKey: exec.walEntry.idempotencyKey,
     });
-    const fsmCheck = validateWithOutlinesFsm(fsmTestPayload);
+    const fsmCheck = runOutlinesFsmShield(fsmTestPayload);
 
     // 2. Run Behavioral Canary Z-score check
-    const canaryCheck: CanaryStatus = evaluateBehavioralCanary(0.5);
+    const canaryCheck: CanaryStatus = calculateDynamicCanary();
 
     // 3. Verify RBI MDR Cap Invariant
     const mdrFee = exec.sandboxOutput.settlement?.finalMdrFee || 0;
@@ -246,12 +246,12 @@ return { mdrResult, okfPolicy };
     }
 
     const decision =
-      fsmCheck.isValid && !canaryCheck.isBreached && rbiCapVerified
+      fsmCheck.verdict !== "blocked" && !canaryCheck.isBreached && rbiCapVerified
         ? "APPROVED_FOR_AUTO_EXECUTION"
         : "FSE_HUMAN_IN_THE_LOOP_REQUIRED";
 
     return {
-      fsmShieldPassed: fsmCheck.isValid,
+      fsmShieldPassed: fsmCheck.verdict !== "blocked",
       canaryPassed: !canaryCheck.isBreached,
       rbiCapVerified,
       hmacDigest,
@@ -265,7 +265,7 @@ return { mdrResult, okfPolicy };
    * Connects perception -> planning -> sandboxed execution -> cryptographic verification
    */
   public async runCognitiveLoop(obs: BrainObservation): Promise<BrainCycleResult> {
-    const cycleId = `CYCLE-${Date.now().toString(36).toUpperCase()}-${generateFencingEpoch()}`;
+    const cycleId = `CYCLE-${Date.now().toString(36).toUpperCase()}-${cryptoVault.nextFencingEpoch()}`;
     const timestamp = new Date().toISOString();
 
     // 1. Observe & Plan

@@ -8,6 +8,7 @@ import { handleVcgMenu } from "./controllers/vcg.controller.ts";
 import { handleOkfEvaluate } from "./controllers/okf.controller.ts";
 import { handleBrainCycle } from "./controllers/brain.controller.ts";
 import { handleGetWal, handleGetCanary } from "./controllers/governance.controller.ts";
+import { handlePaytmInitiate, handlePaytmRefund, handlePaytmCredentialsStatus } from "./controllers/paytm.controller.ts";
 
 export async function dispatchApiRoute(path: string, method: string, body: any): Promise<{ status: number; body: any }> {
   const normPath = path.replace(/\/$/, "");
@@ -23,6 +24,22 @@ export async function dispatchApiRoute(path: string, method: string, body: any):
         timestamp: new Date().toISOString(),
       },
     };
+  }
+
+  // Paytm API Gateway Endpoints
+  if (method === "POST" && normPath === "/api/v1/paytm/initiate") {
+    const res = await handlePaytmInitiate(body);
+    return { status: res.success ? 200 : 400, body: res };
+  }
+
+  if (method === "POST" && normPath === "/api/v1/paytm/refund") {
+    const res = await handlePaytmRefund(body);
+    return { status: res.success ? 200 : 400, body: res };
+  }
+
+  if (method === "GET" && normPath === "/api/v1/paytm/credentials-status") {
+    const res = handlePaytmCredentialsStatus();
+    return { status: 200, body: res };
   }
 
   if (method === "POST" && normPath === "/api/v1/settlement/calculate") {
@@ -65,6 +82,9 @@ export async function dispatchApiRoute(path: string, method: string, body: any):
         "POST /api/v1/vcg/menu",
         "POST /api/v1/okf/evaluate",
         "POST /api/v1/brain/cycle",
+        "POST /api/v1/paytm/initiate",
+        "POST /api/v1/paytm/refund",
+        "GET  /api/v1/paytm/credentials-status",
         "GET  /api/v1/governance/wal",
         "GET  /api/v1/governance/canary",
         "GET  /api/v1/health",
