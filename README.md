@@ -22,6 +22,18 @@ Indian retail merchants frequently struggle with digital payments due to:
 
 ---
 
+## 📑 Core Documentation Suite
+
+| Document Name | File Path | Scope & Detailed Contents |
+| :--- | :--- | :--- |
+| **Product Requirements Document (PRD)** | [`PRD.md`](file:///c:/Users/omkar/pi/PRD.md) | Problem statement, target personas (Ramesh Kirana, Arun FSE), functional specifications, non-functional SLOs, and OKRs. |
+| **Technical Requirements Document (TRD)** | [`TRD.md`](file:///c:/Users/omkar/pi/TRD.md) | High-Level Design (HLD), Low-Level Design (LLD), component contracts, REST API specs, and security boundary isolation. |
+| **UI Design System & App Flow** | [`UI_DESIGN_AND_APP_FLOW.md`](file:///c:/Users/omkar/pi/UI_DESIGN_AND_APP_FLOW.md) | Official Paytm design tokens, Soundbox 4.0 IoT hardware card, ASCII wireframes, and 4 end-to-end sequence app flows. |
+| **The Autonomous Brain Engine** | [`BRAIN.md`](file:///c:/Users/omkar/pi/BRAIN.md) | Single-Loop Orchestrator (O-P-E-V), 3-Rung CEEcil Cognition Ladder, Outlines FSM Shield, and Cloudflare Code Mode MCP (~980 tokens). |
+| **Master Blueprint & Architecture** | [`PI_MUNSHI_MASTER_BRAIN_AND_SYSTEM_ARCHITECTURE.md`](file:///c:/Users/omkar/pi/PI_MUNSHI_MASTER_BRAIN_AND_SYSTEM_ARCHITECTURE.md) | 30+ component implementation matrix, RBI compliance floor, and API key security gateway deep-dive. |
+
+---
+
 ## 🏛️ Complete System Architecture
 
 Pi Munshi enforces the **Brain / Hands / Keys Isolation Principle** to ensure that LLMs never hallucinate financial math and private merchant API credentials never leak into prompt contexts.
@@ -286,3 +298,4 @@ Verifies zero console errors and captures multilingual screenshots in `screensho
 
 **Developed for Paytm Build for India AI Hackathon – Bengaluru (Track 3)**  
 *Host: Paytm (One97 Communications Ltd.) & Devsemble*
+

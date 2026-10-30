@@ -58,3 +58,4 @@ export class CryptoVaultService {
 }
 
 export const cryptoVault = CryptoVaultService.getInstance();
+

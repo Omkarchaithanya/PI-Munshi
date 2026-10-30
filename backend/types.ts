@@ -126,3 +126,4 @@ export type WalEntry = {
   timestamp: string;
   note: string;
 };
+
