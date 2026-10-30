@@ -407,3 +407,4 @@ node scripts/test-language-switch.mjs
 - **It eliminates the #1 LLM vulnerability:** The Brain/Hands/Keys isolation ensures API keys never leak into the reasoning context.
 - **It introduces Google Cloud OKF v0.2:** The knowledge base uses verified trust signals, preventing outdated policy hallucinations.
 - **It respects Indian retail realities:** Voice-first Indic UX designed for Tier-2/3 merchants paired with enterprise-grade fintech reliability.
+
