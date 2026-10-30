@@ -2,12 +2,14 @@ import React, { useState } from "react";
 import { Mic, MicOff, Send, Sparkles, Volume2, Bot, CheckCircle2 } from "lucide-react";
 import { speak } from "@/lib/munshi/audio";
 import { munshiApi } from "@/lib/api-client";
+import { getTranslation } from "@/lib/munshi/i18n";
 
 interface VoiceAssistantProps {
   lang: string;
 }
 
 export function VoiceAssistant({ lang }: VoiceAssistantProps) {
+  const t = getTranslation(lang);
   const [listening, setListening] = useState(false);
   const [query, setQuery] = useState("");
   const [loading, setLoading] = useState(false);
@@ -35,20 +37,48 @@ export function VoiceAssistant({ lang }: VoiceAssistantProps) {
         language: lang as any,
       });
 
-      const reply = res.voiceReadout || "आपका अनुरोध सफलतापूर्वक संसाधित कर दिया गया है।";
+      const reply = res.voiceReadout || (
+        lang === "kn-IN"
+          ? "ನಿಮ್ಮ ವಿನಂತಿಯನ್ನು ಯಶಸ್ವಿಯಾಗಿ ಪ್ರಕ್ರಿಯೆಗೊಳಿಸಲಾಗಿದೆ."
+          : lang === "en-IN"
+          ? "Your request has been successfully processed."
+          : "आपका अनुरोध सफलतापूर्वक संसाधित कर दिया गया है।"
+      );
       setResponse(reply);
       speak(reply, lang);
     } catch (err) {
-      // Local fallback answering with real data
+      // Local fallback answering with real data in selected language
       let fallback = "";
-      if (q.includes("पेमेंट") || q.includes("payment")) {
-        fallback = "रमेश जी, आज आपकी दुकान पर कुल ₹2,150 का भुगतान प्राप्त हुआ है, जिसमें 3 सफल ट्रांजैक्शन हैं।";
-      } else if (q.includes("सेटलमेंट") || q.includes("settlement")) {
-        fallback = "आपका ₹1,650 का सेटलमेंट एसबीआई बैंक खाते में जमा हो चुका है। शेष ₹500 आज रात 11:59 बजे ट्रांसफर होगा।";
-      } else if (q.includes("साउंडबॉक्स") || q.includes("soundbox")) {
-        fallback = "साउंडबॉक्स ऑनलाइन है, 88% बैटरी और 4G सिग्नल पूर्ण है। कोई समस्या नहीं है।";
+      if (lang === "kn-IN") {
+        if (q.includes("ಪಾವತಿ") || q.includes("payment")) {
+          fallback = "ರಮೇಶ್ ಅವರೇ, ಇಂದು ನಿಮ್ಮ ಅಂಗಡಿಗೆ ಒಟ್ಟು ₹2,150 ಪಾವತಿ ಬಂದಿದೆ, ಇದರಲ್ಲಿ 3 ಯಶಸ್ವಿ ವಹಿವಾಟುಗಳಿವೆ.";
+        } else if (q.includes("ಸೆಟಲ್ಮೆಂಟ್") || q.includes("settlement")) {
+          fallback = "ನಿಮ್ಮ ₹1,650 ಸೆಟಲ್‌ಮೆಂಟ್ ಎಸ್‌ಬಿಐ ಬ್ಯಾಂಕ್ ಖಾತೆಗೆ ಜಮೆಯಾಗಿದೆ. ಉಳಿದ ₹500 ಇಂದು ರಾತ್ರಿ 11:59 ಕ್ಕೆ ಜಮೆಯಾಗಲಿದೆ.";
+        } else if (q.includes("ಸೌಂಡ್‌ಬಾಕ್ಸ್") || q.includes("soundbox")) {
+          fallback = "ಸೌಂಡ್‌ಬಾಕ್ಸ್ ಆನ್‌ಲೈನ್‌ನಲ್ಲಿದೆ, 88% ಬ್ಯಾಟರಿ ಮತ್ತು ಪೂರ್ಣ 4G ಸಿಗ್ನಲ್ ಹೊಂದಿದೆ.";
+        } else {
+          fallback = "ನಮಸ್ಕಾರ ರಮೇಶ್ ಅವರೇ! ನಿಮ್ಮ ಎಲ್ಲಾ ಡಿಜಿಟಲ್ ಪಾವತಿಗಳು ಸುರಕ್ಷಿತವಾಗಿವೆ.";
+        }
+      } else if (lang === "en-IN") {
+        if (q.toLowerCase().includes("payment") || q.toLowerCase().includes("received") || q.toLowerCase().includes("total")) {
+          fallback = "Ramesh ji, today your store received a total of ₹2,150 across 3 successful transactions.";
+        } else if (q.toLowerCase().includes("settlement") || q.toLowerCase().includes("bank")) {
+          fallback = "Your ₹1,650 settlement has been credited to your SBI account. Remaining ₹500 will settle tonight at 11:59 PM.";
+        } else if (q.toLowerCase().includes("soundbox") || q.toLowerCase().includes("working") || q.toLowerCase().includes("audio")) {
+          fallback = "Paytm Soundbox 4.0 is online with 88% battery and full 4G VoLTE signal.";
+        } else {
+          fallback = "Namaste Ramesh ji! All your digital payments and settlements are fully verified.";
+        }
       } else {
-        fallback = "नमस्ते रमेश जी! आपकी दुकान के सभी डिजिटल भुगतान एवं सेटलमेंट सुरक्षित हैं।";
+        if (q.includes("पेमेंट") || q.includes("payment")) {
+          fallback = "रमेश जी, आज आपकी दुकान पर कुल ₹2,150 का भुगतान प्राप्त हुआ है, जिसमें 3 सफल ट्रांजैक्शन हैं।";
+        } else if (q.includes("सेटलमेंट") || q.includes("settlement")) {
+          fallback = "आपका ₹1,650 का सेटलमेंट एसबीआई बैंक खाते में जमा हो चुका है। शेष ₹500 आज रात 11:59 बजे ट्रांसफर होगा।";
+        } else if (q.includes("साउंडबॉक्स") || q.includes("soundbox")) {
+          fallback = "साउंडबॉक्स ऑनलाइन है, 88% बैटरी और 4G सिग्नल पूर्ण है। कोई समस्या नहीं है।";
+        } else {
+          fallback = "नमस्ते रमेश जी! आपकी दुकान के सभी डिजिटल भुगतान एवं सेटलमेंट सुरक्षित हैं।";
+        }
       }
       setResponse(fallback);
       speak(fallback, lang);
@@ -64,9 +94,15 @@ export function VoiceAssistant({ lang }: VoiceAssistantProps) {
       setListening(false);
     } else {
       setListening(true);
-      // Simulate speech recognition trigger
+      // Simulate speech recognition trigger with localized question
       setTimeout(() => {
-        handleAsk("मेरा आज का पेमेंट कितना आया?");
+        const testQ =
+          lang === "kn-IN"
+            ? "ಇಂದಿನ ಒಟ್ಟು ಪಾವತಿ ಎಷ್ಟು?"
+            : lang === "en-IN"
+            ? "What is my total payment today?"
+            : "मेरा आज का पेमेंट कितना आया?";
+        handleAsk(testQ);
       }, 2500);
     }
   };
@@ -83,8 +119,8 @@ export function VoiceAssistant({ lang }: VoiceAssistantProps) {
             <Sparkles className="size-4 text-[#002970]" />
           </div>
           <div>
-            <h3 className="font-extrabold text-sm text-[#002970]">मुंशी AI से बोलकर पूछें (Voice Assistant)</h3>
-            <p className="text-[11px] text-gray-500">माइक दबाएं और हिंदी या कन्नड़ में पूछें</p>
+            <h3 className="font-extrabold text-sm text-[#002970]">{t.askMunshiTitle}</h3>
+            <p className="text-[11px] text-gray-500">{t.askMunshiSub}</p>
           </div>
         </div>
       </div>
@@ -98,7 +134,7 @@ export function VoiceAssistant({ lang }: VoiceAssistantProps) {
               key={idx}
               type="button"
               onClick={() => handleAsk(label)}
-              className="text-xs px-3 py-1.5 rounded-full bg-[#F0F8FF] hover:bg-[#E0F6FD] text-[#002970] font-medium border border-blue-100 transition-colors shadow-2xs"
+              className="text-xs px-3 py-1.5 rounded-full bg-[#F0F8FF] hover:bg-[#E0F6FD] text-[#002970] font-medium border border-blue-100 transition-colors shadow-2xs cursor-pointer"
             >
               "{label}"
             </button>
@@ -113,12 +149,12 @@ export function VoiceAssistant({ lang }: VoiceAssistantProps) {
             <Bot className="size-4" />
           </div>
           <div className="flex-1">
-            <span className="text-[11px] font-bold text-[#002970] block mb-0.5">मुंशी AI उत्तर:</span>
+            <span className="text-[11px] font-bold text-[#002970] block mb-0.5">{t.aiResponseLabel}</span>
             <p className="text-xs text-gray-800 leading-relaxed font-medium">{response}</p>
           </div>
           <button
             onClick={() => speak(response, lang)}
-            className="p-1.5 rounded-lg text-[#002970] hover:bg-blue-100 transition-colors shrink-0"
+            className="p-1.5 rounded-lg text-[#002970] hover:bg-blue-100 transition-colors shrink-0 cursor-pointer"
             title="पुनः सुनें"
           >
             <Volume2 className="size-4" />
@@ -131,7 +167,7 @@ export function VoiceAssistant({ lang }: VoiceAssistantProps) {
         <button
           type="button"
           onClick={toggleMic}
-          className={`size-12 rounded-2xl flex items-center justify-center shadow-md transition-all active:scale-95 shrink-0 ${
+          className={`size-12 rounded-2xl flex items-center justify-center shadow-md transition-all active:scale-95 shrink-0 cursor-pointer ${
             listening
               ? "bg-red-500 text-white animate-pulse ring-4 ring-red-200"
               : "bg-[#00BAF2] hover:bg-[#00a8dc] text-[#002970]"
@@ -147,14 +183,14 @@ export function VoiceAssistant({ lang }: VoiceAssistantProps) {
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && handleAsk(query)}
-            placeholder={listening ? "मुंशी सुन रहा है... बोलिए" : "यहाँ सवाल टाइप करें या माइक दबाएं..."}
+            placeholder={listening ? t.listening : t.inputPlaceholder}
             className="w-full h-12 rounded-2xl border border-gray-200 bg-[#F8FAFC] px-4 text-xs font-medium text-gray-900 placeholder:text-gray-400 focus:border-[#00BAF2] focus:bg-white focus:outline-hidden transition-all shadow-inner"
           />
           <button
             type="button"
             disabled={loading || !query.trim()}
             onClick={() => handleAsk(query)}
-            className="absolute right-2 top-2 h-8 px-3 rounded-xl bg-[#002970] text-white hover:bg-[#001738] disabled:opacity-40 transition-colors flex items-center justify-center font-bold text-xs"
+            className="absolute right-2 top-2 h-8 px-3 rounded-xl bg-[#002970] text-white hover:bg-[#001738] disabled:opacity-40 transition-colors flex items-center justify-center font-bold text-xs cursor-pointer"
           >
             {loading ? "..." : <Send className="size-3.5" />}
           </button>

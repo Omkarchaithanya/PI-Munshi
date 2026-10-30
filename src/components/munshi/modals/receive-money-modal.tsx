@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { X, QrCode, Volume2, CheckCircle2, Copy, Check } from "lucide-react";
 import { munshiApi } from "@/lib/api-client";
 import { playSwarChirp, speak } from "@/lib/munshi/audio";
+import { getTranslation } from "@/lib/munshi/i18n";
 
 interface ReceiveMoneyModalProps {
   isOpen: boolean;
@@ -11,6 +12,7 @@ interface ReceiveMoneyModalProps {
 }
 
 export function ReceiveMoneyModal({ isOpen, onClose, lang, onPaymentSuccess }: ReceiveMoneyModalProps) {
+  const t = getTranslation(lang);
   const [amount, setAmount] = useState<number>(100);
   const [copied, setCopied] = useState(false);
   const [simulating, setSimulating] = useState(false);
@@ -42,7 +44,13 @@ export function ReceiveMoneyModal({ isOpen, onClose, lang, onPaymentSuccess }: R
           : `पेटीएम पर ${amount} रुपये प्राप्त हुए।`;
 
       speak(phrase, lang);
-      setSuccessMsg(`भुगतान प्राप्त: ₹${amount}`);
+      setSuccessMsg(
+        lang === "kn-IN"
+          ? `ಪಾವತಿ ಸ್ವೀಕರಿಸಲಾಗಿದೆ: ₹${amount}`
+          : lang === "en-IN"
+          ? `Payment received: ₹${amount}`
+          : `भुगतान प्राप्त: ₹${amount}`
+      );
       onPaymentSuccess?.();
       setTimeout(() => {
         setSuccessMsg(null);
@@ -65,13 +73,13 @@ export function ReceiveMoneyModal({ isOpen, onClose, lang, onPaymentSuccess }: R
               <QrCode className="size-4" />
             </div>
             <div>
-              <h3 className="font-bold text-sm tracking-tight">पैसे प्राप्त करें (Receive Money)</h3>
-              <p className="text-[11px] text-blue-200">ऑल-इन-वन यूपीआई क्यूआर कोड</p>
+              <h3 className="font-bold text-sm tracking-tight">{t.modalReceiveTitle}</h3>
+              <p className="text-[11px] text-blue-200">{t.modalScanPay}</p>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="p-1.5 rounded-full hover:bg-white/10 text-white transition-colors"
+            className="p-1.5 rounded-full hover:bg-white/10 text-white transition-colors cursor-pointer"
           >
             <X className="size-5" />
           </button>
@@ -80,12 +88,12 @@ export function ReceiveMoneyModal({ isOpen, onClose, lang, onPaymentSuccess }: R
         {/* QR Section */}
         <div className="p-6 flex flex-col items-center bg-gradient-to-b from-[#F0F8FF] to-white">
           <div className="text-center mb-3">
-            <span className="font-extrabold text-[#002970] text-base">रमेश किराना स्टोर</span>
+            <span className="font-extrabold text-[#002970] text-base">{t.storeName}</span>
             <div className="flex items-center justify-center gap-1.5 mt-0.5">
               <span className="text-xs text-gray-500 font-mono">{upiId}</span>
               <button
                 onClick={handleCopyUpi}
-                className="text-[#00BAF2] hover:text-[#002970] p-1 rounded transition-colors"
+                className="text-[#00BAF2] hover:text-[#002970] p-1 rounded transition-colors cursor-pointer"
                 title="Copy UPI ID"
               >
                 {copied ? <Check className="size-3 text-emerald-600" /> : <Copy className="size-3" />}
@@ -114,7 +122,7 @@ export function ReceiveMoneyModal({ isOpen, onClose, lang, onPaymentSuccess }: R
           {/* Amount Modifier */}
           <div className="w-full mt-4">
             <div className="flex items-center justify-between text-xs text-gray-600 mb-1 font-medium">
-              <span>राशि दर्ज करें (Amount in ₹):</span>
+              <span>{t.modalCustomAmount}</span>
               <span className="font-bold text-[#002970]">₹{amount}</span>
             </div>
             <div className="flex gap-2">
@@ -123,7 +131,7 @@ export function ReceiveMoneyModal({ isOpen, onClose, lang, onPaymentSuccess }: R
                   key={val}
                   type="button"
                   onClick={() => setAmount(val)}
-                  className={`flex-1 py-1.5 text-xs font-bold rounded-lg border transition-all ${
+                  className={`flex-1 py-1.5 text-xs font-bold rounded-lg border transition-all cursor-pointer ${
                     amount === val
                       ? "bg-[#00BAF2] text-[#002970] border-[#00BAF2] shadow-sm"
                       : "bg-white text-gray-700 border-gray-200 hover:border-[#00BAF2]"
@@ -148,14 +156,11 @@ export function ReceiveMoneyModal({ isOpen, onClose, lang, onPaymentSuccess }: R
             type="button"
             disabled={simulating}
             onClick={handleSimulatePayment}
-            className="w-full mt-4 flex items-center justify-center gap-2 py-3 rounded-xl bg-[#00BAF2] hover:bg-[#00a8dc] text-[#002970] font-black text-sm shadow-md transition-transform active:scale-[0.98] disabled:opacity-50"
+            className="w-full mt-4 flex items-center justify-center gap-2 py-3 rounded-xl bg-[#00BAF2] hover:bg-[#00a8dc] text-[#002970] font-black text-sm shadow-md transition-transform active:scale-[0.98] disabled:opacity-50 cursor-pointer"
           >
             <Volume2 className="size-4" />
-            {simulating ? "प्रोसेसिंग..." : `ग्राहक पेमेंट टेस्ट करें (₹${amount})`}
+            {simulating ? "..." : `${t.modalSimulatePayment} (₹${amount})`}
           </button>
-          <p className="text-[10px] text-gray-400 mt-2 text-center">
-            *टेस्ट मोड: तुरंत साउंडबॉक्स वॉइस अलर्ट और लेजर एंट्री जनरेट होगी
-          </p>
         </div>
       </div>
     </div>

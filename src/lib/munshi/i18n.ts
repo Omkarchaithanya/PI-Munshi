@@ -1,348 +1,751 @@
 export type LangCode = "hi-IN" | "kn-IN" | "en-IN";
 
-export type TranslationDictionary = {
+export interface TranslationDictionary {
+  // Common / Header
   appName: string;
-  brandTagline: string;
-  liveSwitch: string;
+  paytmForBusiness: string;
   okfBadge: string;
-  shopViewBtn: string;
-  judgeViewBtn: string;
+  demoBadge: string;
+  shopkeeperTab: string;
+  fseTab: string;
+  judgeTab: string;
+  scenarioBarTitle: string;
+  scene1Short: string;
+  scene2Short: string;
+  scene3Short: string;
+  scene4Short: string;
 
-  // 4 Scenes
-  scene1Title: string;
-  scene1Hint: string;
-  scene2Title: string;
-  scene2Hint: string;
-  scene3Title: string;
-  scene3Hint: string;
-  scene4Title: string;
-  scene4Hint: string;
+  // Shopkeeper Greeting
+  storeName: string;
+  upiId: string;
+  greetingTitle: string;
+  greetingSub: string;
+  showQrBtn: string;
+  instantSettlementBtn: string;
 
-  // Shop Info
-  shopkeeperLabel: string;
-  fseRepLabel: string;
-  okfVerifiedBadge: string;
+  // 4 Quick Actions
+  qaReceiveMoney: string;
+  qaReceiveMoneySub: string;
+  qaPaymentHistory: string;
+  qaPaymentHistorySub: string;
+  qaBankSettlement: string;
+  qaBankSettlementSub: string;
+  qaSoundbox: string;
+  qaSoundboxSub: string;
 
-  // Hero Card
-  paymentCreditedPill: string;
-  listenAloudBtn: string;
-  soundboxHeader: string;
-  utrLabel: string;
-  orderIdLabel: string;
-  settlementDoneLabel: string;
+  // Today's Business Card
+  todayBusinessTitle: string;
+  realTimeBadge: string;
+  totalPaymentsReceived: string;
+  successfulPaymentsCount: string;
+  bankSettledTitle: string;
+  bankSettledSub: string;
+  pendingSettlementTitle: string;
+  pendingSettlementSub: string;
+  mdrBankFeeTitle: string;
+  govtSubsidyPill: string;
 
-  // Real-Time Tester
-  testRealValuesTitle: string;
-  testRealValuesDesc: string;
-  calculateBtn: string;
-  waiverCheckboxLabel: string;
+  // Recent Payments
+  recentPaymentsTitle: string;
+  filterAll: string;
+  filterSuccess: string;
+  filterSettled: string;
+  creditedToBank: string;
+  settlingTonight: string;
+  pending: string;
+  noPaymentsFound: string;
 
-  // 4 Breakdown Cards
-  card1Title: string;
-  card1Subtitle: string;
-  card2Title: string;
-  card2SubtitleFree: string;
-  card2SubtitleCharged: string;
-  card3Title: string;
-  card3SubtitleApplied: string;
-  card3SubtitleNone: string;
-  card4Title: string;
-  card4Subtitle: string;
+  // Voice Assistant
+  askMunshiTitle: string;
+  askMunshiSub: string;
+  chipTodayReceived: string;
+  chipWhenSettlement: string;
+  chipSoundboxWorking: string;
+  chipDid500Come: string;
+  inputPlaceholder: string;
+  aiResponseLabel: string;
+  listening: string;
 
-  // Human Gate
-  humanGateTitle: string;
-  humanGateQuestion: string;
-  haanBtn: string;
-  naBtn: string;
-  disbursedSuccessTitle: string;
-  disbursedSuccessDesc: string;
+  // Soundbox Telemetry
+  soundboxStatusTitle: string;
+  soundboxModel: string;
+  online: string;
+  battery: string;
+  audioTestBtn: string;
+  troubleshootBtn: string;
 
-  // Live Ticker
-  liveTickerTitle: string;
+  // Merchant Support
+  supportTitle: string;
+  fseName: string;
+  fseBeat: string;
+  callFseBtn: string;
+  helpTicketBtn: string;
 
-  // Engine View
-  okfStoreTitle: string;
-  okfStoreDesc: string;
+  // Mobile Bottom Navigation
+  navHome: string;
+  navPayments: string;
+  navSettlement: string;
+  navSoundbox: string;
+  navHelp: string;
+
+  // Footer
+  footerHackathon: string;
+  footerTrack: string;
+  footerCompliance: string;
+
+  // FSE Operations Console
+  fseConsoleTitle: string;
+  fseConsoleSub: string;
+  handoverBtn: string;
+  statAssignedMerchants: string;
+  statActiveDisputes: string;
+  statNextVisit: string;
+  statSoundboxUptime: string;
+  allActivePill: string;
+  underReviewPill: string;
+  connected100Pill: string;
+  assignedMerchantsTitle: string;
+  activeCountBadge: string;
+  viewProfile: string;
+  lowBattery: string;
+  activeDisputesTitle: string;
+  reviewRequiredBadge: string;
+  uploadEvidenceBtn: string;
+  instantReversalBtn: string;
+  safeHandoffTitle: string;
+  safeHandoffDesc: string;
+  recipientOfficer: string;
+  confirmHandoffBtn: string;
+  memoryStreamTitle: string;
+  notePlaceholder: string;
+  saveNoteBtn: string;
+
+  // Judge / Engine View
+  judgeTitle: string;
+  judgeSub: string;
+  nightlyDreamBtn: string;
+  statSystemLoad: string;
+  statCanaryZ: string;
+  statCostPerCall: string;
+  statAutonomyLevel: string;
   fiveTrustSignalsTitle: string;
-  signal1Provenance: string;
-  signal2TrustTier: string;
-  signal3Freshness: string;
-  signal4Lifecycle: string;
-  signal5Attestation: string;
-  runCragBtn: string;
-  cragVerifiedTitle: string;
+  cragValidateBtn: string;
+  activePolicyFile: string;
+  provenanceLabel: string;
+  trustTierLabel: string;
+  freshnessLabel: string;
+  lifecycleLabel: string;
+  attestationLabel: string;
+  cragConfidenceScore: string;
+  highConfidenceVerified: string;
+  fsmShieldTitle: string;
+  fsmShieldSub: string;
+  testPromptInjectionBtn: string;
+  ceecilLadderTitle: string;
+  singleLoopOpev: string;
+  rung1Title: string;
+  rung1Desc: string;
+  rung1Accuracy: string;
+  rung2Title: string;
+  rung2Desc: string;
+  rung2Autonomy: string;
+  rung3Title: string;
+  rung3Desc: string;
+  rung3Status: string;
+  walTitleBadge: string;
+  idempotencyGuaranteed: string;
 
-  fseCardTitle: string;
-  fseDualKeyLabel: string;
-  activeFseLabel: string;
-  inheritedNotice: string;
-  runDreamBtn: string;
-  arunResignBtn: string;
-
-  routerTitle: string;
-  activeSkillLabel: string;
-  codeModeTitle: string;
-  codeModeSub: string;
-  auditLogTitle: string;
-  walTitle: string;
-  canaryTitle: string;
-  canaryDesc: string;
-  shieldTitle: string;
-  shieldDesc: string;
-  testInjectionBtn: string;
-};
+  // Modals
+  modalReceiveTitle: string;
+  modalScanPay: string;
+  modalCustomAmount: string;
+  modalSimulatePayment: string;
+  modalClose: string;
+  modalTxnDetailTitle: string;
+  modalDigitalReceipt: string;
+  modalBankRefRrn: string;
+  modalCustomerUpi: string;
+  modalPaymentMode: string;
+  modalTimestamp: string;
+  modalMdrWaiver: string;
+  modalSettlementStatus: string;
+  modalRaiseDispute: string;
+  modalSettlementTitle: string;
+  modalTotalSettled: string;
+  modalLinkedBank: string;
+  modalPayoutSchedule: string;
+  modalInstantPayoutBtn: string;
+  modalSoundboxTitle: string;
+  modalSoundboxImei: string;
+  modalFirmware: string;
+  modalSpeakerHealth: string;
+  modalSignalStrength: string;
+  modalPlayTestChime: string;
+  modalResetConnection: string;
+}
 
 export const I18N: Record<LangCode, TranslationDictionary> = {
-  "hi-IN": {
+  "en-IN": {
+    // Common / Header
     appName: "Pi Munshi",
-    brandTagline: "पेटीएम स्वायत्त फ्रंटलाइन साथी · Google Cloud OKF v0.2 ट्रस्ट सिग्नल्स · साउंडबॉक्स वॉइस",
-    liveSwitch: "लाइव बैंक स्विच",
-    okfBadge: "OKF v0.2 मानक",
-    shopViewBtn: "🏪 दुकान दृश्य (Shop View)",
-    judgeViewBtn: "⚙️ OKF v0.2 व जज (Judge View)",
+    paytmForBusiness: "Paytm for Business",
+    okfBadge: "OKF v0.2",
+    demoBadge: "DEMO MODE",
+    shopkeeperTab: "Shopkeeper",
+    fseTab: "Field FSE",
+    judgeTab: "Judge / Engine",
+    scenarioBarTitle: "Live Hackathon Scenario Triggers:",
+    scene1Short: "1 · Bill Defense (POD)",
+    scene2Short: "2 · Checkout Shield (VCG)",
+    scene3Short: "3 · Block Attack (FSM)",
+    scene4Short: "4 · Nightly Settlement & Resign",
 
-    scene1Title: "1 · बिल बचाव (POD)",
-    scene1Hint: "11s स्वर-मुद्रा APOD",
-    scene2Title: "2 · चेकआउट रक्षा (VCG)",
-    scene2Hint: "Flo Pro मेनू + 'हाँ'",
-    scene3Title: "3 · हमला रोकें (FSM)",
-    scene3Hint: "Outlines शील्ड + RCA",
-    scene4Title: "4 · रात्रि हिसाब व इस्तीफा",
-    scene4Hint: "अरुण → नेहा हस्तांतरण",
+    // Shopkeeper Greeting
+    storeName: "Ramesh Kirana Store (Ramesh Kirana)",
+    upiId: "UPI: ramesh.kirana@paytm",
+    greetingTitle: "Namaste, Ramesh ji! 🙏",
+    greetingSub: "Here is your store's secure digital payment summary, settlement status, and Soundbox health.",
+    showQrBtn: "Show QR Code",
+    instantSettlementBtn: "Instant Settlement",
 
-    shopkeeperLabel: "दुकानदार:",
-    fseRepLabel: "FSE प्रतिनिधि:",
-    okfVerifiedBadge: "✓ OKF v0.2 प्रमाणित (Verified)",
+    // 4 Quick Actions
+    qaReceiveMoney: "Receive Money",
+    qaReceiveMoneySub: "All-in-One UPI QR",
+    qaPaymentHistory: "Payment History",
+    qaPaymentHistorySub: "All Digital Transactions",
+    qaBankSettlement: "Bank Settlement",
+    qaBankSettlementSub: "UTR & Daily Payout",
+    qaSoundbox: "Soundbox 4.0",
+    qaSoundboxSub: "88% Battery • Online",
 
-    paymentCreditedPill: "कल का पेमेंट बैंक में आ गया!",
-    listenAloudBtn: "🔊 बोलकर सुनें (आवाज़ में सुनें)",
-    soundboxHeader: "🎙️ साउंडबॉक्स घोषणा (Soundbox Audio Outcome)",
-    utrLabel: "UTR:",
-    orderIdLabel: "ऑर्डर ID:",
-    settlementDoneLabel: "T+1 ऑटो-सेटलमेंट पूरा",
+    // Today's Business Card
+    todayBusinessTitle: "TODAY'S BUSINESS",
+    realTimeBadge: "Real-time Live Update",
+    totalPaymentsReceived: "Total Payments Received",
+    successfulPaymentsCount: "3 Successful Transactions",
+    bankSettledTitle: "Bank Settled",
+    bankSettledSub: "UTR: 62998412...",
+    pendingSettlementTitle: "Pending Settlement",
+    pendingSettlementSub: "Tonight at 11:59 PM",
+    mdrBankFeeTitle: "MDR Bank Charges",
+    govtSubsidyPill: "100% Govt Subsidy",
 
-    testRealValuesTitle: "⚡ रियल-टाइम बिल राशि जांचें (Test Real-Time Values)",
-    testRealValuesDesc: "कोई भी असली राशि डालकर तुरंत असली MDR फीस, OKF v0.2 नियम और साउंडबॉक्स आवाज़ चेक करें",
-    calculateBtn: "गणना करें",
-    waiverCheckboxLabel: "दुकानदार छूट लागू करें (Apply OKF v0.2 Discretionary MDR Waiver ≤ ₹15)",
+    // Recent Payments
+    recentPaymentsTitle: "Recent Payments",
+    filterAll: "All",
+    filterSuccess: "Success",
+    filterSettled: "Settled",
+    creditedToBank: "Credited to Bank",
+    settlingTonight: "Settling Tonight",
+    pending: "Pending",
+    noPaymentsFound: "No transactions found",
 
-    card1Title: "1. कुल बिल राशि (Bill)",
-    card1Subtitle: "ग्राहक द्वारा क्यूआर स्कैन",
-    card2Title: "2. आरबीआई नियम MDR फीस (0.4%)",
-    card2SubtitleFree: "₹2,000 तक 100% फ्री",
-    card2SubtitleCharged: "₹2,000 से ऊपर 0.4% फीस (कैप ₹300)",
-    card3Title: "3. मुंशी पॉलिसी छूट (Waiver)",
-    card3SubtitleApplied: "✓ OKF v0.2 नियम के तहत माफ",
-    card3SubtitleNone: "छूट लागू नहीं",
-    card4Title: "4. खाते में नेट जमा (In Bank)",
-    card4Subtitle: "बैंक UTR से पुष्टीकृत",
+    // Voice Assistant
+    askMunshiTitle: "Ask Pi Munshi (Voice Assistant)",
+    askMunshiSub: "Click the mic and speak in English, Hindi, or Kannada",
+    chipTodayReceived: "\"How much did I receive today?\"",
+    chipWhenSettlement: "\"When will my settlement arrive?\"",
+    chipSoundboxWorking: "\"Is my Soundbox working?\"",
+    chipDid500Come: "\"Did I receive ₹500 payment?\"",
+    inputPlaceholder: "Type your question or click mic...",
+    aiResponseLabel: "Pi Munshi Answer:",
+    listening: "Listening...",
 
-    humanGateTitle: "मानव सह-हस्ताक्षर आवश्यक (Level 2 Human Approval Required)",
-    humanGateQuestion: "शर्मा जी, मंगलवार थोक व्यापारी के लिए ₹18,000 का 24-घंटे वाला ज़ीरो-फीस पेटीएम ब्रिज क्रेडिट चालू खाते में डालना है?",
-    haanBtn: "👍 हाँ (Haan - मंजूर करें)",
-    naBtn: "👎 ना (रद्द करें)",
-    disbursedSuccessTitle: "₹18,000 चालू खाते में सफलतापूर्वक भेज दिए गए!",
-    disbursedSuccessDesc: "मानव सह-हस्ताक्षर द्वारा स्वीकृत · Write-Ahead Log (WAL) में दर्ज · ऑटोनॉमी स्तर 3 में पदोन्नत",
+    // Soundbox Telemetry
+    soundboxStatusTitle: "Soundbox Status (SOUNDBOX 4.0)",
+    soundboxModel: "Paytm Soundbox 4.0 4G",
+    online: "Online",
+    battery: "Battery",
+    audioTestBtn: "Audio Test",
+    troubleshootBtn: "Troubleshoot",
 
-    liveTickerTitle: "लाइव ट्रांजैक्शन फीड (Live Countertop Activity)",
+    // Merchant Support
+    supportTitle: "Merchant Support (SUPPORT)",
+    fseName: "FSE Arun Sharma (Your Field Executive)",
+    fseBeat: "Koramangala Beat • 9123456780",
+    callFseBtn: "Call FSE",
+    helpTicketBtn: "Help Ticket",
 
-    okfStoreTitle: "Google Cloud OKF v0.2 नॉलेज स्टोर",
-    okfStoreDesc: "Google Cloud के खुले मानक पर आधारित। 5 ट्रस्ट सिग्नल्स के साथ गिट-वर्जन्ड मार्कडाउन।",
-    fiveTrustSignalsTitle: "OKF v0.2 के पाँच ट्रस्ट सिग्नल्स (Five Trust Signals)",
-    signal1Provenance: "1. उद्गम / Provenance (Sources):",
-    signal2TrustTier: "2. विश्वसनीयता श्रेणी / Trust Tier:",
-    signal3Freshness: "3. ताजगी / Freshness (Validity):",
-    signal4Lifecycle: "4. जीवन चक्र / Lifecycle Status:",
-    signal5Attestation: "5. सत्यापन / Attested Computation:",
-    runCragBtn: "OKF v0.2 CRAG मूल्यांकन चलाएं",
-    cragVerifiedTitle: "CRAG उद्धरण सत्यापित (Citation Verified)",
+    // Mobile Bottom Navigation
+    navHome: "Home",
+    navPayments: "Payments",
+    navSettlement: "Settlement",
+    navSoundbox: "Soundbox",
+    navHelp: "Support / FSE",
 
-    fseCardTitle: "FSE एट्रिशन व टेरिटरी हस्तांतरण",
-    fseDualKeyLabel: "दोहरी-कुंजी मेमोरी",
-    activeFseLabel: "सक्रिय FSE:",
-    inheritedNotice: "✓ अरुण की 12-दुकानों की टेरिटरी शून्य वादा नुकसान के साथ हस्तांतरित।",
-    runDreamBtn: "🌙 रात्रि 11:30 हिसाब चलाएं",
-    arunResignBtn: "🔄 अरुण का इस्तीफा (7 PM)",
+    // Footer
+    footerHackathon: "Paytm Build for India AI Hackathon",
+    footerTrack: "Track 3: Autonomous AI Teammates",
+    footerCompliance: "100% NPCI UDIR & RBI FREE-AI Compliant",
 
-    routerTitle: "लागत-आधारित 3-रंग कॉग्निशन रूटर",
-    activeSkillLabel: "सक्रिय स्किल:",
-    codeModeTitle: "Cloudflare Code Mode MCP (~980 टोकन)",
-    codeModeSub: "पारंपरिक JSON टूल्स की तुलना में 99.3% टोकन बचत",
-    auditLogTitle: "डिटरमिनिस्टिक बॉडी व एजेंट ऑडिट लॉग",
-    walTitle: "Write-Ahead Log (WAL)",
-    canaryTitle: "Netflix Data Canary",
-    canaryDesc: "रिफंड वेलोसिटी पर नज़र रखता है। Z > 3.0σ होने पर 150s में लेवल 3 स्वतः रद्द।",
-    shieldTitle: "Lethal Trifecta Shield (Outlines FSM)",
-    shieldDesc: "अविश्वसनीय टेक्स्ट को वित्तीय टूल्स से अलग रखता है। सिर्फ टाइप किए गए एनम की अनुमति।",
-    testInjectionBtn: "प्रॉम्प्ट इंजेक्शन हमला टेस्ट करें",
+    // FSE Operations Console
+    fseConsoleTitle: "FSE Operations Console",
+    fseConsoleSub: "Merchant visits, dispute resolution, Soundbox service, and safe territory handoff management.",
+    handoverBtn: "Handover to Priya",
+    statAssignedMerchants: "Assigned Merchants (BEAT)",
+    statActiveDisputes: "Active Disputes",
+    statNextVisit: "Next Visit",
+    statSoundboxUptime: "Soundbox 4G Uptime",
+    allActivePill: "All Active",
+    underReviewPill: "Under Review",
+    connected100Pill: "100% Signal Connected",
+    assignedMerchantsTitle: "ASSIGNED MERCHANTS IN TERRITORY",
+    activeCountBadge: "3 Active Merchants",
+    viewProfile: "View Profile →",
+    lowBattery: "Low Battery",
+    activeDisputesTitle: "ACTIVE DISPUTES",
+    reviewRequiredBadge: "1 Review Pending",
+    uploadEvidenceBtn: "Upload Evidence",
+    instantReversalBtn: "Instant Reversal",
+    safeHandoffTitle: "SAFE FSE HANDOFF",
+    safeHandoffDesc: "Seamlessly transfer all 3 merchants' full memory history and pending commitments to FSE Priya Nair without any loss of promises.",
+    recipientOfficer: "Recipient Officer: FSE Priya Nair (ID: DEMO_FSE_PRIYA • 9123456789)",
+    confirmHandoffBtn: "Confirm Handoff",
+    memoryStreamTitle: "MERCHANT MEMORY & VISIT NOTES",
+    notePlaceholder: "Add visit note (e.g., Soundbox 4G SIM tested and verified OK)...",
+    saveNoteBtn: "Save Note",
+
+    // Judge / Engine View
+    judgeTitle: "Judge & System Architecture Console",
+    judgeSub: "5 All-in-One Trust Signals, Outlines FSM Shield, 3-Rung Cognition Ladder, and Reinforcement Learning.",
+    nightlyDreamBtn: "Run Nightly Dreaming",
+    statSystemLoad: "System Load (SPS)",
+    statCanaryZ: "Canary Z-Score",
+    statCostPerCall: "Cost Per Call",
+    statAutonomyLevel: "Autonomy Level",
+    fiveTrustSignalsTitle: "GOOGLE CLOUD OKF V0.2 TRUST SIGNALS",
+    cragValidateBtn: "Verify CRAG Citation",
+    activePolicyFile: "Active Policy: rbi_mdr_waiver_cap_2026.md",
+    provenanceLabel: "1. Provenance: Reserve Bank of India & National Payments Corporation of India (NPCI)",
+    trustTierLabel: "2. Trust Tier: tier-1-verified",
+    freshnessLabel: "3. Freshness: Valid until 2026-10-15",
+    lifecycleLabel: "4. Lifecycle: STABLE",
+    attestationLabel: "5. Cryptographic SHA-256 Attestation Hash:",
+    cragConfidenceScore: "CRAG Confidence Score: 99%",
+    highConfidenceVerified: "✓ HIGH_CONFIDENCE_AUTHORITATIVE (Fail-Closed Verified)",
+    fsmShieldTitle: "OUTLINES LEXICAL FSM SHIELD (ADVERSARIAL SHIELD)",
+    fsmShieldSub: "Strict mathematical lexical barrier instantly blocking prompt injections & unauthorized fund movements",
+    testPromptInjectionBtn: "Test Adversarial Prompt Injection",
+    ceecilLadderTitle: "CEECIL 3-RUNG COGNITION LADDER",
+    singleLoopOpev: "Single-Loop O-P-E-V",
+    rung1Title: "Rung 1: Reflex Confirm",
+    rung1Desc: "0 LLM Tokens • 180ms Latency",
+    rung1Accuracy: "100% Exact",
+    rung2Title: "Rung 2: Policy Arbitrage",
+    rung2Desc: "~450 Tokens • CRAG Evaluation",
+    rung2Autonomy: "L2 Autonomy",
+    rung3Title: "Rung 3: VCG Mechanism Design",
+    rung3Desc: "Flo Pro Multi-Party Contract Menu",
+    rung3Status: "Verified",
+    walTitleBadge: "WRITE-AHEAD LOG (WAL) & AUDIT TRAILS",
+    idempotencyGuaranteed: "Idempotency Guaranteed",
+
+    // Modals
+    modalReceiveTitle: "All-in-One Paytm QR Code",
+    modalScanPay: "Scan with any UPI App (Paytm, GPay, PhonePe)",
+    modalCustomAmount: "Set Custom Amount:",
+    modalSimulatePayment: "⚡ Simulate Customer UPI Payment",
+    modalClose: "Close",
+    modalTxnDetailTitle: "Digital Payment Receipt",
+    modalDigitalReceipt: "Paytm Verified Digital Receipt",
+    modalBankRefRrn: "Bank Reference (RRN)",
+    modalCustomerUpi: "Customer UPI ID",
+    modalPaymentMode: "Payment Mode",
+    modalTimestamp: "Timestamp",
+    modalMdrWaiver: "MDR Subsidy Waiver",
+    modalSettlementStatus: "Settlement Status",
+    modalRaiseDispute: "Raise UDIR Dispute",
+    modalSettlementTitle: "Bank Settlement Breakdown",
+    modalTotalSettled: "Net Deposited in Bank",
+    modalLinkedBank: "Linked Bank Account",
+    modalPayoutSchedule: "Payout Schedule",
+    modalInstantPayoutBtn: "⚡ Transfer to Bank Instantly",
+    modalSoundboxTitle: "Paytm Soundbox 4.0 Diagnostics",
+    modalSoundboxImei: "IMEI Number",
+    modalFirmware: "Firmware Version",
+    modalSpeakerHealth: "Speaker Health",
+    modalSignalStrength: "4G VoLTE Signal",
+    modalPlayTestChime: "🔔 Play Test Payment Voice",
+    modalResetConnection: "🔄 Reset 4G Connection",
+  },
+
+  "hi-IN": {
+    // Common / Header
+    appName: "Pi Munshi",
+    paytmForBusiness: "Paytm for Business",
+    okfBadge: "OKF v0.2",
+    demoBadge: "DEMO MODE",
+    shopkeeperTab: "दुकानदार",
+    fseTab: "फ़ील्ड FSE",
+    judgeTab: "जज / इंजन",
+    scenarioBarTitle: "लाइव हैकथॉन टेस्ट परिदृश्य (One-Click Scenario Triggers):",
+    scene1Short: "1 · बिल बचाव (POD)",
+    scene2Short: "2 · चेकआउट रक्षा (VCG)",
+    scene3Short: "3 · हमला रोकें (FSM)",
+    scene4Short: "4 · रात्रि हिसाब व इस्तीफा",
+
+    // Shopkeeper Greeting
+    storeName: "रमेश किराना स्टोर (Ramesh Kirana)",
+    upiId: "UPI: ramesh.kirana@paytm",
+    greetingTitle: "नमस्ते, रमेश जी! 🙏",
+    greetingSub: "यहाँ है आपकी दुकान का आज का सुरक्षित डिजिटल पेमेंट सारांश, सेटलमेंट और साउंडबॉक्स स्थिति।",
+    showQrBtn: "क्यूआर कोड दिखाएं (Show QR)",
+    instantSettlementBtn: "तुरंत सेटलमेंट",
+
+    // 4 Quick Actions
+    qaReceiveMoney: "पैसे प्राप्त करें",
+    qaReceiveMoneySub: "ऑल-इन-वन यूपीआई क्यूआर",
+    qaPaymentHistory: "पेमेंट हिस्ट्री",
+    qaPaymentHistorySub: "सभी डिजिटल लेन-देन",
+    qaBankSettlement: "बैंक सेटलमेंट",
+    qaBankSettlementSub: "UTR एवं दैनिक निकासी",
+    qaSoundbox: "साउंडबॉक्स 4.0",
+    qaSoundboxSub: "88% बैटरी • ऑनलाइन",
+
+    // Today's Business Card
+    todayBusinessTitle: "आज का कुल कारोबार (TODAY'S BUSINESS)",
+    realTimeBadge: "रियल-टाइम लाइव अपडेट",
+    totalPaymentsReceived: "कुल भुगतान प्राप्त",
+    successfulPaymentsCount: "3 सफल लेन-देन",
+    bankSettledTitle: "बैंक में जमा (SETTLED)",
+    bankSettledSub: "UTR: 62998412...",
+    pendingSettlementTitle: "लंबित सेटलमेंट (PENDING)",
+    pendingSettlementSub: "आज रात 11:59 बजे",
+    mdrBankFeeTitle: "MDR बैंक शुल्क",
+    govtSubsidyPill: "100% सरकारी सब्सिडी",
+
+    // Recent Payments
+    recentPaymentsTitle: "हाल के भुगतान (Recent Payments)",
+    filterAll: "सभी",
+    filterSuccess: "सफल",
+    filterSettled: "सेटल",
+    creditedToBank: "खाते में जमा",
+    settlingTonight: "आज रात जमा",
+    pending: "लंबित",
+    noPaymentsFound: "कोई लेन-देन नहीं मिला",
+
+    // Voice Assistant
+    askMunshiTitle: "मुंशी AI से बोलकर पूछें (Voice Assistant)",
+    askMunshiSub: "माइक दबाएं और हिंदी, अंग्रेज़ी या कन्नड़ में पूछें",
+    chipTodayReceived: "\"मेरा आज का पेमेंट कितना आया?\"",
+    chipWhenSettlement: "\"मेरा सेटलमेंट कब आएगा?\"",
+    chipSoundboxWorking: "\"साउंडबॉक्स में आवाज़ आ रही है?\"",
+    chipDid500Come: "\"क्या ₹500 का पेमेंट आया?\"",
+    inputPlaceholder: "यहाँ सवाल टाइप करें या माइक दबाएं...",
+    aiResponseLabel: "मुंशी AI उत्तर:",
+    listening: "सुन रहे हैं...",
+
+    // Soundbox Telemetry
+    soundboxStatusTitle: "साउंडबॉक्स स्थिति (SOUNDBOX 4.0)",
+    soundboxModel: "Paytm Soundbox 4.0 4G",
+    online: "ऑनलाइन",
+    battery: "बैटरी",
+    audioTestBtn: "ध्वनि टेस्ट",
+    troubleshootBtn: "समस्या निवारण",
+
+    // Merchant Support
+    supportTitle: "मदद एवं फ़ील्ड सहायता (SUPPORT)",
+    fseName: "FSE अरुण शर्मा (आपका फ़ील्ड अधिकारी)",
+    fseBeat: "कोरमंगला क्षेत्र • 9123456780",
+    callFseBtn: "कॉल करें",
+    helpTicketBtn: "हेल्प टिकट",
+
+    // Mobile Bottom Navigation
+    navHome: "होम",
+    navPayments: "भुगतान",
+    navSettlement: "सेटलमेंट",
+    navSoundbox: "साउंडबॉक्स",
+    navHelp: "सहायता / FSE",
+
+    // Footer
+    footerHackathon: "Paytm Build for India AI Hackathon",
+    footerTrack: "Track 3: Autonomous AI Teammates",
+    footerCompliance: "100% NPCI UDIR & RBI FREE-AI Compliant",
+
+    // FSE Operations Console
+    fseConsoleTitle: "फ़ील्ड ऑपरेशंस डैशबोर्ड (FSE Operations Console)",
+    fseConsoleSub: "दुकानदार दौरे, शिकायत निवारण, साउंडबॉक्स सेवा एवं सुरक्षित हैंडऑफ प्रबंधन।",
+    handoverBtn: "क्षेत्र हैंडऑफ करें (Handover to Priya)",
+    statAssignedMerchants: "आवंटित दुकानें (BEAT)",
+    statActiveDisputes: "सक्रिय विवाद (DISPUTES)",
+    statNextVisit: "अगला दौरा (NEXT VISIT)",
+    statSoundboxUptime: "साउंडबॉक्स 4G अपटाइम",
+    allActivePill: "सभी सक्रिय",
+    underReviewPill: "समीक्षाधीन",
+    connected100Pill: "100% सिग्नल कनेक्टेड",
+    assignedMerchantsTitle: "आवंटित व्यापारी बीट (ASSIGNED MERCHANTS IN TERRITORY)",
+    activeCountBadge: "3 सक्रिय दुकानें",
+    viewProfile: "प्रोफ़ाइल देखें →",
+    lowBattery: "बैटरी कम",
+    activeDisputesTitle: "सक्रिय विवाद (ACTIVE DISPUTES)",
+    reviewRequiredBadge: "1 समीक्षाधीन",
+    uploadEvidenceBtn: "प्रमाण अपलोड करें",
+    instantReversalBtn: "तत्काल रिवर्सल दें",
+    safeHandoffTitle: "सुरक्षित क्षेत्र हैंडऑफ (SAFE FSE HANDOFF)",
+    safeHandoffDesc: "स्थान परिवर्तन या छुट्टी पर जाने की स्थिति में अपने सभी 3 व्यापारियों का संपूर्ण इतिहास एवं चालू प्रतिबद्धताएं FSE प्रिया नायर को सुरक्षित ट्रांसफर करें।",
+    recipientOfficer: "प्राप्तकर्ता अधिकारी: FSE प्रिया नायर (ID: DEMO_FSE_PRIYA • 9123456789)",
+    confirmHandoffBtn: "कार्यभार हस्तांतरित करें (Confirm Handoff)",
+    memoryStreamTitle: "व्यापारी मेमोरी एवं विज़िट नोट्स (MEMORY STREAM)",
+    notePlaceholder: "फ़ील्ड विज़िट का नया नोट जोड़ें (उदा. साउंडबॉक्स 4G सिम टेस्ट किया)...",
+    saveNoteBtn: "नोट सेव करें",
+
+    // Judge / Engine View
+    judgeTitle: "जज एवं सिस्टम आर्किटेक्चर कंसोल (Judge / Engine)",
+    judgeSub: "5 ऑल-इन-वन ट्रस्ट सिग्नल्स, आउटलाइन्स FSM शील्ड, 3-रंग कॉग्निशन लैडर एवं रीइन्फोर्समेंट लर्निंग।",
+    nightlyDreamBtn: "नाइटली ड्रीमिंग चलाएं (Nightly Dream)",
+    statSystemLoad: "सिस्टम लोड (SPS)",
+    statCanaryZ: "कैनरी Z-स्कोर",
+    statCostPerCall: "प्रति कॉल टोकन लागत",
+    statAutonomyLevel: "स्वायत्तता स्तर",
+    fiveTrustSignalsTitle: "GOOGLE CLOUD OKF V0.2 ट्रस्ट सिग्नल्स",
+    cragValidateBtn: "CRAG सत्यापित करें",
+    activePolicyFile: "सक्रिय नीति फ़ाइल: rbi_mdr_waiver_cap_2026.md",
+    provenanceLabel: "1. उद्गम (Provenance): Reserve Bank of India & NPCI",
+    trustTierLabel: "2. ट्रस्ट टीयर: tier-1-verified",
+    freshnessLabel: "3. ताज़गी (Freshness): 2026-10-15 तक मान्य",
+    lifecycleLabel: "4. लाइफसाइकिल: STABLE",
+    attestationLabel: "5. क्रिप्टोग्राफिक SHA-256 बाइट अटेस्टेशन हैश:",
+    cragConfidenceScore: "CRAG कॉन्फ़िडेंस स्कोर: 99%",
+    highConfidenceVerified: "✓ HIGH_CONFIDENCE_AUTHORITATIVE (फेल-क्लोज्ड सत्यापित)",
+    fsmShieldTitle: "आउटलाइन्स लेक्सिकल FSM शील्ड (ADVERSARIAL SHIELD)",
+    fsmShieldSub: "प्रॉम्प्ट इंजेक्शन एवं अनधिकृत मनी वर्ब का तत्काल गणितीय अवरोध",
+    testPromptInjectionBtn: "प्रॉम्प्ट इंजेक्शन टेस्ट करें",
+    ceecilLadderTitle: "CEECIL 3-रंग कॉग्निशन लैडर",
+    singleLoopOpev: "सिंगल-लूप O-P-E-V",
+    rung1Title: "रंग 1: रिफ्लेक्स कन्फर्म",
+    rung1Desc: "0 LLM टोकन • 180ms विलंबता",
+    rung1Accuracy: "100% सटीक",
+    rung2Title: "रंग 2: पॉलिसी आर्बिट्रेज",
+    rung2Desc: "~450 टोकन • CRAG इवैल्यूएशन",
+    rung2Autonomy: "L2 स्वायत्तता",
+    rung3Title: "रंग 3: VCG मैकेनिज़्म डिज़ाइन",
+    rung3Desc: "फ्लो प्रो बहु-पक्षीय अनुबंध मेनू",
+    rung3Status: "सत्यापित",
+    walTitleBadge: "राइट-अहेड लॉग (WAL) एवं ऑडिट ट्रेल्स",
+    idempotencyGuaranteed: "आइडमपोटेंसी गारंटीकृत",
+
+    // Modals
+    modalReceiveTitle: "ऑल-इन-वन पेटीएम क्यूआर कोड",
+    modalScanPay: "किसी भी UPI ऐप से स्कैन करके भुगतान करें",
+    modalCustomAmount: "राशि चुनें या लिखें:",
+    modalSimulatePayment: "⚡ ग्राहक का UPI पेमेंट टेस्ट करें",
+    modalClose: "बंद करें",
+    modalTxnDetailTitle: "डिजिटल पेमेंट रसीद",
+    modalDigitalReceipt: "पेटीएम सत्यापित डिजिटल रसीद",
+    modalBankRefRrn: "बैंक संदर्भ संख्या (RRN)",
+    modalCustomerUpi: "ग्राहक UPI ID",
+    modalPaymentMode: "भुगतान का प्रकार",
+    modalTimestamp: "समय",
+    modalMdrWaiver: "MDR शुल्क छूट (सब्सिडी)",
+    modalSettlementStatus: "सेटलमेंट स्थिति",
+    modalRaiseDispute: "UDIR विवाद दर्ज करें",
+    modalSettlementTitle: "बैंक सेटलमेंट विवरण",
+    modalTotalSettled: "बैंक में कुल जमा राशि",
+    modalLinkedBank: "लिंक किया गया बैंक खाता",
+    modalPayoutSchedule: "निकासी समय",
+    modalInstantPayoutBtn: "⚡ तुरंत बैंक खाते में निकालें",
+    modalSoundboxTitle: "पेटीएम साउंडबॉक्स 4.0 स्थिति",
+    modalSoundboxImei: "IMEI नंबर",
+    modalFirmware: "फ़र्मवेयर वर्ज़न",
+    modalSpeakerHealth: "स्पीकर स्थिति",
+    modalSignalStrength: "4G VoLTE सिग्नल",
+    modalPlayTestChime: "🔔 पेमेंट ध्वनि टेस्ट करें",
+    modalResetConnection: "🔄 4G कनेक्शन रीसेट करें",
   },
 
   "kn-IN": {
+    // Common / Header
     appName: "ಪೈ ಮುನ್ಷಿ (Pi Munshi)",
-    brandTagline: "ಪೇಟಿಎಂ ಸ್ವಾಯತ್ತ ಫ್ರಂಟ್‌ಲೈನ್ ಒಡನಾಡಿ · Google Cloud OKF v0.2 ಟ್ರಸ್ಟ್ ಸಿಗ್ನಲ್‌ಗಳು · ಸೌಂಡ್‌ಬಾಕ್ಸ್ ಧ್ವನಿ",
-    liveSwitch: "ಲೈವ್ ಬ್ಯಾಂಕ್ ಸ್ವಿಚ್",
-    okfBadge: "OKF v0.2 ಮಾನದಂಡ",
-    shopViewBtn: "🏪 ಅಂಗಡಿ ವೀಕ್ಷಣೆ (Shop View)",
-    judgeViewBtn: "⚙️ OKF v0.2 ಮತ್ತು ಜಡ್ಜ್ (Judge View)",
+    paytmForBusiness: "ಪೇಟಿಎಂ ಫಾರ್ ಬಿಸಿನೆಸ್",
+    okfBadge: "OKF v0.2",
+    demoBadge: "ಡೆಮೋ ಮೋಡ್",
+    shopkeeperTab: "ಅಂಗಡಿಯವರು",
+    fseTab: "ಫೀಲ್ಡ್ FSE",
+    judgeTab: "ಜಡ್ಜ್ / ಎಂಜಿನ್",
+    scenarioBarTitle: "ಲೈವ್ ಹ್ಯಾಕಥಾನ್ ಸನ್ನಿವೇಶಗಳು (One-Click Scenario Triggers):",
+    scene1Short: "1 · ಬಿಲ್ ರಕ್ಷಣೆ (POD)",
+    scene2Short: "2 · ಚೆಕ್‌ಔಟ್ ರಕ್ಷಣೆ (VCG)",
+    scene3Short: "3 · ದಾಳಿ ತಡೆಯಿರಿ (FSM)",
+    scene4Short: "4 · ರಾತ್ರಿ ಲೆಕ್ಕ & ರಾಜೀನಾಮೆ",
 
-    scene1Title: "1 · ಬಿಲ್ ರಕ್ಷಣೆ (POD)",
-    scene1Hint: "11s ಸ್ವರ-ಮುದ್ರಾ APOD",
-    scene2Title: "2 · ಚೆಕ್‌ಔಟ್ ರಕ್ಷಣೆ (VCG)",
-    scene2Hint: "Flo Pro ಮೆನು + 'ಹೌದು'",
-    scene3Title: "3 · ದಾಳಿ ತಡೆಯಿರಿ (FSM)",
-    scene3Hint: "Outlines ಶೀಲ್ಡ್ + RCA",
-    scene4Title: "4 · ರಾತ್ರಿ ಲೆಕ್ಕ & ರಾಜೀನಾಮೆ",
-    scene4Hint: "ಅರುಣ್ → ನೇಹಾ ವರ್ಗಾವಣೆ",
+    // Shopkeeper Greeting
+    storeName: "ರಮೇಶ್ ಕಿರಾಣಿ ಸ್ಟೋರ್ (Ramesh Kirana)",
+    upiId: "UPI: ramesh.kirana@paytm",
+    greetingTitle: "ನಮಸ್ಕಾರ, ರಮೇಶ್ ಅವರೇ! 🙏",
+    greetingSub: "ಇಲ್ಲಿದೆ ನಿಮ್ಮ ಅಂಗಡಿಯ ಇಂದಿನ ಸುರಕ್ಷಿತ ಡಿಜಿಟಲ್ ಪಾವತಿ ಸಾರಾಂಶ, ಸೆಟಲ್‌ಮೆಂಟ್ ಮತ್ತು ಸೌಂಡ್‌ಬಾಕ್ಸ್ ಸ್ಥಿತಿ.",
+    showQrBtn: "ಕ್ಯೂಆರ್ ಕೋಡ್ ತೋರಿಸಿ (Show QR)",
+    instantSettlementBtn: "ತಕ್ಷಣದ ಸೆಟಲ್‌ಮೆಂಟ್",
 
-    shopkeeperLabel: "ಅಂಗಡಿಯವರು:",
-    fseRepLabel: "FSE ಪ್ರತಿನಿಧಿ:",
-    okfVerifiedBadge: "✓ OKF v0.2 ಪರಿಶೀಲಿಸಲಾಗಿದೆ (Verified)",
+    // 4 Quick Actions
+    qaReceiveMoney: "ಹಣ ಸ್ವೀಕರಿಸಿ",
+    qaReceiveMoneySub: "ಆಲ್-ಇನ್-ಒನ್ ಯುಪಿಐ ಕ್ಯೂಆರ್",
+    qaPaymentHistory: "ಪಾವತಿ ಇತಿಹಾಸ",
+    qaPaymentHistorySub: "ಎಲ್ಲಾ ಡಿಜಿಟಲ್ ವಹಿವಾಟುಗಳು",
+    qaBankSettlement: "ಬ್ಯಾಂಕ್ ಸೆಟಲ್‌ಮೆಂಟ್",
+    qaBankSettlementSub: "UTR ಮತ್ತು ದೈನಂದಿನ ವಾಪಸಾತಿ",
+    qaSoundbox: "ಸೌಂಡ್‌ಬಾಕ್ಸ್ 4.0",
+    qaSoundboxSub: "88% ಬ್ಯಾಟರಿ • ಆನ್‌ಲೈನ್",
 
-    paymentCreditedPill: "ನಿನ್ನೆಯ ಪಾವತಿ ಬ್ಯಾಂಕ್ ಖಾತೆಗೆ ಜಮೆಯಾಗಿದೆ!",
-    listenAloudBtn: "🔊 ಧ್ವನಿ ಕೇಳಿ (ಆಡಿಯೋದಲ್ಲಿ ಕೇಳಿ)",
-    soundboxHeader: "🎙️ ಸೌಂಡ್‌ಬಾಕ್ಸ್ ಧ್ವನಿ ಘೋಷಣೆ (Soundbox Audio)",
-    utrLabel: "UTR:",
-    orderIdLabel: "ಆರ್ಡರ್ ID:",
-    settlementDoneLabel: "T+1 ಆಟೋ-ಸೆಟಲ್‌ಮೆಂಟ್ ಪೂರ್ಣಗೊಂಡಿದೆ",
+    // Today's Business Card
+    todayBusinessTitle: "ಇಂದಿನ ಒಟ್ಟು ವ್ಯಾಪಾರ (TODAY'S BUSINESS)",
+    realTimeBadge: "ನೈಜ-ಸಮಯದ ಲೈವ್ ಅಪ್ಡೇಟ್",
+    totalPaymentsReceived: "ಸ್ವೀಕರಿಸಿದ ಒಟ್ಟು ಪಾವತಿ",
+    successfulPaymentsCount: "3 ಯಶಸ್ವಿ ವಹಿವಾಟುಗಳು",
+    bankSettledTitle: "ಬ್ಯಾಂಕ್‌ಗೆ ಜಮೆ (SETTLED)",
+    bankSettledSub: "UTR: 62998412...",
+    pendingSettlementTitle: "ಬಾಕಿ ಸೆಟಲ್‌ಮೆಂಟ್ (PENDING)",
+    pendingSettlementSub: "ಇಂದು ರಾತ್ರಿ 11:59 ಕ್ಕೆ",
+    mdrBankFeeTitle: "MDR ಬ್ಯಾಂಕ್ ಶುಲ್ಕ",
+    govtSubsidyPill: "100% ಸರ್ಕಾರಿ ಸಬ್ಸಿಡಿ",
 
-    testRealValuesTitle: "⚡ ನೈಜ-ಸಮಯದ ಬಿಲ್ ಮೊತ್ತ ಪರೀಕ್ಷಿಸಿ (Real-Time Values)",
-    testRealValuesDesc: "ಯಾವುದೇ ನಿಜವಾದ ಮೊತ್ತ ನಮೂದಿಸಿ ತಕ್ಷಣವೇ MDR ಶುಲ್ಕ, OKF v0.2 ನಿಯಮ ಮತ್ತು ಸೌಂಡ್‌ಬಾಕ್ಸ್ ಧ್ವನಿ ಪರಿಶೀಲಿಸಿ",
-    calculateBtn: "ಲೆಕ್ಕಾಚಾರ ಮಾಡಿ",
-    waiverCheckboxLabel: "ಅಂಗಡಿಯವರಿಗೆ ಶುಲ್ಕ ಮನ್ನಾ ಅನ್ವಯಿಸಿ (OKF v0.2 MDR Waiver ≤ ₹15)",
+    // Recent Payments
+    recentPaymentsTitle: "ಇತ್ತೀಚಿನ ಪಾವತಿಗಳು (Recent Payments)",
+    filterAll: "ಎಲ್ಲಾ",
+    filterSuccess: "ಯಶಸ್ವಿ",
+    filterSettled: "ಸೆಟಲ್",
+    creditedToBank: "ಖಾತೆಗೆ ಜಮೆಯಾಗಿದೆ",
+    settlingTonight: "ಇಂದು ರಾತ್ರಿ ಜಮೆ",
+    pending: "ಬಾಕಿ",
+    noPaymentsFound: "ಯಾವುದೇ ವಹಿವಾಟುಗಳು ಕಂಡುಬಂದಿಲ್ಲ",
 
-    card1Title: "1. ಒಟ್ಟು ಬಿಲ್ ಮೊತ್ತ (Bill)",
-    card1Subtitle: "ಗ್ರಾಹಕರಿಂದ ಕ್ಯೂಆರ್ ಸ್ಕ್ಯಾನ್",
-    card2Title: "2. RBI ನಿಯಮ MDR ಶುಲ್ಕ (0.4%)",
-    card2SubtitleFree: "₹2,000 ವರೆಗೆ 100% ಉಚಿತ",
-    card2SubtitleCharged: "₹2,000 ಕ್ಕಿಂತ ಹೆಚ್ಚು 0.4% ಶುಲ್ಕ (ಗರಿಷ್ಠ ₹300)",
-    card3Title: "3. ಮುನ್ಷಿ ರಿಯಾಯಿತಿ (Waiver)",
-    card3SubtitleApplied: "✓ OKF v0.2 ನಿಯಮದಡಿ ಮನ್ನಾ ಮಾಡಲಾಗಿದೆ",
-    card3SubtitleNone: "ರಿಯಾಯಿತಿ ಅನ್ವಯಿಸಿಲ್ಲ",
-    card4Title: "4. ಬ್ಯಾಂಕ್ ಖಾತೆಗೆ ನಿವ್ವಳ ಜಮೆ (In Bank)",
-    card4Subtitle: "ಬ್ಯಾಂಕ್ UTR ನಿಂದ ದೃಢೀಕರಿಸಲಾಗಿದೆ",
+    // Voice Assistant
+    askMunshiTitle: "ಮುನ್ಷಿ AI ಜೊತೆ ಮಾತನಾಡಿ (ಧ್ವನಿ ಸಹಾಯಕ)",
+    askMunshiSub: "ಮೈಕ್ ಒತ್ತಿ ಮತ್ತು ಕನ್ನಡ, ಇಂಗ್ಲಿಷ್ ಅಥವಾ ಹಿಂದಿಯಲ್ಲಿ ಮಾತನಾಡಿ",
+    chipTodayReceived: "\"ಇಂದು ನನಗೆ ಎಷ್ಟು ಹಣ ಬಂದಿದೆ?\"",
+    chipWhenSettlement: "\"ನನ್ನ ಸೆಟಲ್‌ಮೆಂಟ್ ಯಾವಾಗ ಬರುತ್ತದೆ?\"",
+    chipSoundboxWorking: "\"ಸೌಂಡ್‌ಬಾಕ್ಸ್ ಕೆಲಸ ಮಾಡುತ್ತಿದೆಯೇ?\"",
+    chipDid500Come: "\"₹500 ಪಾವತಿ ಬಂದಿದೆಯೇ?\"",
+    inputPlaceholder: "ಇಲ್ಲಿ ಪ್ರಶ್ನೆಯನ್ನು ಟೈಪ್ ಮಾಡಿ ಅಥವಾ ಮೈಕ್ ಒತ್ತಿ...",
+    aiResponseLabel: "ಮುನ್ಷಿ AI ಉತ್ತರ:",
+    listening: "ಕೇಳಿಸಿಕೊಳ್ಳಲಾಗುತ್ತಿದೆ...",
 
-    humanGateTitle: "ಮಾನವ ಸಹ-ಸಹಿಯ ಅಗತ್ಯವಿದೆ (Level 2 Human Approval Required)",
-    humanGateQuestion: "ಶರ್ಮಾ ಅವರೇ, ಮಂಗಳವಾರ ಸಗಟು ವ್ಯಾಪಾರಿಗೆ ಪಾವತಿಸಲು ₹18,000 ಮೊತ್ತದ 24-ಗಂಟೆಗಳ ಶೂನ್ಯ-ಶುಲ್ಕ ಬ್ರಿಡ್ಜ್ ಕ್ರೆಡಿಟ್ ಖಾತೆಗೆ ಜಮೆ ಮಾಡಬೇಕೇ?",
-    haanBtn: "👍 ಹೌದು (Haan - ಅನುಮೋದಿಸಿ)",
-    naBtn: "👎 ಇಲ್ಲ (ತಿರಸ್ಕರಿಸಿ)",
-    disbursedSuccessTitle: "₹18,000 ಯಶಸ್ವಿಯಾಗಿ ಚಾಲ್ತಿ ಖಾತೆಗೆ ವರ್ಗಾಯಿಸಲಾಗಿದೆ!",
-    disbursedSuccessDesc: "ಮಾನವ ಅನುಮೋದನೆಯೊಂದಿಗೆ ಜಮೆ · Write-Ahead Log ನಲ್ಲಿ ದಾಖಲು · ಹಂತ 3 ಸ್ವಾಯತ್ತತೆಗೆ ಬಡ್ತಿ",
+    // Soundbox Telemetry
+    soundboxStatusTitle: "ಸೌಂಡ್‌ಬಾಕ್ಸ್ ಸ್ಥಿತಿ (SOUNDBOX 4.0)",
+    soundboxModel: "Paytm Soundbox 4.0 4G",
+    online: "ಆನ್‌ಲೈನ್",
+    battery: "ಬ್ಯಾಟರಿ",
+    audioTestBtn: "ಧ್ವನಿ ಪರೀಕ್ಷೆ",
+    troubleshootBtn: "ಸಮಸ್ಯೆ ಪರಿಹಾರ",
 
-    liveTickerTitle: "ಲೈವ್ ವಹಿವಾಟು ಫೀಡ್ (Live Activity)",
+    // Merchant Support
+    supportTitle: "ಅಂಗಡಿಯವರ ಸಹಾಯ (SUPPORT)",
+    fseName: "FSE ಅರುಣ್ ಶರ್ಮಾ (ನಿಮ್ಮ ಫೀಲ್ಡ್ ಅಧಿಕಾರಿ)",
+    fseBeat: "ಕೋರಮಂಗಲ ಬೀಟ್ • 9123456780",
+    callFseBtn: "ಕರೆ ಮಾಡಿ",
+    helpTicketBtn: "ಸಹಾಯ ಟಿಕೆಟ್",
 
-    okfStoreTitle: "Google Cloud OKF v0.2 ನಾಲೆಡ್ಜ್ ಸ್ಟೋರ್",
-    okfStoreDesc: "Google Cloud ಮುಕ್ತ ಮಾನದಂಡ. 5 ಟ್ರಸ್ಟ್ ಸಿಗ್ನಲ್‌ಗಳೊಂದಿಗೆ ಗಿಟ್-ವರ್ಷನ್ ಮಾರ್ಕ್‌ಡೌನ್.",
-    fiveTrustSignalsTitle: "OKF v0.2 ಐದು ಟ್ರಸ್ಟ್ ಸಿಗ್ನಲ್‌ಗಳು (Five Trust Signals)",
-    signal1Provenance: "1. ಮೂಲ / Provenance (Sources):",
-    signal2TrustTier: "2. ವಿಶ್ವಾಸಾರ್ಹತೆ / Trust Tier:",
-    signal3Freshness: "3. ತಾಜಾತನ / Freshness (Validity):",
-    signal4Lifecycle: "4. ಜೀವನ ಚಕ್ರ / Lifecycle Status:",
-    signal5Attestation: "5. ದೃಢೀಕರಣ / Attested Computation:",
-    runCragBtn: "OKF v0.2 CRAG ಮೌಲ್ಯಮಾಪನ ನಡೆಸಿ",
-    cragVerifiedTitle: "CRAG ಉಲ್ಲೇಖ ಪರಿಶೀಲಿಸಲಾಗಿದೆ",
+    // Mobile Bottom Navigation
+    navHome: "ಮುಖಪುಟ",
+    navPayments: "ಪಾವತಿಗಳು",
+    navSettlement: "ಸೆಟಲ್‌ಮೆಂಟ್",
+    navSoundbox: "ಸೌಂಡ್‌ಬಾಕ್ಸ್",
+    navHelp: "ಸಹಾಯ / FSE",
 
-    fseCardTitle: "FSE ರಾಜೀನಾಮೆ ಮತ್ತು ಜವಾಬ್ದಾರಿ ವರ್ಗಾವಣೆ",
-    fseDualKeyLabel: "ಡ್ಯುಯಲ್-ಕೀ ಮೆಮೊರಿ",
-    activeFseLabel: "ಸಕ್ರಿಯ FSE:",
-    inheritedNotice: "✓ ಅರುಣ್ ಅವರ 12 ಅಂಗಡಿಗಳ ಜವಾಬ್ದಾರಿ ಯಾವುದೇ ಭರವಸೆ ಕಳೆದುಕೊಳ್ಳದೆ ವರ್ಗಾವಣೆಗೊಂಡಿದೆ.",
-    runDreamBtn: "🌙 ರಾತ್ರಿ 11:30 ಲೆಕ್ಕಾಚಾರ ನಡೆಸಿ",
-    arunResignBtn: "🔄 ಅರುಣ್ ರಾಜೀನಾಮೆ (7 PM)",
+    // Footer
+    footerHackathon: "Paytm Build for India AI Hackathon",
+    footerTrack: "Track 3: Autonomous AI Teammates",
+    footerCompliance: "100% NPCI UDIR & RBI FREE-AI Compliant",
 
-    routerTitle: "ವೆಚ್ಚ-ಆಧಾರಿತ 3-ಹಂತದ ಕಾಗ್ನಿಷನ್ ರೂಟರ್",
-    activeSkillLabel: "ಸಕ್ರಿಯ ಸ್ಕಿಲ್:",
-    codeModeTitle: "Cloudflare Code Mode MCP (~980 ಟೋಕನ್)",
-    codeModeSub: "ಸಾಂಪ್ರದಾಯಿಕ JSON ಟೂಲ್ಸ್‌ಗಿಂತ 99.3% ಟೋಕನ್ ಕಡಿತ",
-    auditLogTitle: "ಡಿಟರ್ಮಿನಿಸ್ಟಿಕ್ ಬಾಡಿ & ಆಡಿಟ್ ಲಾಗ್",
-    walTitle: "Write-Ahead Log (WAL)",
-    canaryTitle: "Netflix Data Canary",
-    canaryDesc: "ಮರುಪಾವತಿ ವೇಗವನ್ನು ಮೇಲ್ವಿಚಾರಣೆ ಮಾಡುತ್ತದೆ. Z > 3.0σ ಆದರೆ 150 ಸೆಕೆಂಡುಗಳಲ್ಲಿ ಹಂತ 3 ರದ್ದು.",
-    shieldTitle: "Lethal Trifecta Shield (Outlines FSM)",
-    shieldDesc: "ಅನಧಿಕೃತ ಪಠ್ಯವನ್ನು ಹಣಕಾಸು ಟೂಲ್ಸ್‌ಗಳಿಂದ ಪ್ರತ್ಯೇಕಿಸುತ್ತದೆ.",
-    testInjectionBtn: "ಪ್ರಾಮ್ಟ್ ಇಂಜೆಕ್ಷನ್ ಪರೀಕ್ಷಿಸಿ",
-  },
+    // FSE Operations Console
+    fseConsoleTitle: "FSE ಕಾರ್ಯಾಚರಣೆಗಳ ಕನ್ಸೋಲ್ (FSE Operations)",
+    fseConsoleSub: "ವ್ಯಾಪಾರಿಗಳ ಭೇಟಿ, ವಿವಾದ ಪರಿಹಾರ, ಸೌಂಡ್‌ಬಾಕ್ಸ್ ಸೇವೆ ಮತ್ತು ಸುರಕ್ಷಿತ ವರ್ಗಾವಣೆ ನಿರ್ವಹಣೆ.",
+    handoverBtn: "ಪ್ರಿಯಾಗೆ ವರ್ಗಾಯಿಸಿ (Handover to Priya)",
+    statAssignedMerchants: "ನಿಯೋಜಿತ ಅಂಗಡಿಗಳು (BEAT)",
+    statActiveDisputes: "ಸಕ್ರಿಯ ವಿವಾದಗಳು (DISPUTES)",
+    statNextVisit: "ಮುಂದಿನ ಭೇಟಿ (NEXT VISIT)",
+    statSoundboxUptime: "ಸೌಂಡ್‌ಬಾಕ್ಸ್ 4G ಸಮಯ",
+    allActivePill: "ಎಲ್ಲವೂ ಸಕ್ರಿಯ",
+    underReviewPill: "ಪರಿಶೀಲನೆಯಲ್ಲಿದೆ",
+    connected100Pill: "100% ಸಿಗ್ನಲ್ ಕನೆಕ್ಟೆಡ್",
+    assignedMerchantsTitle: "ನಿಯೋಜಿತ ವ್ಯಾಪಾರಿಗಳ ಪಟ್ಟಿ (ASSIGNED MERCHANTS)",
+    activeCountBadge: "3 ಸಕ್ರಿಯ ಅಂಗಡಿಗಳು",
+    viewProfile: "ಪ್ರೊಫೈಲ್ ನೋಡಿ →",
+    lowBattery: "ಬ್ಯಾಟರಿ ಕಡಿಮೆ",
+    activeDisputesTitle: "ಸಕ್ರಿಯ ವಿವಾದಗಳು (ACTIVE DISPUTES)",
+    reviewRequiredBadge: "1 ಪರಿಶೀಲನೆ ಬಾಕಿ",
+    uploadEvidenceBtn: "ಸಾಕ್ಷ್ಯ ಅಪ್‌ಲೋಡ್ ಮಾಡಿ",
+    instantReversalBtn: "ತಕ್ಷಣ ಮರುಪಾವತಿ ನೀಡಿ",
+    safeHandoffTitle: "ಸುರಕ್ಷಿತ FSE ವರ್ಗಾವಣೆ (SAFE FSE HANDOFF)",
+    safeHandoffDesc: "ಸ್ಥಳ ಬದಲಾವಣೆ ಅಥವಾ ರಜೆಯ ಸಮಯದಲ್ಲಿ ನಿಮ್ಮ ಎಲ್ಲಾ 3 ವ್ಯಾಪಾರಿಗಳ ಸಂಪೂರ್ಣ ಇತಿಹಾಸ ಮತ್ತು ಬಾಕಿ ಬದ್ಧತೆಗಳನ್ನು FSE ಪ್ರಿಯಾ ನಾಯರ್ ಅವರಿಗೆ ವರ್ಗಾಯಿಸಿ.",
+    recipientOfficer: "ಸ್ವೀಕರಿಸುವ ಅಧಿಕಾರಿ: FSE ಪ್ರಿಯಾ ನಾಯರ್ (ID: DEMO_FSE_PRIYA • 9123456789)",
+    confirmHandoffBtn: "ವರ್ಗಾವಣೆ ದೃಢೀಕರಿಸಿ (Confirm Handoff)",
+    memoryStreamTitle: "ವ್ಯಾಪಾರಿ ಮೆಮೊರಿ & ಭೇಟಿ ಟಿಪ್ಪಣಿಗಳು (MEMORY STREAM)",
+    notePlaceholder: "ಭೇಟಿಯ ಹೊಸ ಟಿಪ್ಪಣಿ ಸೇರಿಸಿ (ಉದಾ. ಸೌಂಡ್‌ಬಾಕ್ಸ್ 4G ಸಿಮ್ ಪರೀಕ್ಷಿಸಲಾಗಿದೆ)...",
+    saveNoteBtn: "ಟಿಪ್ಪಣಿ ಉಳಿಸಿ",
 
-  "en-IN": {
-    appName: "Pi Munshi",
-    brandTagline: "Paytm Autonomous Frontline Teammate · Google Cloud OKF v0.2 Trust Signals · Voice-First Soundbox",
-    liveSwitch: "Live Bank Switch",
-    okfBadge: "OKF v0.2 Standard",
-    shopViewBtn: "🏪 Shopkeeper View",
-    judgeViewBtn: "⚙️ OKF v0.2 & Judge View",
+    // Judge / Engine View
+    judgeTitle: "ಜಡ್ಜ್ ಮತ್ತು ಸಿಸ್ಟಮ್ ಆರ್ಕಿಟೆಕ್ಚರ್ ಕನ್ಸೋಲ್ (Judge / Engine)",
+    judgeSub: "5 ಆಲ್-ಇನ್-ಒನ್ ಟ್ರಸ್ಟ್ ಸಿಗ್ನಲ್‌ಗಳು, ಔಟ್‌ಲೈನ್ಸ್ FSM ಶೀಲ್ಡ್, 3-ಹಂತದ ಕಾಗ್ನಿಷನ್ ಲ್ಯಾಡರ್.",
+    nightlyDreamBtn: "ರಾತ್ರಿ ಡ್ರೀಮಿಂಗ್ ನಡೆಸಿ (Nightly Dream)",
+    statSystemLoad: "ಸಿಸ್ಟಮ್ ಲೋಡ್ (SPS)",
+    statCanaryZ: "ಕ್ಯಾನರಿ Z-ಸ್ಕೋರ್",
+    statCostPerCall: "ಪ್ರತಿ ಕರೆಯ ಟೋಕನ್ ವೆಚ್ಚ",
+    statAutonomyLevel: "ಸ್ವಾಯತ್ತತೆಯ ಮಟ್ಟ",
+    fiveTrustSignalsTitle: "GOOGLE CLOUD OKF V0.2 ಟ್ರಸ್ಟ್ ಸಿಗ್ನಲ್‌ಗಳು",
+    cragValidateBtn: "CRAG ದೃಢೀಕರಿಸಿ",
+    activePolicyFile: "ಸಕ್ರಿಯ ನೀತಿ ಫೈಲ್: rbi_mdr_waiver_cap_2026.md",
+    provenanceLabel: "1. ಮೂಲ (Provenance): Reserve Bank of India & NPCI",
+    trustTierLabel: "2. ಟ್ರಸ್ಟ್ ಶ್ರೇಣಿ: tier-1-verified",
+    freshnessLabel: "3. ತಾಜಾತನ (Freshness): 2026-10-15 ರವರೆಗೆ ಮಾನ್ಯ",
+    lifecycleLabel: "4. ಜೀವಿತಾವಧಿ: STABLE",
+    attestationLabel: "5. ಕ್ರಿಪ್ಟೋಗ್ರಾಫಿಕ್ SHA-256 ಹ್ಯಾಶ್:",
+    cragConfidenceScore: "CRAG ವಿಶ್ವಾಸಾರ್ಹತೆ ಸ್ಕೋರ್: 99%",
+    highConfidenceVerified: "✓ HIGH_CONFIDENCE_AUTHORITATIVE (ಪರಿಶೀಲಿಸಲಾಗಿದೆ)",
+    fsmShieldTitle: "ಔಟ್‌ಲೈನ್ಸ್ ಲೆಕ್ಸಿಕಲ್ FSM ಶೀಲ್ಡ್ (ADVERSARIAL SHIELD)",
+    fsmShieldSub: "ಪ್ರಾಮ್ಟ್ ಇಂಜೆಕ್ಷನ್ ಮತ್ತು ಅನಧಿಕೃತ ವಹಿವಾಟುಗಳಿಗೆ ಗಣಿತದ ತಡೆಗೋಡೆ",
+    testPromptInjectionBtn: "ಪ್ರಾಮ್ಟ್ ಇಂಜೆಕ್ಷನ್ ಪರೀಕ್ಷಿಸಿ",
+    ceecilLadderTitle: "CEECIL 3-ಹಂತದ ಕಾಗ್ನಿಷನ್ ಲ್ಯಾಡರ್",
+    singleLoopOpev: "ಸಿಂಗಲ್-ಲೂಪ್ O-P-E-V",
+    rung1Title: "ಹಂತ 1: ರಿಫ್ಲೆಕ್ಸ್ ದೃಢೀಕರಣ",
+    rung1Desc: "0 LLM ಟೋಕನ್‌ಗಳು • 180ms ವಿಳಂಬ",
+    rung1Accuracy: "100% ನಿಖರ",
+    rung2Title: "ಹಂತ 2: ಪಾಲಿಸಿ ಆರ್ಬಿಟ್ರೇಜ್",
+    rung2Desc: "~450 ಟೋಕನ್‌ಗಳು • CRAG ಮೌಲ್ಯಮಾಪನ",
+    rung2Autonomy: "L2 ಸ್ವಾಯತ್ತತೆ",
+    rung3Title: "ಹಂತ 3: VCG ಮೆಕ್ಯಾನಿಸಂ ವಿನ್ಯಾಸ",
+    rung3Desc: "Flo Pro ಬಹು-ಪಕ್ಷ ಒಪ್ಪಂದ ಮೆನು",
+    rung3Status: "ದೃಢೀಕರಿಸಲಾಗಿದೆ",
+    walTitleBadge: "ರೈಟ್-ಅಹೆಡ್ ಲಾಗ್ (WAL) & ಆಡಿಟ್ ಟ್ರೇಲ್ಸ್",
+    idempotencyGuaranteed: "ಐಡೆಂಪೊಟೆನ್ಸಿ ಗ್ಯಾರಂಟಿ",
 
-    scene1Title: "1 · Defend bill (POD)",
-    scene1Hint: "11s Swar-Mudra APOD",
-    scene2Title: "2 · Save checkout (VCG)",
-    scene2Hint: "Flo Pro menu + Haan",
-    scene3Title: "3 · Block attack (FSM)",
-    scene3Hint: "Outlines shield + RCA",
-    scene4Title: "4 · Nightly Dream & Resign",
-    scene4Hint: "Arun → Neha handoff",
-
-    shopkeeperLabel: "Merchant:",
-    fseRepLabel: "FSE Representative:",
-    okfVerifiedBadge: "✓ OKF v0.2 Verified",
-
-    paymentCreditedPill: "Yesterday's Payment Credited in Bank!",
-    listenAloudBtn: "🔊 Listen Outcome Aloud",
-    soundboxHeader: "🎙️ Soundbox Audio Outcome",
-    utrLabel: "UTR:",
-    orderIdLabel: "Order ID:",
-    settlementDoneLabel: "T+1 Auto-Settlement Completed",
-
-    testRealValuesTitle: "⚡ Test Real-Time Values (Stop Fake Values)",
-    testRealValuesDesc: "Enter any real bill amount to calculate live MDR fees, OKF v0.2 rules, and listen to the Soundbox audio in real time",
-    calculateBtn: "Calculate",
-    waiverCheckboxLabel: "Apply Retention Fee Waiver (OKF v0.2 Discretionary MDR Waiver ≤ ₹15)",
-
-    card1Title: "1. Total Bill Amount",
-    card1Subtitle: "Scanned via counter QR",
-    card2Title: "2. RBI MDR Fee (0.4%)",
-    card2SubtitleFree: "100% Free up to ₹2,000",
-    card2SubtitleCharged: "0.40% fee on >₹2,000 (Cap ₹300)",
-    card3Title: "3. Munshi Policy Waiver",
-    card3SubtitleApplied: "✓ Waived under OKF v0.2 policy",
-    card3SubtitleNone: "Waiver not applied",
-    card4Title: "4. Net Credited to Bank",
-    card4Subtitle: "Verified via bank UTR",
-
-    humanGateTitle: "Level 2 Human Approval Required (Multi-Sig Gate)",
-    humanGateQuestion: "Sharma ji, disburse ₹18,000 24-hour zero-fee Paytm bridge credit to current account for Tuesday wholesaler payout?",
-    haanBtn: "👍 Haan (Approve Disbursal)",
-    naBtn: "👎 Na (Reject)",
-    disbursedSuccessTitle: "₹18,000 successfully disbursed to current account!",
-    disbursedSuccessDesc: "Approved via human co-signature · Committed to Write-Ahead Log · Promoted to Level 3 Autonomy",
-
-    liveTickerTitle: "Live Countertop Activity Feed",
-
-    okfStoreTitle: "Google Cloud OKF v0.2 Knowledge Store",
-    okfStoreDesc: "Standardized on Google Cloud vendor-neutral specification. Replaces opaque vector embeddings with Git-versioned Markdown & Five Opt-In Trust Signals.",
-    fiveTrustSignalsTitle: "OKF v0.2 Five Opt-In Trust Signals",
-    signal1Provenance: "1. Provenance (Sources & Lineage):",
-    signal2TrustTier: "2. Trust Tier (Verification):",
-    signal3Freshness: "3. Freshness (Validity Window):",
-    signal4Lifecycle: "4. Lifecycle Status:",
-    signal5Attestation: "5. Attestation / Attested Computation:",
-    runCragBtn: "Run OKF v0.2 CRAG Evaluation",
-    cragVerifiedTitle: "CRAG Statutory Citation Verified",
-
-    fseCardTitle: "FSE Attrition & Territory Memory Handoff",
-    fseDualKeyLabel: "Dual-Key Memory",
-    activeFseLabel: "Active FSE:",
-    inheritedNotice: "✓ Inherited Arun's 12-shop beat with zero promise or memory loss.",
-    runDreamBtn: "🌙 Run 11:30 PM Dreaming",
-    arunResignBtn: "🔄 Arun Resigned (7:00 PM)",
-
-    routerTitle: "Cost-Tiered 3-Rung Cognition Router",
-    activeSkillLabel: "Active Skill:",
-    codeModeTitle: "Cloudflare Code Mode MCP (~980 Tokens)",
-    codeModeSub: "99.3% token reduction compared to 150+ raw JSON tools",
-    auditLogTitle: "Deterministic Body & Agent Audit Log",
-    walTitle: "Write-Ahead Log (WAL)",
-    canaryTitle: "Netflix Data Canary",
-    canaryDesc: "Monitors refund velocity in Upstash Redis. Auto-revokes Level 3 within 150s if Z > 3.0σ.",
-    shieldTitle: "Lethal Trifecta Shield (Outlines FSM)",
-    shieldDesc: "Air-gaps untrusted text from financial tools. Emits strictly typed enums only.",
-    testInjectionBtn: "Test Adversarial Injection",
+    // Modals
+    modalReceiveTitle: "ಆಲ್-ಇನ್-ಒನ್ ಪೇಟಿಎಂ ಕ್ಯೂಆರ್ ಕೋಡ್",
+    modalScanPay: "ಯಾವುದೇ ಯುಪಿಐ ಆ್ಯಪ್‌ನಿಂದ ಸ್ಕ್ಯಾನ್ ಮಾಡಿ ಪಾವತಿಸಿ",
+    modalCustomAmount: "ಮೊತ್ತವನ್ನು ನಮೂದಿಸಿ ಅಥವಾ ಆಯ್ಕೆಮಾಡಿ:",
+    modalSimulatePayment: "⚡ ಗ್ರಾಹಕರ ಯುಪಿಐ ಪಾವತಿ ಪರೀಕ್ಷಿಸಿ",
+    modalClose: "ಮುಚ್ಚಿ",
+    modalTxnDetailTitle: "ಡಿಜಿಟಲ್ ಪಾವತಿ ರಶೀದಿ",
+    modalDigitalReceipt: "ಪೇಟಿಎಂ ಪರಿಶೀಲಿಸಿದ ಡಿಜಿಟಲ್ ರಶೀದಿ",
+    modalBankRefRrn: "ಬ್ಯಾಂಕ್ ಉಲ್ಲೇಖ ಸಂಖ್ಯೆ (RRN)",
+    modalCustomerUpi: "ಗ್ರಾಹಕರ ಯುಪಿಐ ಐಡಿ",
+    modalPaymentMode: "ಪಾವತಿ ವಿಧಾನ",
+    modalTimestamp: "ಸಮಯ",
+    modalMdrWaiver: "MDR ಶುಲ್ಕ ರಿಯಾಯಿತಿ (ಸಬ್ಸಿಡಿ)",
+    modalSettlementStatus: "ಸೆಟಲ್‌ಮೆಂಟ್ ಸ್ಥಿತಿ",
+    modalRaiseDispute: "UDIR ವಿವಾದ ದಾಖಲಿಸಿ",
+    modalSettlementTitle: "ಬ್ಯಾಂಕ್ ಸೆಟಲ್‌ಮೆಂಟ್ ವಿವರಣೆ",
+    modalTotalSettled: "ಬ್ಯಾಂಕ್‌ಗೆ ಒಟ್ಟು ಜಮೆಯಾದ ಮೊತ್ತ",
+    modalLinkedBank: "ಲಿಂಕ್ ಮಾಡಿದ ಬ್ಯಾಂಕ್ ಖಾತೆ",
+    modalPayoutSchedule: "ವಾಪಸಾತಿ ವೇಳಾಪಟ್ಟಿ",
+    modalInstantPayoutBtn: "⚡ ತಕ್ಷಣ ಬ್ಯಾಂಕ್ ಖಾತೆಗೆ ಜಮೆ ಮಾಡಿ",
+    modalSoundboxTitle: "ಪೇಟಿಎಂ ಸೌಂಡ್‌ಬಾಕ್ಸ್ 4.0 ಸ್ಥಿತಿ",
+    modalSoundboxImei: "IMEI ಸಂಖ್ಯೆ",
+    modalFirmware: "ಫರ್ಮ್‌ವೇರ್ ಆವೃತ್ತಿ",
+    modalSpeakerHealth: "ಸ್ಪೀಕರ್ ಸ್ಥಿತಿ",
+    modalSignalStrength: "4G VoLTE ಸಿಗ್ನಲ್",
+    modalPlayTestChime: "🔔 ಪಾವತಿ ಧ್ವನಿ ಪರೀಕ್ಷಿಸಿ",
+    modalResetConnection: "🔄 4G ಸಂಪರ್ಕ ಮರುಹೊಂದಿಸಿ",
   },
 };
 
+export function getLangCode(lang?: string): LangCode {
+  if (!lang) return "hi-IN";
+  if (lang.startsWith("en")) return "en-IN";
+  if (lang.startsWith("kn")) return "kn-IN";
+  return "hi-IN";
+}
+
+export function getTranslation(lang?: string): TranslationDictionary {
+  const code = getLangCode(lang);
+  return I18N[code] || I18N["hi-IN"];
+}

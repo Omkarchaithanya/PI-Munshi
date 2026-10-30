@@ -3,7 +3,7 @@ import { useMunshi } from "@/lib/munshi/store";
 import { ShopkeeperView } from "./shopkeeper-view";
 import { FseView } from "./fse-view";
 import { JudgeView } from "./judge-view";
-import { I18N } from "@/lib/munshi/i18n";
+import { I18N, getTranslation } from "@/lib/munshi/i18n";
 import {
   ShieldCheck,
   Store,
@@ -24,7 +24,7 @@ import {
 export function CommandCenter() {
   const lang = useMunshi((s) => s.lang);
   const setLang = useMunshi((s) => s.setLang);
-  const t = I18N[lang] || I18N["hi-IN"];
+  const t = getTranslation(lang);
 
   // 3 Primary User Experiences
   const [activeTab, setActiveTab] = useState<"shopkeeper" | "fse" | "judge">("shopkeeper");
@@ -37,10 +37,10 @@ export function CommandCenter() {
   const runDream = useMunshi((s) => s.runDream);
 
   const scenes = [
-    { id: 1, title: t.scene1Title, hint: t.scene1Hint, run: "defend" as const },
-    { id: 2, title: t.scene2Title, hint: t.scene2Hint, run: "checkout" as const },
-    { id: 3, title: t.scene3Title, hint: t.scene3Hint, run: "attack" as const },
-    { id: 4, title: t.scene4Title, hint: t.scene4Hint, run: "dream" as const },
+    { id: 1, title: t.scene1Short, hint: "", run: "defend" as const },
+    { id: 2, title: t.scene2Short, hint: "", run: "checkout" as const },
+    { id: 3, title: t.scene3Short, hint: "", run: "attack" as const },
+    { id: 4, title: t.scene4Short, hint: "", run: "dream" as const },
   ];
 
   const launch = (id: (typeof scenes)[number]["run"]) => {
@@ -68,15 +68,15 @@ export function CommandCenter() {
             <div className="hidden sm:block">
               <div className="flex items-center gap-2">
                 <span className="text-sm font-extrabold text-white tracking-wide">
-                  Paytm for Business
+                  {t.paytmForBusiness}
                 </span>
                 <span className="inline-flex items-center gap-1 rounded-full bg-[#00BAF2]/20 px-2 py-0.5 text-[10px] font-bold text-[#00BAF2] border border-[#00BAF2]/30">
                   <ShieldCheck className="size-3" />
-                  OKF v0.2
+                  {t.okfBadge}
                 </span>
                 <span className="inline-flex items-center gap-1 rounded-full bg-amber-500/20 px-2 py-0.5 text-[10px] font-bold text-amber-300 border border-amber-500/40">
                   <span className="size-1.5 rounded-full bg-amber-400 animate-pulse" />
-                  DEMO MODE
+                  {t.demoBadge}
                 </span>
               </div>
             </div>
@@ -96,7 +96,7 @@ export function CommandCenter() {
                 }`}
               >
                 <Store className="size-3.5" />
-                <span className="hidden xs:inline">दुकानदार</span>
+                <span className="hidden xs:inline">{t.shopkeeperTab}</span>
               </button>
               <button
                 type="button"
@@ -108,7 +108,7 @@ export function CommandCenter() {
                 }`}
               >
                 <UserCheck className="size-3.5" />
-                <span className="hidden xs:inline">फ़ील्ड FSE</span>
+                <span className="hidden xs:inline">{t.fseTab}</span>
               </button>
               <button
                 type="button"
@@ -120,7 +120,7 @@ export function CommandCenter() {
                 }`}
               >
                 <Terminal className="size-3.5" />
-                <span className="hidden xs:inline">जज / इंजन</span>
+                <span className="hidden xs:inline">{t.judgeTab}</span>
               </button>
             </div>
 
@@ -178,7 +178,7 @@ export function CommandCenter() {
         <div className="w-full max-w-[1400px] mx-auto flex flex-wrap items-center justify-between gap-2">
           <div className="flex items-center gap-1.5 font-bold text-[11px] text-[#00BAF2]">
             <Play className="size-3 fill-current" />
-            <span>लाइव हैकथॉन टेस्ट परिदृश्य (One-Click Scenario Triggers):</span>
+            <span>{t.scenarioBarTitle}</span>
           </div>
 
           <div className="flex flex-wrap items-center gap-1.5">
@@ -219,7 +219,7 @@ export function CommandCenter() {
             }`}
           >
             <Home className="size-5" />
-            <span>होम</span>
+            <span>{t.navHome}</span>
           </button>
 
           <button
@@ -233,21 +233,20 @@ export function CommandCenter() {
             className="flex flex-col items-center gap-1 text-[11px] font-bold text-gray-400 hover:text-[#002970] cursor-pointer transition-colors"
           >
             <CreditCard className="size-5" />
-            <span>भुगतान</span>
+            <span>{t.navPayments}</span>
           </button>
 
           <button
             type="button"
             onClick={() => {
               setActiveTab("shopkeeper");
-              // triggers settlement modal via DOM trigger
               const el = document.querySelector('button:has-text("बैंक सेटलमेंट")') as HTMLButtonElement;
               el?.click();
             }}
             className="flex flex-col items-center gap-1 text-[11px] font-bold text-gray-400 hover:text-[#002970] cursor-pointer transition-colors"
           >
             <Building2 className="size-5" />
-            <span>सेटलमेंट</span>
+            <span>{t.navSettlement}</span>
           </button>
 
           <button
@@ -260,7 +259,7 @@ export function CommandCenter() {
             className="flex flex-col items-center gap-1 text-[11px] font-bold text-gray-400 hover:text-[#002970] cursor-pointer transition-colors"
           >
             <Volume2 className="size-5" />
-            <span>साउंडबॉक्स</span>
+            <span>{t.navSoundbox}</span>
           </button>
 
           <button
@@ -271,7 +270,7 @@ export function CommandCenter() {
             className="flex flex-col items-center gap-1 text-[11px] font-bold text-gray-400 hover:text-[#002970] cursor-pointer transition-colors"
           >
             <HelpCircle className="size-5" />
-            <span>सहायता / FSE</span>
+            <span>{t.navHelp}</span>
           </button>
         </div>
       </nav>
@@ -280,20 +279,20 @@ export function CommandCenter() {
       <footer className="border-t border-gray-200 bg-white py-3 px-4 text-xs text-gray-500 mb-14 md:mb-0">
         <div className="w-full max-w-[1400px] mx-auto flex flex-wrap items-center justify-between gap-2">
           <div className="flex items-center gap-2">
-            <span className="font-bold text-[#002970]">Paytm Build for India AI Hackathon</span>
+            <span className="font-bold text-[#002970]">{t.footerHackathon}</span>
             <span>·</span>
-            <span>Track 3: Autonomous AI Teammates</span>
+            <span>{t.footerTrack}</span>
             <span>·</span>
-            <span className="text-[#00BAF2] font-black">Pi Munshi (पाई-मुंशी)</span>
+            <span className="text-[#00BAF2] font-black">{t.appName}</span>
           </div>
 
           <div className="flex items-center gap-3">
             <span className="flex items-center gap-1 text-emerald-600 font-bold">
               <ShieldCheck className="size-3.5" />
-              100% NPCI UDIR & RBI FREE-AI Compliant
+              {t.footerCompliance}
             </span>
             <span>·</span>
-            <span className="font-mono text-[#002970] font-bold">Google Cloud OKF v0.2</span>
+            <span className="font-mono text-[#002970] font-bold">Google Cloud {t.okfBadge}</span>
           </div>
         </div>
       </footer>

@@ -25,12 +25,14 @@ import { SoundboxTroubleshootModal } from "./modals/soundbox-troubleshoot-modal"
 import { VoiceAssistant } from "./voice-assistant";
 import { munshiApi } from "@/lib/api-client";
 import { playSwarChirp, speak } from "@/lib/munshi/audio";
+import { getTranslation } from "@/lib/munshi/i18n";
 
 interface ShopkeeperViewProps {
   lang: string;
 }
 
 export function ShopkeeperView({ lang }: ShopkeeperViewProps) {
+  const t = getTranslation(lang);
   const [receiveModalOpen, setReceiveModalOpen] = useState(false);
   const [settlementModalOpen, setSettlementModalOpen] = useState(false);
   const [soundboxModalOpen, setSoundboxModalOpen] = useState(false);
@@ -77,25 +79,17 @@ export function ShopkeeperView({ lang }: ShopkeeperViewProps) {
           <div className="flex flex-wrap items-center gap-2 mb-1.5">
             <span className="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full bg-[#00BAF2]/20 border border-[#00BAF2]/40 text-[#00BAF2] text-xs font-bold">
               <Sparkles className="size-3" />
-              रमेश किराना स्टोर (Ramesh Kirana)
+              {t.storeName}
             </span>
             <span className="text-xs text-blue-200/90 font-mono bg-white/10 px-2 py-0.5 rounded-md">
-              UPI: ramesh.kirana@paytm
+              {t.upiId}
             </span>
           </div>
           <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-white">
-            {lang === "kn-IN"
-              ? "ನಮಸ್ಕಾರ, ರಮೇಶ್ ಜೀ! 🙏"
-              : lang === "en-IN"
-              ? "Namaste, Ramesh ji! 🙏"
-              : "नमस्ते, रमेश जी! 🙏"}
+            {t.greetingTitle}
           </h1>
           <p className="text-xs sm:text-sm text-blue-100/80 mt-1 max-w-xl">
-            {lang === "kn-IN"
-              ? "ಇಲ್ಲಿ ನಿಮ್ಮ ಅಂಗಡಿಯ ಇಂದಿನ ಪಾವತಿ, ಸೆಟಲ್ಮೆಂಟ್ ಮತ್ತು ಸೌಂಡ್‌ಬಾಕ್ಸ್ ಸ್ಥಿತಿ ಇದೆ."
-              : lang === "en-IN"
-              ? "Here is your shop's payment summary, settlement status, and Soundbox telemetry."
-              : "यहाँ है आपकी दुकान का आज का सुरक्षित डिजिटल पेमेंट सारांश, सेटलमेंट और साउंडबॉक्स स्थिति।"}
+            {t.greetingSub}
           </p>
         </div>
 
@@ -106,7 +100,7 @@ export function ShopkeeperView({ lang }: ShopkeeperViewProps) {
             className="flex items-center gap-2 px-4 py-3 rounded-2xl bg-[#00BAF2] hover:bg-[#00a8dc] text-[#002970] font-black text-xs sm:text-sm shadow-md transition-all active:scale-95 cursor-pointer"
           >
             <QrCode className="size-4 sm:size-5" />
-            क्यूआर कोड दिखाएं (Show QR)
+            {t.showQrBtn}
           </button>
           <button
             type="button"
@@ -114,7 +108,7 @@ export function ShopkeeperView({ lang }: ShopkeeperViewProps) {
             className="flex items-center gap-1.5 px-4 py-3 rounded-2xl bg-white/10 hover:bg-white/20 border border-white/20 text-white font-bold text-xs sm:text-sm transition-all cursor-pointer"
           >
             <Zap className="size-4 text-amber-300" />
-            तुरंत सेटलमेंट
+            {t.instantSettlementBtn}
           </button>
         </div>
       </section>
@@ -133,10 +127,10 @@ export function ShopkeeperView({ lang }: ShopkeeperViewProps) {
             </div>
             <div className="min-w-0">
               <span className="block font-black text-xs sm:text-sm text-[#002970] truncate">
-                पैसे प्राप्त करें
+                {t.qaReceiveMoney}
               </span>
               <span className="block text-[11px] text-gray-500 truncate mt-0.5">
-                ऑल-इन-वन यूपीआई क्यूआर
+                {t.qaReceiveMoneySub}
               </span>
             </div>
           </button>
@@ -155,10 +149,10 @@ export function ShopkeeperView({ lang }: ShopkeeperViewProps) {
             </div>
             <div className="min-w-0">
               <span className="block font-black text-xs sm:text-sm text-[#002970] truncate">
-                पेमेंट हिस्ट्री
+                {t.qaPaymentHistory}
               </span>
               <span className="block text-[11px] text-gray-500 truncate mt-0.5">
-                सभी डिजिटल लेन-देन
+                {t.qaPaymentHistorySub}
               </span>
             </div>
           </button>
@@ -174,10 +168,10 @@ export function ShopkeeperView({ lang }: ShopkeeperViewProps) {
             </div>
             <div className="min-w-0">
               <span className="block font-black text-xs sm:text-sm text-[#002970] truncate">
-                बैंक सेटलमेंट
+                {t.qaBankSettlement}
               </span>
               <span className="block text-[11px] text-gray-500 truncate mt-0.5">
-                UTR एवं दैनिक निकासी
+                {t.qaBankSettlementSub}
               </span>
             </div>
           </button>
@@ -193,10 +187,10 @@ export function ShopkeeperView({ lang }: ShopkeeperViewProps) {
             </div>
             <div className="min-w-0">
               <span className="block font-black text-xs sm:text-sm text-[#002970] truncate">
-                साउंडबॉक्स 4.0
+                {t.qaSoundbox}
               </span>
               <span className="block text-[11px] text-emerald-600 font-bold truncate mt-0.5">
-                88% बैटरी • ऑनलाइन
+                {t.qaSoundboxSub}
               </span>
             </div>
           </button>
@@ -215,12 +209,12 @@ export function ShopkeeperView({ lang }: ShopkeeperViewProps) {
               <div className="flex items-center gap-2">
                 <span className="size-2.5 rounded-full bg-emerald-500 animate-pulse" />
                 <h3 className="text-xs sm:text-sm font-black text-[#002970] uppercase tracking-wider">
-                  आज का कुल कारोबार (Today's Business)
+                  {t.todayBusinessTitle}
                 </h3>
               </div>
               <span className="text-[11px] text-gray-500 font-medium flex items-center gap-1 bg-gray-50 px-2.5 py-1 rounded-full border border-gray-200/60">
                 <Clock className="size-3 text-gray-400" />
-                रियल-टाइम लाइव अपडेट
+                {t.realTimeBadge}
               </span>
             </div>
 
@@ -228,53 +222,53 @@ export function ShopkeeperView({ lang }: ShopkeeperViewProps) {
               {/* Total Today */}
               <div className="p-3 rounded-2xl bg-[#F0F8FF]/80 border border-blue-100">
                 <span className="text-[11px] font-bold text-gray-500 uppercase tracking-wide block">
-                  कुल भुगतान प्राप्त
+                  {t.totalPaymentsReceived}
                 </span>
                 <span className="text-2xl sm:text-3xl font-black text-[#002970] mt-1 block">
                   ₹{totalToday > 0 ? totalToday.toFixed(2) : "2,150.00"}
                 </span>
                 <span className="inline-flex items-center gap-1 text-[11px] text-emerald-700 font-bold mt-1 bg-emerald-100/70 px-2 py-0.5 rounded-md">
                   <CheckCircle2 className="size-3" />
-                  {successCount > 0 ? successCount : 3} सफल लेन-देन
+                  {successCount > 0 ? successCount : 3} {t.successfulPaymentsCount}
                 </span>
               </div>
 
               {/* Settled in Bank */}
               <div className="p-3 rounded-2xl bg-white border border-gray-100">
                 <span className="text-[11px] font-bold text-gray-500 uppercase tracking-wide block">
-                  बैंक में जमा (Settled)
+                  {t.bankSettledTitle}
                 </span>
                 <span className="text-xl sm:text-2xl font-bold text-emerald-700 mt-1 block">
                   ₹1,650.00
                 </span>
                 <span className="text-[10px] text-gray-500 font-mono block mt-1">
-                  UTR: 62998412...
+                  {t.bankSettledSub}
                 </span>
               </div>
 
               {/* Pending Settlement */}
               <div className="p-3 rounded-2xl bg-white border border-gray-100">
                 <span className="text-[11px] font-bold text-gray-500 uppercase tracking-wide block">
-                  लंबित सेटलमेंट (Pending)
+                  {t.pendingSettlementTitle}
                 </span>
                 <span className="text-xl sm:text-2xl font-bold text-amber-600 mt-1 block">
                   ₹500.00
                 </span>
                 <span className="text-[10px] text-gray-500 block mt-1">
-                  आज रात 11:59 बजे
+                  {t.pendingSettlementSub}
                 </span>
               </div>
 
               {/* MDR Fee */}
               <div className="p-3 rounded-2xl bg-white border border-gray-100">
                 <span className="text-[11px] font-bold text-gray-500 uppercase tracking-wide block">
-                  MDR बैंक शुल्क
+                  {t.mdrBankFeeTitle}
                 </span>
                 <span className="text-xl sm:text-2xl font-bold text-emerald-600 mt-1 block">
                   ₹0.00
                 </span>
                 <span className="inline-block text-[10px] text-emerald-700 font-bold bg-emerald-50 px-1.5 py-0.5 rounded mt-1 border border-emerald-200">
-                  100% सरकारी सब्सिडी
+                  {t.govtSubsidyPill}
                 </span>
               </div>
             </div>
@@ -286,7 +280,7 @@ export function ShopkeeperView({ lang }: ShopkeeperViewProps) {
               <div className="flex items-center gap-2">
                 <CreditCard className="size-4 text-[#00BAF2]" />
                 <h3 className="text-sm font-black text-[#002970] tracking-wide">
-                  हाल के भुगतान (Recent Payments)
+                  {t.recentPaymentsTitle}
                 </h3>
               </div>
 
@@ -303,7 +297,7 @@ export function ShopkeeperView({ lang }: ShopkeeperViewProps) {
                         : "bg-gray-100 text-gray-600 hover:bg-gray-200"
                     }`}
                   >
-                    {filterKey === "ALL" ? "सभी" : filterKey === "SUCCESS" ? "सफल" : "सेटल"}
+                    {filterKey === "ALL" ? t.filterAll : filterKey === "SUCCESS" ? t.filterSuccess : t.filterSettled}
                   </button>
                 ))}
                 <button
@@ -321,7 +315,7 @@ export function ShopkeeperView({ lang }: ShopkeeperViewProps) {
             <div className="divide-y divide-gray-100 mt-2">
               {filteredTransactions.length === 0 ? (
                 <div className="py-10 text-center text-xs text-gray-400 font-medium">
-                  कोई लेन-देन नहीं मिला।
+                  {t.noPaymentsFound}
                 </div>
               ) : (
                 filteredTransactions.map((txn) => (
@@ -366,7 +360,7 @@ export function ShopkeeperView({ lang }: ShopkeeperViewProps) {
                               : "bg-amber-50 text-amber-700"
                           }`}
                         >
-                          {txn.settlement_status === "SETTLED" ? "खाते में जमा" : "आज रात जमा"}
+                          {txn.settlement_status === "SETTLED" ? t.creditedToBank : t.settlingTonight}
                         </span>
                       </div>
                       <ChevronRight className="size-4 text-gray-300 group-hover:text-[#002970] transition-transform group-hover:translate-x-0.5" />
@@ -391,12 +385,12 @@ export function ShopkeeperView({ lang }: ShopkeeperViewProps) {
               <div className="flex items-center gap-2">
                 <Volume2 className="size-4 text-[#00BAF2]" />
                 <h3 className="text-xs sm:text-sm font-black text-[#002970] uppercase tracking-wide">
-                  साउंडबॉक्स स्थिति (Soundbox 4.0)
+                  {t.soundboxStatusTitle}
                 </h3>
               </div>
               <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-700 text-[10px] font-bold">
                 <span className="size-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                ऑनलाइन
+                {t.online}
               </span>
             </div>
 
@@ -406,13 +400,13 @@ export function ShopkeeperView({ lang }: ShopkeeperViewProps) {
               </div>
               <div>
                 <h4 className="font-extrabold text-xs sm:text-sm text-[#002970]">
-                  Paytm Soundbox 4.0 4G
+                  {t.soundboxModel}
                 </h4>
                 <p className="text-[11px] text-gray-400 font-mono mt-0.5">IMEI: 860123456789012</p>
                 <div className="flex items-center gap-3 mt-1.5 text-xs text-gray-600">
                   <span className="flex items-center gap-1 font-bold">
                     <Battery className="size-3.5 text-emerald-600" />
-                    88% बैटरी
+                    88% {t.battery}
                   </span>
                   <span className="flex items-center gap-1 font-bold">
                     <Wifi className="size-3.5 text-blue-600" />
@@ -427,19 +421,25 @@ export function ShopkeeperView({ lang }: ShopkeeperViewProps) {
                 type="button"
                 onClick={() => {
                   playSwarChirp("100");
-                  speak("पेटीएम पर एक सौ रुपये प्राप्त हुए।", lang);
+                  const phrase =
+                    lang === "kn-IN"
+                      ? "ಪೇಟಿಎಂ ನಲ್ಲಿ ₹100 ಸ್ವೀಕರಿಸಲಾಗಿದೆ."
+                      : lang === "en-IN"
+                      ? "Received 100 rupees on Paytm."
+                      : "पेटीएम पर एक सौ रुपये प्राप्त हुए।";
+                  speak(phrase, lang);
                 }}
                 className="py-2.5 px-3 rounded-xl bg-[#F0F8FF] hover:bg-[#E0F6FD] text-[#002970] font-black text-xs border border-blue-100 transition-colors flex items-center justify-center gap-1.5 cursor-pointer"
               >
                 <Volume2 className="size-3.5" />
-                ध्वनि टेस्ट
+                {t.audioTestBtn}
               </button>
               <button
                 type="button"
                 onClick={() => setSoundboxModalOpen(true)}
                 className="py-2.5 px-3 rounded-xl border border-gray-200 hover:border-[#00BAF2] text-gray-700 font-bold text-xs hover:bg-gray-50 transition-colors flex items-center justify-center cursor-pointer"
               >
-                समस्या निवारण
+                {t.troubleshootBtn}
               </button>
             </div>
           </div>
@@ -449,7 +449,7 @@ export function ShopkeeperView({ lang }: ShopkeeperViewProps) {
             <div className="flex items-center gap-2 pb-3 border-b border-gray-100">
               <ShieldCheck className="size-4 text-[#00BAF2]" />
               <h3 className="text-xs sm:text-sm font-black text-[#002970] uppercase tracking-wide">
-                मदद एवं फ़ील्ड सहायता (Support)
+                {t.supportTitle}
               </h3>
             </div>
 
@@ -459,10 +459,10 @@ export function ShopkeeperView({ lang }: ShopkeeperViewProps) {
               </div>
               <div className="min-w-0">
                 <span className="font-extrabold text-xs text-[#002970] block truncate">
-                  FSE अरुण शर्मा (आपका फ़ील्ड अधिकारी)
+                  {t.fseName}
                 </span>
                 <span className="text-[11px] text-gray-500 block truncate">
-                  कोरमंगला क्षेत्र • 9123456780
+                  {t.fseBeat}
                 </span>
               </div>
             </div>
@@ -474,7 +474,7 @@ export function ShopkeeperView({ lang }: ShopkeeperViewProps) {
                 className="flex-1 py-2 px-3 rounded-xl bg-[#002970] hover:bg-[#001738] text-white font-bold text-xs transition-colors flex items-center justify-center gap-1.5 cursor-pointer shadow-sm"
               >
                 <Phone className="size-3" />
-                कॉल करें
+                {t.callFseBtn}
               </button>
               <button
                 type="button"
@@ -482,7 +482,7 @@ export function ShopkeeperView({ lang }: ShopkeeperViewProps) {
                 className="flex-1 py-2 px-3 rounded-xl border border-gray-200 hover:border-[#00BAF2] text-gray-700 font-bold text-xs hover:bg-gray-50 transition-colors flex items-center justify-center gap-1.5 cursor-pointer"
               >
                 <HelpCircle className="size-3" />
-                हेल्प टिकट
+                {t.helpTicketBtn}
               </button>
             </div>
           </div>

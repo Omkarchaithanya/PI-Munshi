@@ -1,5 +1,6 @@
 import React from "react";
 import { X, CheckCircle2, ShieldCheck, Share2, HelpCircle, ArrowDownLeft } from "lucide-react";
+import { getTranslation } from "@/lib/munshi/i18n";
 
 interface TransactionDetailModalProps {
   transaction: any | null;
@@ -8,6 +9,7 @@ interface TransactionDetailModalProps {
 }
 
 export function TransactionDetailModal({ transaction, onClose, lang }: TransactionDetailModalProps) {
+  const t = getTranslation(lang);
   if (!transaction) return null;
 
   const isSuccess = transaction.status === "SUCCESS";
@@ -19,11 +21,11 @@ export function TransactionDetailModal({ transaction, onClose, lang }: Transacti
         {/* Top Pattern Header */}
         <div className="bg-[#002970] px-5 py-4 text-white flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <span className="font-extrabold text-sm tracking-tight">Pay<span className="text-[#00BAF2]">tm</span> रसीद</span>
+            <span className="font-extrabold text-sm tracking-tight">{t.modalTxnDetailTitle}</span>
           </div>
           <button
             onClick={onClose}
-            className="p-1 rounded-full hover:bg-white/10 text-white transition-colors"
+            className="p-1 rounded-full hover:bg-white/10 text-white transition-colors cursor-pointer"
           >
             <X className="size-5" />
           </button>
@@ -38,7 +40,7 @@ export function TransactionDetailModal({ transaction, onClose, lang }: Transacti
             </div>
             <h2 className="text-xl font-black text-[#002970]">₹{amount.toFixed(2)}</h2>
             <p className="text-xs font-semibold text-emerald-700 bg-emerald-50 px-2.5 py-0.5 rounded-full mt-1 border border-emerald-200">
-              भुगतान सफल (Payment Successful)
+              {t.filterSuccess} ✓
             </p>
             <span className="text-[11px] text-gray-400 mt-1">
               {new Date(transaction.created_at || Date.now()).toLocaleTimeString("en-IN", {
@@ -58,54 +60,54 @@ export function TransactionDetailModal({ transaction, onClose, lang }: Transacti
           {/* Details Card */}
           <div className="mt-5 rounded-2xl bg-white p-4 border border-gray-100 shadow-sm space-y-3 text-xs">
             <div className="flex justify-between items-center pb-2 border-b border-gray-50">
-              <span className="text-gray-500">ग्राहक (Customer UPI):</span>
+              <span className="text-gray-500">{t.modalCustomerUpi}:</span>
               <span className="font-mono font-bold text-gray-800">{transaction.payer_vpa || "customer@paytm"}</span>
             </div>
 
             <div className="flex justify-between items-center pb-2 border-b border-gray-50">
-              <span className="text-gray-500">लेन-देन आईडी (Txn ID):</span>
+              <span className="text-gray-500">Txn ID:</span>
               <span className="font-mono text-gray-700 text-[11px] truncate max-w-[160px]">{transaction.txn_id}</span>
             </div>
 
             <div className="flex justify-between items-center pb-2 border-b border-gray-50">
-              <span className="text-gray-500">बैंक संदर्भ (RRN):</span>
+              <span className="text-gray-500">{t.modalBankRefRrn}:</span>
               <span className="font-mono text-gray-700 text-[11px]">{transaction.rrn || "RRN-482910"}</span>
             </div>
 
             <div className="flex justify-between items-center pb-2 border-b border-gray-50">
-              <span className="text-gray-500">सेटलमेंट स्थिति:</span>
+              <span className="text-gray-500">{t.modalSettlementStatus}:</span>
               <span className={`font-bold ${transaction.settlement_status === "SETTLED" ? "text-emerald-600" : "text-amber-600"}`}>
-                {transaction.settlement_status === "SETTLED" ? "बैंक खाते में जमा (Settled)" : "आज रात जमा होगा (Pending)"}
+                {transaction.settlement_status === "SETTLED" ? t.creditedToBank : t.settlingTonight}
               </span>
             </div>
 
             <div className="flex justify-between items-center pt-1">
-              <span className="text-gray-500">MDR शुल्क:</span>
-              <span className="font-bold text-emerald-600">₹0.00 (100% सब्सिडी)</span>
+              <span className="text-gray-500">{t.modalMdrWaiver}:</span>
+              <span className="font-bold text-emerald-600">₹0.00 ({t.govtSubsidyPill})</span>
             </div>
           </div>
 
           {/* Trust Banner */}
           <div className="mt-3 flex items-center justify-center gap-1 text-[11px] text-[#002970] font-medium">
             <ShieldCheck className="size-3.5 text-[#00BAF2]" />
-            Paytm Bank Escrow एवं NPCI UDIR द्वारा सुरक्षित
+            {t.footerCompliance}
           </div>
 
           {/* Action Buttons */}
           <div className="mt-5 flex gap-2">
             <button
-              onClick={() => alert("रसीद व्हाट्सएप पर साझा करने के लिए तैयार है!")}
-              className="flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-xl border border-[#00BAF2] text-[#002970] font-bold text-xs hover:bg-[#F0F9FF] transition-colors"
+              onClick={() => alert("Receipt ready to share via WhatsApp / SMS!")}
+              className="flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-xl border border-[#00BAF2] text-[#002970] font-bold text-xs hover:bg-[#F0F9FF] transition-colors cursor-pointer"
             >
               <Share2 className="size-3.5" />
-              शेयर रसीद
+              {lang === "kn-IN" ? "ರಶೀದಿ ಹಂಚಿಕೊಳ್ಳಿ" : lang === "en-IN" ? "Share Receipt" : "शेयर रसीद"}
             </button>
             <button
-              onClick={() => alert("मदद और सहायता टिकट दर्ज कर दिया गया है। FSE अरुण शर्मा को सूचित किया गया।")}
-              className="flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-800 font-bold text-xs transition-colors"
+              onClick={() => alert("Ticket created and assigned to FSE.")}
+              className="flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-800 font-bold text-xs transition-colors cursor-pointer"
             >
               <HelpCircle className="size-3.5" />
-              मदद चाहिए
+              {t.modalRaiseDispute}
             </button>
           </div>
         </div>
