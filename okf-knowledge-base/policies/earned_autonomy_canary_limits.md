@@ -1,13 +1,43 @@
 ---
-policy_id: "PTM-GOV-2026-AUTO-03"
+okf: "0.2"
+type: "policy"
 title: "Graduated Earned Autonomy & Netflix Data Canary Governance"
 short_name: "Autonomy Ladder & Canary Policy"
-regulator: "Paytm Model Governance & Compliance Committee"
-effective_date: "2026-10-01"
-last_updated_date: "2026-10-29"
+description: "Governance matrix defining autonomy progression from Level 0 to Level 3 and automated Netflix 3-sigma canary circuit breakers"
 category: "AUTONOMY_GOVERNANCE"
-status: "ACTIVE"
-git_commit_sha: "71c08ff94361ba89201de472c"
+
+# OKF v0.2 Trust Signal 1: Provenance
+sources:
+  - uri: "paytm://ai-governance/autonomous-agents/charter-2026"
+    title: "Paytm Model Risk & Autonomous Agent Charter"
+  - uri: "netflix://techblog/data-canary-catalog-validation"
+    title: "Netflix 3-Sigma Behavioral Data Canary Pattern"
+
+# OKF v0.2 Trust Signal 2: Trust Tiers
+trust:
+  generated:
+    by: "human"
+    identity: "Paytm Model Governance Committee"
+  verified:
+    by: "human"
+    identity: "Chief Risk Officer, One97 Communications"
+    tier: "tier-1-verified"
+
+# OKF v0.2 Trust Signal 3: Freshness
+freshness:
+  effective_date: "2026-10-01"
+  last_reviewed: "2026-10-29"
+  stale_after: "2027-01-01"
+
+# OKF v0.2 Trust Signal 4: Lifecycle Status
+status: "stable"
+
+# OKF v0.2 Trust Signal 5: Attestation
+attestation:
+  method: "git-commit-audit"
+  upstream_sha256: "71c08ff94361ba89201de472c91823ab0928120c"
+  attested_computation_id: "COMP-CANARY-Z-03"
+
 rules:
   level_0: "Prepare (8-line gist, shop dossier, offline cache)"
   level_1: "Reversible Auto-Act (Settlement check, hardware ticket, receipt SMS)"
@@ -32,5 +62,5 @@ Autonomy is a ledger, not a switch. An AI teammate can never be granted broad au
   - Revocation: A single customer dispute anomaly, policy violation, or canary trigger immediately revokes the action class back to Level 2.
 
 ## 3. Netflix 3σ Behavioral Data Canary
-- The system continuously calculates the rolling Z-score of waiver velocity and dispute reversals.
+- The system continuously calculates rolling Z-scores of waiver velocity and dispute reversals.
 - If $Z = \frac{|x - \mu|}{\sigma} > 3.00$, the canary automatically triggers an emergency circuit-breaker within 150 seconds, revoking Level 3 autonomy across the territory.

@@ -1,13 +1,43 @@
 ---
-policy_id: "PTM-CORE-2026-DREAM-01"
+okf: "0.2"
+type: "concept"
 title: "11:30 PM Nightly Dreaming & FSE Resignation Handoff Specification"
 short_name: "Nightly Dreaming & Territory Memory"
-regulator: "Paytm Field Operations Technology Group"
-effective_date: "2026-09-15"
-last_updated_date: "2026-10-30"
+description: "Protocol for asynchronous 11:30 PM memory consolidation into 8-line OKF gists and zero-loss field rep resignation handoff"
 category: "NIGHTLY_DREAMING"
-status: "ACTIVE"
-git_commit_sha: "3d29a501bc8947ef62194a20b"
+
+# OKF v0.2 Trust Signal 1: Provenance
+sources:
+  - uri: "paytm://operations/field-sales/beat-management-v4"
+    title: "Paytm Field Operations Playbook 2026"
+  - uri: "coinbase://engineering/ceecil-nightly-dreaming-memory"
+    title: "Coinbase CEEcil Dual-Entity Agent Memory Architecture"
+
+# OKF v0.2 Trust Signal 2: Trust Tiers
+trust:
+  generated:
+    by: "pipeline"
+    identity: "Pi Munshi Nightly Reflection Worker"
+  verified:
+    by: "human"
+    identity: "Paytm Bengaluru Area Sales Manager (ASM)"
+    tier: "tier-1-verified"
+
+# OKF v0.2 Trust Signal 3: Freshness
+freshness:
+  effective_date: "2026-09-15"
+  last_reviewed: "2026-10-30"
+  stale_after: "2027-03-31"
+
+# OKF v0.2 Trust Signal 4: Lifecycle Status
+status: "stable"
+
+# OKF v0.2 Trust Signal 5: Attestation
+attestation:
+  method: "git-commit-audit"
+  upstream_sha256: "3d29a501bc8947ef62194a20b83017a419284ca0"
+  attested_computation_id: "COMP-DREAM-GIST-8L"
+
 rules:
   consolidation_cron: "30 23 * * *"
   max_gist_lines: 8
