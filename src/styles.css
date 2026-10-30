@@ -1,27 +1,37 @@
 @import "tailwindcss";
 
 @theme {
-  --font-sans: "IBM Plex Sans", "Noto Sans", ui-sans-serif, system-ui, sans-serif;
-  --font-display: "Fraunces", "Iowan Old Style", Georgia, serif;
+  --font-sans: "Inter", "Noto Sans Devanagari", "Noto Sans Kannada", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Inter", system-ui, sans-serif;
 
-  --color-ink: #07131a;
-  --color-ink-2: #0c1b24;
-  --color-panel: #122632;
-  --color-panel-2: #183140;
-  --color-line: #234556;
-  --color-fg: #e7f2f6;
-  --color-mist: #8eacbb;
-  --color-paper: #f3eee4;
-  --color-paper-ink: #1c1915;
-  --color-paper-soft: #6d6458;
-  --color-cyan: #00b4e6;
-  --color-cyan-2: #b8ecff;
-  --color-brass: #e0b15a;
-  --color-brass-ink: #2a1d08;
-  --color-signal: #ff6b6b;
+  /* Official Paytm Brand Design Tokens */
+  --color-paytm-dark: #001738;
+  --color-paytm-navy: #002970;
+  --color-paytm-blue: #002e6e;
+  --color-paytm-cyan: #00baf2;
+  --color-paytm-cyan-light: #e0f6fd;
+  --color-paytm-green: #00b569;
+  --color-paytm-gold: #ffa400;
+
+  /* Semantic UI Tokens mapped to Paytm Identity */
+  --color-ink: #001738;
+  --color-ink-2: #002252;
+  --color-panel: #002970;
+  --color-panel-2: #00378e;
+  --color-line: #0b457f;
+  --color-fg: #ffffff;
+  --color-mist: #93c5fd;
+  --color-paper: #f0f6ff;
+  --color-paper-ink: #001738;
+  --color-paper-soft: #4b6b94;
+  --color-cyan: #00baf2;
+  --color-cyan-2: #bae6fd;
+  --color-brass: #ffa400;
+  --color-brass-ink: #001738;
+  --color-signal: #ef4444;
   --color-signal-ink: #2a1012;
 
-  --radius-card: 0.75rem;
+  --radius-card: 1rem;
 }
 
 @layer base {

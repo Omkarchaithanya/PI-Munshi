@@ -61,24 +61,28 @@ export function CommandCenter() {
         <div className="flex flex-wrap items-center justify-between gap-3 px-3 py-2 md:px-5">
           {/* Logo & Brand Identity */}
           <div className="flex items-center gap-3">
-            <div className="flex size-11 shrink-0 items-center justify-center rounded-lg bg-brass font-display text-xl font-bold text-brass-ink shadow-md">
-              पि
+            <div className="flex items-center rounded-xl bg-gradient-to-r from-[#001738] to-[#002970] px-3.5 py-1.5 border border-[#00BAF2]/40 shadow-lg">
+              <span className="text-white font-black text-2xl tracking-tighter">Pay</span>
+              <span className="text-[#00BAF2] font-black text-2xl tracking-tighter">tm</span>
+              <span className="ml-2 rounded-md bg-[#00BAF2] px-2 py-0.5 text-xs font-black text-[#001738] tracking-tight">
+                मुंशी AI
+              </span>
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h1 className="font-display text-xl font-bold leading-none text-fg md:text-2xl">
-                  {t.appName}
-                </h1>
-                <span className="inline-flex items-center gap-1 rounded-full bg-cyan/15 px-2 py-0.5 text-[10px] font-semibold text-cyan border border-cyan/30">
-                  <ShieldCheck className="size-3" />
-                  {t.okfBadge}
+                <span className="text-sm font-extrabold text-white tracking-wide">
+                  Paytm for Business
                 </span>
-                <span className="hidden items-center gap-1.5 rounded-full bg-emerald-500/10 px-2.5 py-0.5 text-[11px] font-medium text-emerald-400 sm:inline-flex">
+                <span className="inline-flex items-center gap-1 rounded-full bg-[#00BAF2]/15 px-2.5 py-0.5 text-[10px] font-bold text-[#00BAF2] border border-[#00BAF2]/30">
+                  <ShieldCheck className="size-3" />
+                  OKF v0.2
+                </span>
+                <span className="hidden items-center gap-1.5 rounded-full bg-emerald-500/15 px-2.5 py-0.5 text-[11px] font-bold text-emerald-400 sm:inline-flex">
                   <span className="size-1.5 rounded-full bg-emerald-400 animate-pulse" />
                   {t.liveSwitch}
                 </span>
               </div>
-              <p className="text-xs text-mist">{t.brandTagline}</p>
+              <p className="text-xs text-blue-200/80">{t.brandTagline}</p>
             </div>
           </div>
 
@@ -189,6 +193,27 @@ export function CommandCenter() {
       <main className="min-h-0 flex-1 overflow-y-auto">
         {uiMode === "dukaan" ? <DukaanView /> : <EngineView />}
       </main>
+
+      {/* Official Paytm Partner Footer */}
+      <footer className="shrink-0 border-t border-[#00BAF2]/20 bg-[#001738] px-4 py-2 text-xs text-blue-200/80">
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <div className="flex items-center gap-2">
+            <span className="font-bold text-white">Paytm Build for India AI Hackathon</span>
+            <span>·</span>
+            <span>Track 3: Autonomous AI Teammates</span>
+            <span>·</span>
+            <span className="text-[#00BAF2] font-semibold">Pi Munshi (पाई-मुंशी)</span>
+          </div>
+          <div className="flex items-center gap-3">
+            <span className="flex items-center gap-1 text-[#00B569] font-medium">
+              <ShieldCheck className="size-3.5" />
+              100% NPCI UDIR & RBI FREE-AI Compliant
+            </span>
+            <span>·</span>
+            <span className="font-mono text-[#00BAF2]">Google Cloud OKF v0.2</span>
+          </div>
+        </div>
+      </footer>
     </div>
   );
 }
@@ -279,50 +304,74 @@ function DukaanView() {
         </div>
       </div>
 
-      {/* Hero Paisa Card (Ultra-Accessible for Non-Readers) */}
-      <div className="relative overflow-hidden rounded-2xl border-2 border-emerald-500/40 bg-gradient-to-br from-emerald-950/40 via-ink-2 to-ink p-6 shadow-xl">
-        <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+      {/* Official Paytm Soundbox 4.0 IoT Physical Device & Live Settlement Card */}
+      <div className="relative overflow-hidden rounded-3xl border-2 border-[#00BAF2]/40 bg-gradient-to-br from-[#002970] via-[#001C4D] to-[#001438] p-6 shadow-2xl">
+        {/* Hardware Soundbox Top Status Bezel */}
+        <div className="flex flex-wrap items-center justify-between gap-2 border-b border-[#00BAF2]/20 pb-3 text-xs text-blue-200">
+          <div className="flex items-center gap-2">
+            <span className="relative flex size-2.5">
+              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#00BAF2] opacity-75"></span>
+              <span className="relative inline-flex size-2.5 rounded-full bg-[#00BAF2]"></span>
+            </span>
+            <span className="font-bold tracking-wider text-white">PAYTM SOUNDBOX 4.0 IoT</span>
+            <span className="rounded bg-[#00BAF2]/20 px-1.5 py-0.5 font-mono text-[10px] text-[#00BAF2] font-semibold">
+              4G VoLTE · SIM CONNECTED
+            </span>
+          </div>
+          <div className="flex items-center gap-3 font-mono text-[11px] text-blue-200/80">
+            <span>🔋 98%</span>
+            <span>📶 -72 dBm</span>
+            <span className="rounded-full bg-emerald-500/20 px-2 py-0.5 text-emerald-300 font-semibold">
+              ACTIVE
+            </span>
+          </div>
+        </div>
+
+        <div className="mt-4 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
           <div>
-            <div className="inline-flex items-center gap-2 rounded-full bg-emerald-500/20 px-3 py-1 text-xs font-semibold text-emerald-400">
+            <div className="inline-flex items-center gap-2 rounded-full bg-[#00B569]/20 px-3.5 py-1 text-xs font-bold text-[#00B569] border border-[#00B569]/40 shadow-sm">
               <CheckCircle2 className="size-4" />
-              {t.paymentCreditedPill}
+              <span>{t.paymentCreditedPill}</span>
             </div>
 
             {/* Giant Rupee Value */}
-            <div className="mt-2 text-4xl font-extrabold tracking-tight text-fg md:text-5xl">
+            <div className="mt-2 text-4xl font-black tracking-tight text-white md:text-5xl">
               {inrFormat(realSettlement.orderAmount)}
             </div>
 
-            <div className="mt-1 flex flex-wrap items-center gap-2 text-xs text-mist">
-              <span>{t.utrLabel} <strong className="font-mono text-cyan-2">{realSettlement.utr}</strong></span>
+            <div className="mt-2 flex flex-wrap items-center gap-2 text-xs text-blue-200/80">
+              <span>{t.utrLabel} <strong className="font-mono text-[#00BAF2] font-bold">{realSettlement.utr}</strong></span>
               <span>·</span>
-              <span>{t.orderIdLabel} <strong className="font-mono">{realSettlement.orderId}</strong></span>
+              <span>{t.orderIdLabel} <strong className="font-mono text-white">{realSettlement.orderId}</strong></span>
               <span>·</span>
-              <span className="text-emerald-400">{t.settlementDoneLabel}</span>
+              <span className="text-[#00B569] font-bold">{t.settlementDoneLabel}</span>
             </div>
           </div>
 
-          {/* Giant Voice Button: बोलकर सुनें */}
+          {/* Giant Paytm Cyan Voice Button: बोलकर सुनें */}
           <button
             type="button"
             onClick={speakCurrentOutcome}
-            className={`flex items-center justify-center gap-3 rounded-2xl border-2 px-6 py-4 text-base font-bold shadow-lg transition-all ${
+            className={`flex items-center justify-center gap-3 rounded-2xl border-2 px-6 py-4 text-base font-black shadow-xl transition-all ${
               speaking
-                ? "border-brass bg-brass text-brass-ink animate-pulse ring-4 ring-brass/30"
-                : "border-cyan bg-cyan text-ink hover:bg-cyan-2 hover:scale-105 active:scale-95"
+                ? "border-[#FFA400] bg-[#FFA400] text-[#001738] animate-pulse ring-4 ring-[#FFA400]/40"
+                : "border-[#00BAF2] bg-[#00BAF2] text-[#001738] hover:bg-[#38c8f5] hover:scale-105 active:scale-95 shadow-[#00BAF2]/30"
             }`}
           >
-            <Volume2 className="size-6" />
-            <span>{t.listenAloudBtn}</span>
+            <Volume2 className="size-6 text-[#001738]" />
+            <span className="tracking-tight">{t.listenAloudBtn}</span>
           </button>
         </div>
 
         {/* Spoken Utterance Transcript in Big Readable Text */}
-        <div className="mt-5 rounded-xl border border-line/80 bg-ink/70 p-4">
-          <p className="text-xs font-semibold tracking-wide text-brass uppercase">
-            {t.soundboxHeader}
-          </p>
-          <p className="mt-1 text-base font-medium leading-relaxed text-fg">
+        <div className="mt-5 rounded-2xl border border-[#00BAF2]/30 bg-[#001738]/80 p-4 shadow-inner">
+          <div className="flex items-center justify-between">
+            <p className="text-xs font-bold tracking-wider text-[#FFA400] uppercase">
+              📢 {t.soundboxHeader}
+            </p>
+            <span className="font-mono text-[10px] text-[#00BAF2]">Indic Bulbul TTS 3.0</span>
+          </div>
+          <p className="mt-1 text-base font-semibold leading-relaxed text-white">
             "{lang === "en-IN" ? soundEn : soundHi}"
           </p>
         </div>
@@ -330,6 +379,60 @@ function DukaanView() {
         {/* Audio Spectrogram Waveform */}
         <div className="mt-3">
           <Spectrogram active={chirping || speaking} seed={chirpSeed} />
+        </div>
+
+        {/* Paytm Acceptance Footnote */}
+        <div className="mt-4 flex flex-wrap items-center justify-between border-t border-[#00BAF2]/15 pt-3 text-[11px] text-blue-200/70">
+          <div className="flex items-center gap-2">
+            <span className="font-bold text-white">पेटीएम स्वीकार है</span>
+            <span>·</span>
+            <span>All-in-One UPI QR</span>
+            <span>·</span>
+            <span>RuPay</span>
+            <span>·</span>
+            <span>Paytm Wallet</span>
+          </div>
+          <div className="font-mono text-[#00BAF2]">
+            100% RBI & NPCI UDIR Compliant
+          </div>
+        </div>
+      </div>
+
+      {/* Paytm All-in-One QR Code & Merchant Acceptance Card */}
+      <div className="flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-[#00BAF2]/30 bg-gradient-to-r from-[#002252] to-[#001738] p-4 shadow-md">
+        <div className="flex items-center gap-3">
+          <div className="flex size-14 items-center justify-center rounded-2xl bg-white p-1 shadow-inner">
+            {/* Stylized Paytm QR representation */}
+            <div className="flex size-full flex-col justify-between rounded-lg bg-[#001738] p-1 text-[8px] font-mono font-bold text-[#00BAF2]">
+              <div className="flex justify-between">
+                <span className="size-2.5 rounded-sm bg-[#00BAF2]" />
+                <span className="size-2.5 rounded-sm bg-[#00BAF2]" />
+              </div>
+              <div className="text-center text-[7px] font-black text-white">Paytm</div>
+              <div className="flex justify-between">
+                <span className="size-2.5 rounded-sm bg-[#00BAF2]" />
+                <span className="size-2.5 rounded-sm bg-white" />
+              </div>
+            </div>
+          </div>
+          <div>
+            <div className="flex items-center gap-2">
+              <span className="text-sm font-bold text-white">पेटीएम ऑल-इन-वन क्यूआर (All-in-One QR)</span>
+              <span className="rounded bg-emerald-500/20 px-2 py-0.5 text-[10px] font-bold text-emerald-400 border border-emerald-500/30">
+                0% शुल्क (₹2,000 तक)
+              </span>
+            </div>
+            <p className="text-xs text-blue-200/80">
+              Google Pay, PhonePe, Paytm, BHIM या किसी भी UPI ऐप से भुगतान स्वीकार करें।
+            </p>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-2">
+          <div className="rounded-xl border border-[#00BAF2]/30 bg-[#001738] px-3.5 py-1.5 text-center">
+            <span className="block text-[10px] text-blue-300">दैनिक बैंक निपटान</span>
+            <span className="block text-xs font-bold text-emerald-400">सुबह 7:00 बजे ऑटो-क्रेडिट</span>
+          </div>
         </div>
       </div>
 
