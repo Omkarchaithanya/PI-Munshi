@@ -204,3 +204,4 @@ Executes the full Single-Loop Orchestrator (Observe -> Plan -> Execute -> Verify
 | `PAYTM_MID` | Host Gateway Only | Zone 3 (Reverse Proxy Gate) | Injected only during outbound signed webhook delivery. |
 | `SARVAM_API_KEY` | Server API Route | Zone 3 (Host Server) | Proxy forwards audio streams; client receives raw Opus/PCM16 only. |
 | `DATABASE_URL` | Server Connection Pool | Zone 3 (pgBouncer / Kysely) | Uses prepared statements with parameterized queries. |
+

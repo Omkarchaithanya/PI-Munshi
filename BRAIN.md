@@ -183,3 +183,4 @@ To inspect or extend the Brain engine in code:
 - **Outlines FSM Shield:** [`backend/services/fsm-shield.service.ts`](file:///c:/Users/omkar/pi/backend/services/fsm-shield.service.ts)
 - **OKF v0.2 Knowledge Evaluator:** [`backend/services/okf-knowledge.service.ts`](file:///c:/Users/omkar/pi/backend/services/okf-knowledge.service.ts)
 - **Deterministic Math Engine:** [`backend/services/mdr-calculator.service.ts`](file:///c:/Users/omkar/pi/backend/services/mdr-calculator.service.ts)
+

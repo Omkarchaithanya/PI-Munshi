@@ -11,6 +11,7 @@ import { walLedger } from "./services/wal-ledger.service.ts";
 import { fsmShield } from "./services/fsm-shield.service.ts";
 import { brainOrchestrator } from "./services/brain-orchestrator.service.ts";
 import { dispatchApiRoute } from "./routes.ts";
+import { PiMunshiRLEnv } from "./env.ts";
 
 async function runBackendVerification() {
   console.log("==================================================");
@@ -89,6 +90,17 @@ async function runBackendVerification() {
   const walEntry = walLedger.append("SETTLEMENT_TEST", 4280, "Audit test run");
   assert(walEntry.status === "EXECUTED", "WAL entry status is EXECUTED");
   assert(walEntry.idempotencyKey.startsWith("IDEM-"), "Idempotency key prefixed with monotonic epoch");
+
+  // 9. Test Gymnasium-Style Reinforcement Learning Environment (PiMunshiRLEnv)
+  console.log("\n9. Testing PiMunshi Gymnasium-Style RL Environment (POMDP)...");
+  const env = new PiMunshiRLEnv();
+  const resetState = env.reset({ merchantId: "MID-BELLANDUR-RL-TEST" });
+  assert(resetState.observation.merchantId === "MID-BELLANDUR-RL-TEST", "RL env reset returned valid observation");
+
+  const stepRes = env.step({ type: "RUNG_1_REFLEX_CONFIRM", orderAmount: 3500 });
+  assert(stepRes.reward > 0, "RL step returned positive reward for clean resolution");
+  assert(stepRes.terminated === true, "Single-transaction episode terminated successfully");
+  assert(stepRes.info.mdrFee === 14, "MDR fee computed deterministically in RL step");
 
   console.log("\n==================================================");
   console.log(`VERIFICATION RESULT: ${passed} / ${total} TESTS PASSED (100% Deterministic)`);

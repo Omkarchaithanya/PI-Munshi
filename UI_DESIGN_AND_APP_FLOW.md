@@ -186,3 +186,4 @@ sequenceDiagram
     Shield->>Alert: Opens 10-Second Human Escalation RCA Packet
     Alert-->>Merchant: Alerts FSE & logs incident on shop file. Zero funds transferred.
 ```
+

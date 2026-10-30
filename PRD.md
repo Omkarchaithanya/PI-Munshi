@@ -105,3 +105,4 @@ India leads the world in real-time digital payments with over **13 Billion month
 - **KR-2:** Reduce FSE routine dispute handling time from 55 min/day to **< 5 min/day**.
 - **KR-3:** Achieve **0% fake / hallucinated financial math** by enforcing deterministic backend execution.
 - **KR-4:** Eliminate credential exfiltration vulnerabilities by maintaining strict **Brain/Hands/Keys isolation**.
+

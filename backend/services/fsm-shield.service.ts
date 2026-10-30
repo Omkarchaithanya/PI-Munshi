@@ -14,6 +14,10 @@ export class FsmShieldService {
     "REFLEX_LOOKUP",
     "POLICY_ARBITRATION",
     "DEEP_DISPUTE_RESOLUTION",
+    "RUNG_1_REFLEX_CONFIRM",
+    "RUNG_2_POLICY_ARBITRATE",
+    "RUNG_3_VCG_CONTRACT",
+    "HUMAN_FSE_ESCALATE",
   ];
 
   private readonly INJECTION_BLACKLIST = [
