@@ -350,3 +350,22 @@ auth/db: OFF by default — sign-in, @/lib/db or migrations ONLY on an accounts 
 never:   build an app for a greeting/number/question; invent imagine_* calls;
          ask the user to run commands; delete or abandon /workspace/startup.sh
 ```
+
+## Cursor Cloud specific instructions
+
+Pi Munshi runs as two Node processes after `npm ci`:
+
+| Service | Command | Port | Health |
+| --- | --- | --- | --- |
+| TanStack / Vite preview | `npm run dev` | 8080 | `http://127.0.0.1:8080/` |
+| Standalone REST API | `npm run backend:dev` | 8082 | `http://127.0.0.1:8082/api/v1/health` |
+
+Cloud Agent **`start`** (`.cursor/start.sh`) brings up both if they are down. Grok preview **`startup.sh`** only ensures the Vite dev server on 8080.
+
+**Verification (no Paytm/Sarvam secrets required for core flows):**
+
+- `npm run backend:test` — deterministic backend audit suite
+- `npm test` — workspace script/unit tests
+- `npm run typecheck` and `npm run lint`
+- Settlement hello-world: `POST /api/v1/settlement/calculate` with `{"orderAmount":3500}` on port 8082
+- UI: `node scripts/browser-smoke.mjs` against 8080 after both servers are up
