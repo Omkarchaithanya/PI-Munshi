@@ -68,7 +68,8 @@ export function startBackendServer(port: number = PORT) {
       }
     }
 
-    const response = await dispatchApiRoute(pathname, method, body);
+    const routePath = pathname + url.search;
+    const response = await dispatchApiRoute(routePath, method, body);
     res.writeHead(response.status, { "Content-Type": "application/json" });
     res.end(JSON.stringify(response.body, null, 2));
   });

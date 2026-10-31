@@ -4,7 +4,11 @@
  * Zero Node.js runtime imports (no node:crypto / node:fs) for 100% browser compatibility.
  */
 
-const BACKEND_BASE = "http://localhost:8082";
+/** Same-origin in dev (Vite proxy → :8082); falls back to direct port if needed. */
+const BACKEND_BASE =
+  typeof window !== "undefined" && window.location.hostname === "localhost"
+    ? ""
+    : "http://localhost:8082";
 
 async function request<T>(endpoint: string, method: "GET" | "POST" = "GET", body?: any): Promise<T> {
   const url = `${BACKEND_BASE}${endpoint}`;
@@ -51,6 +55,11 @@ export class MunshiApiClient {
     return json.data;
   }
 
+  public async synthesizeVoice(text: string, languageCode = "hi-IN", mode = "DEMO") {
+    const json = await request<any>("/api/v1/voice/synthesize", "POST", { text, languageCode, mode });
+    return json.data;
+  }
+
   public async runBrainCycle(req: { query: string; merchantId: string; language?: string }) {
     const json = await request<any>("/api/v1/brain/cycle", "POST", req);
     return json.data;
@@ -69,6 +78,23 @@ export class MunshiApiClient {
   public async getProviderStatus() {
     const json = await request<any>("/api/v1/providers/status", "GET");
     return json.providers;
+  }
+
+  public async transcribeVoice(audioBase64: string, languageCode = "hi-IN") {
+    const json = await request<any>("/api/v1/voice/transcribe", "POST", {
+      audioBase64,
+      languageCode,
+      mimeType: "audio/wav",
+      mode: "LIVE",
+    });
+    return json.data as { transcript?: string; isDemo?: boolean };
+  }
+
+  public async getSystemHealth(): Promise<{
+    status: string;
+    database?: { ok: boolean; engine: string; error: string | null };
+  }> {
+    return request("/api/v1/health");
   }
 
   public async getTransactions(merchantId = "DEMO_MERCHANT_RAMESH", mode = "DEMO"): Promise<any[]> {

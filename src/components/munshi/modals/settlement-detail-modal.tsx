@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { X, CheckCircle2, ShieldCheck, ArrowRight, Zap, RefreshCw } from "lucide-react";
 import { munshiApi } from "@/lib/api-client";
 import { playSwarChirp, speak } from "@/lib/munshi/audio";
@@ -15,8 +15,47 @@ export function SettlementDetailModal({ isOpen, onClose, lang, onSettled }: Sett
   const t = getTranslation(lang);
   const [settling, setSettling] = useState(false);
   const [settledResult, setSettledResult] = useState<any | null>(null);
+  const [ledger, setLedger] = useState<{
+    settled: number;
+    gross: number;
+    mdr: number;
+    pending: number;
+    utr: string;
+  } | null>(null);
+
+  useEffect(() => {
+    if (!isOpen) return;
+    let cancel = false;
+    Promise.all([
+      munshiApi.getSettlements("DEMO_MERCHANT_RAMESH", "DEMO"),
+      munshiApi.getTransactions("DEMO_MERCHANT_RAMESH", "DEMO"),
+    ])
+      .then(([settlements, txns]) => {
+        if (cancel) return;
+        const latest = settlements[0];
+        const pending = (txns || [])
+          .filter((t) => t.status === "SUCCESS" && t.settlement_status === "PENDING")
+          .reduce((sum, t) => sum + (Number(t.amount) || 0), 0);
+        setLedger({
+          settled: Number(latest?.net_payout ?? latest?.total_amount ?? 0),
+          gross: Number(latest?.total_amount ?? 0),
+          mdr: Number(latest?.mdr_fee ?? 0),
+          pending,
+          utr: String(latest?.utr || "—"),
+        });
+      })
+      .catch(() => {
+        if (!cancel) setLedger(null);
+      });
+    return () => {
+      cancel = true;
+    };
+  }, [isOpen]);
 
   if (!isOpen) return null;
+
+  const rupee = (n: number) =>
+    new Intl.NumberFormat("en-IN", { style: "currency", currency: "INR", maximumFractionDigits: 2 }).format(n);
 
   const handleInstantSettle = async () => {
     setSettling(true);
@@ -59,10 +98,12 @@ export function SettlementDetailModal({ isOpen, onClose, lang, onSettled }: Sett
         <div className="p-6 bg-gradient-to-b from-[#F0F9FF] to-white">
           <div className="text-center">
             <span className="text-xs font-semibold text-gray-500">{t.modalTotalSettled}</span>
-            <h2 className="text-2xl font-black text-[#002970] mt-0.5">₹1,650.00</h2>
+            <h2 className="text-2xl font-black text-[#002970] mt-0.5">
+              {ledger ? rupee(ledger.settled) : "…"}
+            </h2>
             <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-700 text-xs font-bold mt-2">
               <CheckCircle2 className="size-3.5 text-emerald-600" />
-              UTR: 629984129984 ({t.filterSettled} ✓)
+              UTR: {ledger?.utr || "—"} ({t.filterSettled} ✓)
             </div>
           </div>
 
@@ -74,15 +115,15 @@ export function SettlementDetailModal({ isOpen, onClose, lang, onSettled }: Sett
             </div>
             <div className="flex justify-between items-center pb-2 border-b border-gray-50">
               <span className="text-gray-500">{t.totalPaymentsReceived}:</span>
-              <span className="font-bold text-gray-800">₹1,650.00</span>
+              <span className="font-bold text-gray-800">{ledger ? rupee(ledger.gross) : "…"}</span>
             </div>
             <div className="flex justify-between items-center pb-2 border-b border-gray-50">
               <span className="text-gray-500">{t.modalMdrWaiver}:</span>
-              <span className="font-bold text-emerald-600">₹0.00 ({t.govtSubsidyPill})</span>
+              <span className="font-bold text-emerald-600">{ledger ? rupee(ledger.mdr) : "…"}</span>
             </div>
             <div className="flex justify-between items-center pt-1">
               <span className="text-gray-500">{t.pendingSettlementTitle}:</span>
-              <span className="font-bold text-amber-600">₹500.00</span>
+              <span className="font-bold text-amber-600">{ledger ? rupee(ledger.pending) : "…"}</span>
             </div>
           </div>
 

@@ -83,23 +83,22 @@ export function JudgeView({ lang }: JudgeViewProps) {
   };
 
   return (
-    <div className="w-full max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-5 space-y-6 pb-28">
-      {/* 1. HEADER BANNER */}
-      <section className="rounded-3xl bg-gradient-to-r from-[#001738] via-[#002970] to-[#001738] p-5 sm:p-6 text-white shadow-lg border border-[#001f54] flex flex-col md:flex-row md:items-center justify-between gap-4">
+    <div className="w-full space-y-4">
+      <section className="rounded-lg bg-white border border-[#e6e8ec] px-5 py-4 flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <div className="flex flex-wrap items-center gap-2 mb-1.5">
-            <span className="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full bg-[#00BAF2]/20 border border-[#00BAF2]/40 text-[#00BAF2] text-xs font-bold">
+            <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-[#e8f7fd] text-[#0077a8] text-xs font-semibold">
               <ShieldCheck className="size-3" />
               Google Cloud {t.okfBadge} Knowledge Store
             </span>
-            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 text-xs font-bold">
+            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-800 text-xs font-semibold border border-emerald-200">
               ✓ 48/48 Test Suite Passed (100%)
             </span>
           </div>
-          <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-white">
+          <h2 className="text-lg font-semibold tracking-tight text-[#1a1a1a]">
             {t.judgeTitle}
-          </h1>
-          <p className="text-xs sm:text-sm text-blue-100/80 mt-1 max-w-xl">
+          </h2>
+          <p className="text-xs text-[#6b7280] mt-1 max-w-xl">
             {t.judgeSub}
           </p>
         </div>
