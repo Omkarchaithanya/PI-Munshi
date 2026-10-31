@@ -93,27 +93,24 @@ export function CommandCenter() {
               <button
                 type="button"
                 onClick={() => setLang("hi-IN")}
-                className={`rounded px-2.5 py-1 font-medium transition-all ${
-                  lang === "hi-IN" ? "bg-brass text-brass-ink shadow" : "text-mist hover:text-fg"
-                }`}
+                className={`rounded px-2.5 py-1 font-medium transition-all ${lang === "hi-IN" ? "bg-brass text-brass-ink shadow" : "text-mist hover:text-fg"
+                  }`}
               >
                 🇮🇳 हिंदी
               </button>
               <button
                 type="button"
                 onClick={() => setLang("kn-IN")}
-                className={`rounded px-2.5 py-1 font-medium transition-all ${
-                  lang === "kn-IN" ? "bg-brass text-brass-ink shadow" : "text-mist hover:text-fg"
-                }`}
+                className={`rounded px-2.5 py-1 font-medium transition-all ${lang === "kn-IN" ? "bg-brass text-brass-ink shadow" : "text-mist hover:text-fg"
+                  }`}
               >
                 🌾 ಕನ್ನಡ
               </button>
               <button
                 type="button"
                 onClick={() => setLang("en-IN")}
-                className={`rounded px-2.5 py-1 font-medium transition-all ${
-                  lang === "en-IN" ? "bg-brass text-brass-ink shadow" : "text-mist hover:text-fg"
-                }`}
+                className={`rounded px-2.5 py-1 font-medium transition-all ${lang === "en-IN" ? "bg-brass text-brass-ink shadow" : "text-mist hover:text-fg"
+                  }`}
               >
                 🌐 English
               </button>
@@ -124,11 +121,10 @@ export function CommandCenter() {
               <button
                 type="button"
                 onClick={() => setUiMode("dukaan")}
-                className={`flex items-center gap-1.5 rounded px-3 py-1 font-medium transition-all ${
-                  uiMode === "dukaan"
+                className={`flex items-center gap-1.5 rounded px-3 py-1 font-medium transition-all ${uiMode === "dukaan"
                     ? "bg-cyan text-ink shadow font-semibold"
                     : "text-mist hover:text-fg"
-                }`}
+                  }`}
               >
                 <Store className="size-3.5" />
                 <span>{t.shopViewBtn}</span>
@@ -136,11 +132,10 @@ export function CommandCenter() {
               <button
                 type="button"
                 onClick={() => setUiMode("engine")}
-                className={`flex items-center gap-1.5 rounded px-3 py-1 font-medium transition-all ${
-                  uiMode === "engine"
+                className={`flex items-center gap-1.5 rounded px-3 py-1 font-medium transition-all ${uiMode === "engine"
                     ? "bg-cyan text-ink shadow font-semibold"
                     : "text-mist hover:text-fg"
-                }`}
+                  }`}
               >
                 <Terminal className="size-3.5" />
                 <span>{t.judgeViewBtn}</span>
@@ -292,11 +287,10 @@ function DukaanView() {
                 selectShop(item.id);
                 setCustomInput(String(item.gmv30d > 500000 ? 4280 : 1850));
               }}
-              className={`rounded-lg border px-3 py-1.5 text-xs font-medium transition-all ${
-                item.id === activeShopId
+              className={`rounded-lg border px-3 py-1.5 text-xs font-medium transition-all ${item.id === activeShopId
                   ? "border-cyan bg-panel text-cyan"
                   : "border-line bg-ink text-mist hover:text-fg"
-              }`}
+                }`}
             >
               {item.name}
             </button>
@@ -352,11 +346,10 @@ function DukaanView() {
           <button
             type="button"
             onClick={speakCurrentOutcome}
-            className={`flex items-center justify-center gap-3 rounded-2xl border-2 px-6 py-4 text-base font-black shadow-xl transition-all ${
-              speaking
+            className={`flex items-center justify-center gap-3 rounded-2xl border-2 px-6 py-4 text-base font-black shadow-xl transition-all ${speaking
                 ? "border-[#FFA400] bg-[#FFA400] text-[#001738] animate-pulse ring-4 ring-[#FFA400]/40"
                 : "border-[#00BAF2] bg-[#00BAF2] text-[#001738] hover:bg-[#38c8f5] hover:scale-105 active:scale-95 shadow-[#00BAF2]/30"
-            }`}
+              }`}
           >
             <Volume2 className="size-6 text-[#001738]" />
             <span className="tracking-tight">{t.listenAloudBtn}</span>
@@ -458,11 +451,10 @@ function DukaanView() {
                   setCustomInput(String(amt));
                   void setActiveAmount(amt);
                 }}
-                className={`rounded-lg border px-2.5 py-1 text-xs font-semibold transition-all ${
-                  activeAmount === amt
+                className={`rounded-lg border px-2.5 py-1 text-xs font-semibold transition-all ${activeAmount === amt
                     ? "border-cyan bg-cyan text-ink"
                     : "border-line bg-ink text-mist hover:text-fg hover:border-cyan/40"
-                }`}
+                  }`}
               >
                 ₹{amt.toLocaleString("en-IN")}
               </button>
@@ -705,11 +697,10 @@ function EngineView() {
                 key={doc.filename}
                 type="button"
                 onClick={() => setActiveOkfDoc(doc.filename)}
-                className={`flex items-center justify-between rounded-lg border p-2 text-left text-xs transition-all ${
-                  activeOkfDoc.filename === doc.filename
+                className={`flex items-center justify-between rounded-lg border p-2 text-left text-xs transition-all ${activeOkfDoc.filename === doc.filename
                     ? "border-cyan bg-panel text-cyan"
                     : "border-transparent bg-ink/60 text-mist hover:text-fg hover:bg-ink"
-                }`}
+                  }`}
               >
                 <div className="flex items-center gap-2 min-w-0">
                   <FileText className="size-3.5 shrink-0" />
@@ -870,11 +861,10 @@ function EngineView() {
             {rungs.map((row) => (
               <div
                 key={row.id}
-                className={`rounded-lg border p-3 transition-all ${
-                  rung === row.id
+                className={`rounded-lg border p-3 transition-all ${rung === row.id
                     ? "border-cyan bg-panel text-fg shadow-sm ring-1 ring-cyan/50"
                     : "border-line bg-ink text-fg"
-                }`}
+                  }`}
               >
                 <div className="flex items-center justify-between">
                   <span className="text-xs font-bold">{row.name}</span>
@@ -902,7 +892,7 @@ function EngineView() {
             {codeLines.length === 0 ? (
               <span className="text-mist">
                 // System ready. Launch Scenario 1 (Defend) or Scenario 2 (Checkout) to synthesize
-                // single-pass TypeScript plan in isolated V8 Micro-Sandbox.
+              // single-pass TypeScript plan in isolated V8 Micro-Sandbox.
               </span>
             ) : (
               <pre>{codeLines.join("\n")}</pre>
@@ -923,15 +913,14 @@ function EngineView() {
                 <div key={item.id} className="rounded-lg border border-line/60 bg-ink p-2 text-xs">
                   <div className="flex items-center justify-between">
                     <span
-                      className={`font-semibold ${
-                        item.tone === "block"
+                      className={`font-semibold ${item.tone === "block"
                           ? "text-red-400"
                           : item.tone === "money"
-                          ? "text-brass"
-                          : item.tone === "ok"
-                          ? "text-cyan"
-                          : "text-fg"
-                      }`}
+                            ? "text-brass"
+                            : item.tone === "ok"
+                              ? "text-cyan"
+                              : "text-fg"
+                        }`}
                     >
                       {item.title}
                     </span>
@@ -963,13 +952,12 @@ function EngineView() {
                 <div className="flex items-center justify-between">
                   <span className="font-mono font-semibold text-fg">{row.action}</span>
                   <span
-                    className={`rounded px-1.5 py-0.5 text-[10px] font-bold ${
-                      row.status === "BLOCKED"
+                    className={`rounded px-1.5 py-0.5 text-[10px] font-bold ${row.status === "BLOCKED"
                         ? "bg-red-500/20 text-red-400"
                         : row.status === "EXECUTED"
-                        ? "bg-emerald-500/20 text-emerald-400"
-                        : "bg-amber-500/20 text-amber-400"
-                    }`}
+                          ? "bg-emerald-500/20 text-emerald-400"
+                          : "bg-amber-500/20 text-amber-400"
+                      }`}
                   >
                     {row.status}
                   </span>
