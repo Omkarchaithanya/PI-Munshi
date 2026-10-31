@@ -34,6 +34,13 @@ export class CryptoVaultService {
   }
 
   /**
+   * Generates a cryptographic attestation signature for audit events and dispute payloads
+   */
+  public generateAttestationSignature(payload: string): string {
+    return this.hmacSha256(payload, "PAYTM_PROD_MERCHANT_KEY_2026");
+  }
+
+  /**
    * Returns a monotonically increasing Fencing Epoch token to prevent split-brain double refunds
    */
   public nextFencingEpoch(): number {

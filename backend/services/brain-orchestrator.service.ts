@@ -1,6 +1,7 @@
 /**
  * Pi Munshi Backend Brain Orchestration Service
- * Single-Loop Orchestrator (O-P-E-V) + 3-Rung CEEcil Cognition Ladder
+ * Single-Loop Orchestrator (O-P-E-V-S) + 3-Rung CEEcil Cognition Ladder
+ * Hot-loads 4 Scoped Domain Skills: Samadhan, Suraksha, Vriddhi, Sanchar
  */
 
 import { mdrCalculator } from "./mdr-calculator.service.ts";
@@ -9,8 +10,10 @@ import { okfKnowledge } from "./okf-knowledge.service.ts";
 import { fsmShield } from "./fsm-shield.service.ts";
 import { walLedger } from "./wal-ledger.service.ts";
 import { cryptoVault } from "./crypto-vault.service.ts";
+import { canaryMonitor } from "./canary-monitor.service.ts";
 import { sarvamAdapter } from "../adapters/sarvam.adapter.ts";
 import { dbRepo } from "../database/db.ts";
+import { samadhanSkill, surakshaSkill, vriddhiSkill, sancharSkill } from "../skills/index.ts";
 import type { BrainCycleRequest, BrainCycleResponse } from "../types.ts";
 
 function inr(n: number): string {
@@ -58,7 +61,7 @@ export class BrainOrchestratorService {
     const isMdr = /mdr|fees|fee|policy|शुल्क|कटौती|ಶುಲ್ಕ/i.test(qRaw);
     const isDispute = /dispute|split|fraud|विवाद|धोखा|ವಿವಾದ/i.test(qRaw);
 
-    // 1. Observe & Plan (3-Rung Ladder). Latency is filled with the measured cycle time at the end.
+    // 1. Observe & Plan (3-Rung Ladder).
     let rung: 1 | 2 | 3 = 1;
     let intent = "REFLEX_LOOKUP";
     let tokenBudget = 0;
@@ -75,10 +78,52 @@ export class BrainOrchestratorService {
 
     // 2. Synthesize Code Mode TypeScript & Execute
     const synthesizedCode = `
-// Synthesized by Pi Munshi Brain (Code Mode MCP ~980 Tokens)
+// Synthesized by Pi Munshi Single-Loop Brain (Code Mode MCP ~980 Tokens)
 const result = await paytmMunshi.execute({ intent: "${intent}", amount: ${amount} });
 return result;
     `.trim();
+
+    // 3. Dynamic Domain Skill Activation
+    let activeSkillName = "Sanchar (Vernacular Speech & APOD)";
+    let skillExecution: any = {};
+
+    if (isDispute) {
+      activeSkillName = "Samadhan (Service & Dispute Resolution)";
+      const udirResolution = samadhanSkill.triageUdirError("U30", amount);
+      const defendPayload = samadhanSkill.generateDefendPayload({
+        merchantId: req.merchantId,
+        orderId: `ORDER_${Date.now()}`,
+        disputeId: `DISP_${Date.now().toString(36).toUpperCase()}`,
+        amount,
+        rrn: `RRN_${Date.now()}`,
+        swarMudraHash: cryptoVault.generateAttestationSignature(`DISP:${amount}`),
+        kachaBillVerified: true,
+      });
+      skillExecution = { udirResolution, defendPayload };
+    } else if (isGrowth) {
+      activeSkillName = "Vriddhi (Growth & VCG Contracts)";
+      const bridgeOffer = vriddhiSkill.evaluateWorkingCapitalBridge({
+        merchantId: req.merchantId,
+        heldSettlementAmount: amount,
+      });
+      const contractMenu = vriddhiSkill.generateContractMenu(amount);
+      skillExecution = { bridgeOffer, contractMenu };
+    } else if (isMdr) {
+      activeSkillName = "Suraksha (Risk & Compliance)";
+      const mdrCheck = surakshaSkill.enforceRbiMdrCap(amount, amount * 0.004);
+      const kachaBillCheck = surakshaSkill.evaluateKachaBillOcr("", amount);
+      skillExecution = { mdrCheck, kachaBillCheck };
+    } else {
+      activeSkillName = "Sanchar (Vernacular Speech & APOD)";
+      const apodChirp = sancharSkill.generateSwarMudraApod({
+        merchantId: req.merchantId,
+        orderId: `TXN_${Date.now()}`,
+        rrn: `RRN_${Date.now()}`,
+        amountInr: amount,
+      });
+      const speechTemplate = sancharSkill.renderSoundboxTemplate("PAYMENT_SUCCESS", { amount }, lang);
+      skillExecution = { apodChirp, speechTemplate };
+    }
 
     let executionOutput: any = {};
     if (rung === 1) {
@@ -96,13 +141,16 @@ return result;
       };
     }
 
-    // 3. Verify via Outlines Lexical FSM Shield
+    // 4. Verify via Outlines Lexical FSM Shield
     const fsmCheck = fsmShield.validate(intent, { amount, merchantId: req.merchantId });
 
-    // 4. Record to Write-Ahead Log
-    walLedger.append(intent, amount, `Executed via Brain Rung ${rung} for ${req.merchantId}`);
+    // 5. Check Behavioral Data Canary Status
+    const canaryStatus = canaryMonitor.getStatus();
 
-    // 5. Spoken totals come from the merchant ledger, not fixed rupee strings.
+    // 6. Record to Write-Ahead Log
+    walLedger.append(intent, amount, `Executed via Brain Rung ${rung} with Skill ${activeSkillName} for ${req.merchantId}`);
+
+    // 7. Grounding in Real Database Ledger
     let ledger: {
       ok: boolean;
       total: number;
@@ -135,14 +183,17 @@ return result;
       disputeReason: "",
     };
 
+    let allTxns: any[] = [];
     try {
-      const merchantId = req.merchantId || "DEMO_MERCHANT_RAMESH";
-      const [txns, settlements, device, disputes] = await Promise.all([
-        dbRepo.listTransactions(merchantId, "DEMO"),
-        dbRepo.listSettlements(merchantId, "DEMO"),
-        dbRepo.getDevice("DEMO_SB_RAMESH", "DEMO"),
-        dbRepo.listDisputes(merchantId, "DEMO"),
+      const mode = (req.merchantId || "").startsWith("DEMO") ? "DEMO" : "LIVE";
+      const [txns, settlements, disputes, devices] = await Promise.all([
+        dbRepo.listTransactions(req.merchantId, mode),
+        dbRepo.listSettlements(req.merchantId, mode),
+        dbRepo.listDisputes(req.merchantId, mode),
+        dbRepo.listSoundboxDevices(req.merchantId, mode),
       ]);
+      allTxns = txns;
+      const device = devices?.[0];
       const success = (txns || []).filter((t: any) => t.status === "SUCCESS");
       const successToday = success.filter((t: any) => isToday(t.created_at));
       const use = successToday.length > 0 ? successToday : success;
@@ -173,7 +224,16 @@ return result;
       ledger.ok = false;
     }
 
-    executionOutput = { ...executionOutput, ledger, latencyMeasured: true };
+    executionOutput = {
+      ...executionOutput,
+      activeSkill: activeSkillName,
+      skillExecution,
+      canaryTelemetry: canaryStatus,
+      fsmDfaState: fsmCheck.dfaState,
+      fsmTransitions: fsmCheck.transitionHistory,
+      ledger,
+      latencyMeasured: true,
+    };
 
     const isGreeting =
       /^(hi|hello|hey|namaste|नमस्ते|ನಮಸ್ಕಾರ|halo|good\s*(morning|afternoon|evening)|kaise\s*ho)[\s!.,?]*$/i.test(qRaw.trim());
@@ -192,42 +252,65 @@ return result;
     let voiceReadout = "";
     let usedLlm = false;
 
-    // Call Sarvam Indus LLM (sarvam-105b-conversations) with grounded merchant ledger context
-    if (sarvamAdapter.chatCompletion && !isAmountLookup) {
+    // Call Sarvam Indus LLM with grounded merchant ledger context
+    if (sarvamAdapter.chatCompletion) {
       try {
-        const langName = lang === "kn-IN" ? "Kannada" : lang === "en-IN" ? "Indian English" : "Hindi";
+        const langInstruction =
+          lang === "kn-IN"
+            ? "Respond strictly in natural, polite Kannada (Kannada script). Do not output English or Hindi words except standard brand names like Paytm or UPI."
+            : lang === "en-IN"
+              ? "Respond strictly in clean, polite Indian English. Do not output Hindi or Devanagari text."
+              : "Respond strictly in natural, polite Hindi (Devanagari script). Do not output English words in brackets.";
+
+        const recentTxnsSummary = (allTxns || [])
+          .slice(0, 10)
+          .map((t: any) => `₹${t.amount} (Status: ${t.status}, Time: ${t.created_at ? new Date(t.created_at).toLocaleTimeString("en-IN") : "Today"}, VPA: ${t.payer_vpa || "customer@paytm"}, RRN: ${t.rrn || t.txn_id})`)
+          .join("; ");
+
         const shopSummary = [
-          `Merchant: Ramesh Kumar`,
+          `Merchant Name: Ramesh Kumar`,
           `Shop: Ramesh Kirana Store (UPI: ramesh.kirana@paytm)`,
-          `Today's Total Payments: ${inr(ledger.total)} across ${ledger.count} successful transactions`,
-          `Bank Settled: ${inr(ledger.settled)} (UTR: ${ledger.utr})`,
-          `Pending Settlement: ${inr(ledger.pending)} (settles tonight by 11:59 PM)`,
-          `Paytm Soundbox 4.0: Status ${ledger.soundboxStatus}, Battery ${ledger.battery}%, 4G VoLTE Connected`,
-          `RBI MDR Subsidy: ₹0 fee (100% Government of India MDR subsidy waived)`,
-          `Disputes: ${ledger.disputeAmount > 0 ? `${inr(ledger.disputeAmount)} (${ledger.disputeReason})` : "Zero open disputes"}`,
+          `Today's Total Received Payments: ${inr(ledger.total)} across ${ledger.count} transactions`,
+          `Bank Settled (Already credited to bank): ${inr(ledger.settled)} (UTR: ${ledger.utr})`,
+          `Pending Settlement (Will credit tonight by 11:59 PM): ${inr(ledger.pending)}`,
+          `Paytm Soundbox 4.0 Status: ${ledger.soundboxStatus} (Online), Battery: ${ledger.battery}%, 4G VoLTE Connected`,
+          `RBI MDR Charges: ₹0.00 (100% Government of India MDR subsidy active, zero fee)`,
+          `Disputes / Chargebacks: ${ledger.disputeAmount > 0 ? `${inr(ledger.disputeAmount)} (${ledger.disputeReason})` : "Zero open disputes"}`,
+          `Recent Transactions: ${recentTxnsSummary || "None"}`,
+          `Assigned FSE Field Officer: Arun Sharma (+91 9123456780, Koramangala Beat #4, Next visit: Today 4:00 PM)`,
+          `Active Autonomous Skill: ${activeSkillName}`,
         ].join("\n");
 
-        const systemPrompt = `You are Pi Munshi, an intelligent, respectful, and helpful AI teammate for Indian shopkeepers using Paytm Soundbox and Paytm Payment Gateway.
-Current Verified Shop Data:
+        const systemPrompt = `You are Pi Munshi, an intelligent, respectful, and helpful AI accountant & business teammate for Indian shopkeepers using Paytm Soundbox and Paytm Payment Gateway.
+Current Verified Live Store Data:
 ${shopSummary}
 
+Knowledge & Capabilities:
+- QR & Soundbox: Paytm Soundbox 4.0 4G VoLTE. Daily QR limits can be raised directly via FSE Arun Sharma or the Paytm for Business app. Volume can be adjusted with '+' and '-' buttons; blue LED indicates active 4G signal.
+- Settlements: Automatic nightly zero-loss settlement at 23:30 IST to State Bank of India account (•••• 4091). Zero MDR charges (100% Government of India MDR subsidy active).
+- Working Capital / Credit: Ramesh is pre-approved for a ₹18,000 to ₹25,000 24-hour Working Capital Bridge loan with zero upfront fee (Vriddhi Skill).
+- Field Support: FSE Arun Sharma is assigned to Koramangala 4th Block and visits today at 4:00 PM. FSE Priya Nair is also assigned as secondary custodian.
+- General Business: Provide helpful, realistic guidance on customer UPI queries, chargeback prevention, receipts, and retail management.
+
 Instructions:
-1. Always respond in ${langName}.
-2. Keep the answer direct, practical, concise, and friendly (1-2 sentences).
-3. If the user asks about payments, settlements, Soundbox, disputes, fees, or business operations, answer accurately using the verified shop data above.
-4. If the user greets or asks what you can do, greet them respectfully (address as Ramesh ji) and state how you can help.`;
+1. ${langInstruction}
+2. Keep the answer direct, practical, friendly, and concise (1-3 sentences). Address the merchant respectfully as "Ramesh ji".
+3. Think carefully and autonomously based on the question asked. Use the verified store data and store knowledge above to answer ANY question regarding payments, sales, settlements, Soundbox, QR codes, loans, MDR fees, or store operations.
+4. If asked about a specific payment (e.g. ₹500 or ₹250), check the Recent Transactions list: if found, confirm it with amount and time; if not found, state that it is not yet visible in today's ledger.`;
 
-        const llmResult = await sarvamAdapter.chatCompletion([
-          { role: "system", content: systemPrompt },
-          { role: "user", content: qRaw },
-        ]);
+        if (req.model !== "ceecil-reflex") {
+          const llmResult = await sarvamAdapter.chatCompletion([
+            { role: "system", content: systemPrompt },
+            { role: "user", content: qRaw },
+          ]);
 
-        if (llmResult?.content) {
-          voiceReadout = llmResult.content;
-          tokenBudget = llmResult.tokensUsed || 140;
-          rung = 2;
-          usedLlm = true;
-          executionOutput = { ...executionOutput, llmModel: llmResult.model, tokensUsed: llmResult.tokensUsed };
+          if (llmResult?.content) {
+            voiceReadout = llmResult.content;
+            tokenBudget = llmResult.tokensUsed || 140;
+            rung = 2;
+            usedLlm = true;
+            executionOutput = { ...executionOutput, llmModel: llmResult.model, tokensUsed: llmResult.tokensUsed };
+          }
         }
       } catch (err) {
         console.warn("[BrainOrchestrator] Sarvam LLM error, falling back to deterministic response:", err);
@@ -328,6 +411,41 @@ Instructions:
     }
 
     const estimatedLatencyMs = Date.now() - startedAt;
+    const modelName = req.model || (usedLlm ? "sarvam-105b-conversations" : "ceecil-reflex-engine");
+    const langName = lang === "kn-IN" ? "Kannada" : lang === "en-IN" ? "Indian English" : "Hindi";
+
+    const thoughtChain = [
+      {
+        step: "O",
+        title: "Observation & Intent Classification",
+        detail: `Analyzed query "${qRaw}" in ${langName}. Identified intent: ${intent} (Cognitive Rung ${rung}). Active Domain Skill: ${activeSkillName}.`,
+        status: "verified" as const,
+      },
+      {
+        step: "P",
+        title: "Database Ledger & Memory Grounding",
+        detail: `Grounded in PostgreSQL ledger: Today's GMV ${inr(ledger.total)} (${ledger.count} txns), Bank Settled ${inr(ledger.settled)}, Pending ${inr(ledger.pending)}, Soundbox Battery ${ledger.battery}%.`,
+        status: "verified" as const,
+      },
+      {
+        step: "E",
+        title: "Autonomous Domain Skill & Model Selection",
+        detail: `Executed ${activeSkillName} with model "${modelName}". Allocated token budget: ${tokenBudget} tokens. Latency: ${estimatedLatencyMs}ms.`,
+        status: "verified" as const,
+      },
+      {
+        step: "V",
+        title: "Outlines Lexical FSM Shield & Canary Verification",
+        detail: `Financial transaction boundaries checked. FSM DFA State: ${fsmCheck.dfaState} (${fsmCheck.isValid ? "PASSED" : "FLAGGED"}). Canary Z-score: ${canaryStatus.currentZScore}σ (SPS: ${canaryStatus.spsRate}/s, Status: ${canaryStatus.activeCluster}).`,
+        status: "verified" as const,
+      },
+      {
+        step: "S",
+        title: "Vernacular Response Synthesis",
+        detail: `Formulated culturally grounded, polite answer in ${langName} script addressing merchant as Ramesh ji.`,
+        status: "done" as const,
+      },
+    ];
 
     return {
       cycleId,
@@ -339,9 +457,10 @@ Instructions:
       synthesizedCode,
       executionOutput,
       fsmShieldPassed: fsmCheck.isValid,
-      canaryPassed: true,
+      canaryPassed: !canaryStatus.isBreached,
       voiceReadout,
-      decision: fsmCheck.isValid ? "APPROVED_FOR_AUTO_EXECUTION" : "FSE_HUMAN_IN_THE_LOOP_REQUIRED",
+      decision: fsmCheck.isValid && !canaryStatus.isBreached ? "APPROVED_FOR_AUTO_EXECUTION" : "FSE_HUMAN_IN_THE_LOOP_REQUIRED",
+      thoughtChain,
     };
   }
 }

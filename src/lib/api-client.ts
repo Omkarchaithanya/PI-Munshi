@@ -57,8 +57,18 @@ export class MunshiApiClient {
     return json.data;
   }
 
-  public async runBrainCycle(req: { query: string; merchantId: string; language?: string }) {
+  public async runBrainCycle(req: { query: string; merchantId: string; language?: string; model?: string }) {
     const json = await request<any>("/api/v1/brain/cycle", "POST", req);
+    return json.data;
+  }
+
+  public async getSkillsStatus() {
+    const json = await request<any>("/api/v1/skills/status", "GET");
+    return json;
+  }
+
+  public async executeSkill(req: { skill: string; action: string; payload?: any }) {
+    const json = await request<any>("/api/v1/skills/execute", "POST", req);
     return json.data;
   }
 
@@ -92,6 +102,10 @@ export class MunshiApiClient {
     database?: { ok: boolean; engine: string; error: string | null };
   }> {
     return request("/api/v1/health");
+  }
+
+  public async getDatabaseOverview(): Promise<any> {
+    return request("/api/v1/database/overview");
   }
 
   public async getTransactions(merchantId = "DEMO_MERCHANT_RAMESH", mode = "DEMO"): Promise<any[]> {

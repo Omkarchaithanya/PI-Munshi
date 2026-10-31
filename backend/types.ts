@@ -100,6 +100,7 @@ export type BrainCycleRequest = {
   merchantId: string;
   orderAmount?: number;
   language?: "hi-IN" | "kn-IN" | "en-IN";
+  model?: string;
 };
 
 export type BrainCycleResponse = {
@@ -115,6 +116,12 @@ export type BrainCycleResponse = {
   canaryPassed: boolean;
   voiceReadout: string;
   decision: "APPROVED_FOR_AUTO_EXECUTION" | "FSE_HUMAN_IN_THE_LOOP_REQUIRED";
+  thoughtChain?: Array<{
+    step: string;
+    title: string;
+    detail: string;
+    status: "done" | "in_progress" | "verified";
+  }>;
 };
 
 export type WalEntry = {

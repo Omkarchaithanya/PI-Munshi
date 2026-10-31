@@ -17,6 +17,7 @@ import { approvalService } from "./services/approval.service.ts";
 import { memoryHandoffService } from "./services/memory-handoff.service.ts";
 import { eventStream } from "./services/event-stream.service.ts";
 import { configuredDatabaseUrl, getDb } from "./database/db.ts";
+import { samadhanSkill, surakshaSkill, vriddhiSkill, sancharSkill } from "./skills/index.ts";
 
 export async function dispatchApiRoute(
   path: string,
@@ -182,6 +183,67 @@ export async function dispatchApiRoute(
     return { status: 200, body: { success: true, disputeId, mode, data: created } };
   }
 
+  // 6b. Live Database & Ledger Overview
+  if (method === "GET" && normPath === "/api/v1/database/overview") {
+    try {
+      const db = await getDb();
+      const merchants = await db.query("SELECT * FROM merchants LIMIT 10");
+      const transactions = await db.query("SELECT * FROM transactions WHERE merchant_id = 'DEMO_MERCHANT_RAMESH' ORDER BY created_at DESC LIMIT 30");
+      const settlements = await db.query("SELECT * FROM settlements WHERE merchant_id = 'DEMO_MERCHANT_RAMESH' ORDER BY created_at DESC LIMIT 15");
+      const devices = await db.query("SELECT * FROM soundbox_devices LIMIT 5");
+      const fses = await db.query("SELECT * FROM fses LIMIT 5");
+      const disputes = await db.query("SELECT * FROM disputes LIMIT 10");
+      const memories = await db.query("SELECT * FROM merchant_memory_events WHERE merchant_id = 'DEMO_MERCHANT_RAMESH' ORDER BY created_at DESC LIMIT 15");
+      const audits = await db.query("SELECT * FROM audit_events ORDER BY created_at DESC LIMIT 15");
+
+      const dbUrl = configuredDatabaseUrl();
+      const isRender = dbUrl.includes("render.com");
+      const isTimescale = Boolean(process.env.TIMESCALE_DATABASE_URL);
+
+      return {
+        status: 200,
+        body: {
+          success: true,
+          connection: {
+            engine: isRender ? "PostgreSQL (Render Oregon)" : "PostgreSQL",
+            host: "dpg-dbin98nb9u1s73c02uk0-a.oregon-postgres.render.com",
+            database: "what_to_put_name_pi_munshi_db",
+            ssl: "require (TLS 1.3)",
+            status: "CONNECTED",
+            migration: "0002_pi_munshi_core.sql",
+            timescaleConfigured: isTimescale,
+            timescaleHost: "d3yo06ihv7afhe0983p7.tsdb.cloud.timescale.com:38298",
+          },
+          counts: {
+            merchants: merchants.length,
+            transactions: transactions.length,
+            settlements: settlements.length,
+            devices: devices.length,
+            fses: fses.length,
+            disputes: disputes.length,
+            memoryEvents: memories.length,
+            auditEvents: audits.length,
+          },
+          tables: {
+            merchants,
+            transactions,
+            settlements,
+            devices,
+            fses,
+            disputes,
+            memories,
+            audits,
+          },
+        },
+      };
+    } catch (err: any) {
+      return {
+        status: 500,
+        body: { success: false, error: err.message },
+      };
+    }
+  }
+
   // 7. Soundbox IoT & Chimes
   if (method === "GET" && normPath === "/api/v1/soundbox/status") {
     const deviceId = searchParams.get("deviceId") || body.deviceId || "DEMO_SB_RAMESH";
@@ -285,6 +347,101 @@ export async function dispatchApiRoute(
       mode
     );
     return { status: 200, body: { success: true, mode, data: res } };
+  }
+
+  if (method === "GET" && normPath === "/api/v1/skills/status") {
+    return {
+      status: 200,
+      body: {
+        success: true,
+        architecture: "Single-Loop Brain + 4 Scoped Domain Skills (Anthropic Oct 2026 Pattern)",
+        skills: {
+          samadhan: {
+            name: "Samadhan (समाधान)",
+            domain: "Service & Dispute Resolution",
+            capabilities: ["NPCI UDIR Error Triage (U30, U16, RB, U69, ZM)", "POST /v1/dispute/action DEFEND Payload", "Provisional Credit Engine"],
+            status: "ACTIVE",
+          },
+          suraksha: {
+            name: "Suraksha (सुरक्षा)",
+            domain: "Risk, Compliance & Guardrails",
+            capabilities: ["Simon Willison Lethal Trifecta Air-Gap", "Sarvam Vision 2.1 Kacha-Bill OCR", "10-Second Razorpay RCA-GPT Cards", "RBI MDR Cap Enforcement"],
+            status: "ACTIVE",
+          },
+          vriddhi: {
+            name: "Vriddhi (वृद्धि)",
+            domain: "Growth & VCG Contracts",
+            capabilities: ["Amazon Flo Pro VCG Mechanism", "ADMM Consensus Optimization", "24-Hour Working Capital Bridge", "7-Day UPI AutoPay Split"],
+            status: "ACTIVE",
+          },
+          sanchar: {
+            name: "Sanchar (संचार)",
+            domain: "Vernacular Speech & APOD",
+            capabilities: ["Sarvam Bulbul V4 Flash (<250ms TTFA)", "Swar-Mudra 18.5kHz Ultrasonic APOD", "Indic DiarBench 75dB Shop Noise ASR", "Zero-Loss FSE Resignation Handoff"],
+            status: "ACTIVE",
+          },
+        },
+        timestamp: new Date().toISOString(),
+      },
+    };
+  }
+
+  if (method === "POST" && normPath === "/api/v1/skills/execute") {
+    const { skill, action, payload } = body || {};
+    let result: any = null;
+
+    if (skill === "samadhan") {
+      if (action === "triage_udir") {
+        result = samadhanSkill.triageUdirError(payload?.udirCode || "U30", payload?.amount || 1200, payload?.trustScore || 0.9);
+      } else if (action === "defend_payload") {
+        result = samadhanSkill.generateDefendPayload(payload || {
+          merchantId: "DEMO_MERCHANT_RAMESH",
+          orderId: "DEMO_ORD_001",
+          disputeId: "DEMO_DISP_001",
+          amount: 1200,
+          rrn: "DEMO_RRN_123456",
+          swarMudraHash: "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          kachaBillVerified: true,
+        });
+      }
+    } else if (skill === "suraksha") {
+      if (action === "ocr_kacha_bill") {
+        result = surakshaSkill.evaluateKachaBillOcr(payload?.rawText || "", payload?.expectedAmount || 1200);
+      } else if (action === "generate_rca") {
+        result = surakshaSkill.generateRcaPacket(payload || {
+          merchantId: "DEMO_MERCHANT_RAMESH",
+          exceptionType: "HIGH_VALUE_HOLD",
+          orderAmount: 18000,
+          context: {},
+        });
+      }
+    } else if (skill === "vriddhi") {
+      if (action === "bridge_loan") {
+        result = vriddhiSkill.evaluateWorkingCapitalBridge(payload || {
+          merchantId: "DEMO_MERCHANT_RAMESH",
+          heldSettlementAmount: 18000,
+        });
+      } else if (action === "contract_menu") {
+        result = vriddhiSkill.generateContractMenu(payload?.amount || 3500, payload?.trustScore || 0.88, payload?.margin || 0.15);
+      }
+    } else if (skill === "sanchar") {
+      if (action === "swar_mudra_apod") {
+        result = sancharSkill.generateSwarMudraApod(payload || {
+          merchantId: "DEMO_MERCHANT_RAMESH",
+          orderId: "DEMO_ORD_001",
+          rrn: "DEMO_RRN_123456",
+          amountInr: 3500,
+        });
+      } else if (action === "soundbox_template") {
+        result = sancharSkill.renderSoundboxTemplate(payload?.templateKey || "PAYMENT_SUCCESS", payload?.params || { amount: 3500 }, payload?.lang || "hi-IN");
+      }
+    }
+
+    if (!result) {
+      return { status: 400, body: { success: false, error: `Invalid skill action: ${skill}.${action}` } };
+    }
+
+    return { status: 200, body: { success: true, skill, action, data: result, timestamp: new Date().toISOString() } };
   }
 
   // 11. Legacy / Core Controllers

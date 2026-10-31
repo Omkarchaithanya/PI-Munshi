@@ -69,9 +69,15 @@ export function startBackendServer(port: number = PORT) {
     }
 
     const routePath = pathname + url.search;
-    const response = await dispatchApiRoute(routePath, method, body);
-    res.writeHead(response.status, { "Content-Type": "application/json" });
-    res.end(JSON.stringify(response.body, null, 2));
+    try {
+      const response = await dispatchApiRoute(routePath, method, body);
+      res.writeHead(response.status, { "Content-Type": "application/json" });
+      res.end(JSON.stringify(response.body, null, 2));
+    } catch (err: any) {
+      console.error("[Backend Server Route Error]:", err?.message || err);
+      res.writeHead(500, { "Content-Type": "application/json" });
+      res.end(JSON.stringify({ success: false, error: err?.message || "Internal server error" }));
+    }
   });
 
   server.listen(port, "0.0.0.0", () => {

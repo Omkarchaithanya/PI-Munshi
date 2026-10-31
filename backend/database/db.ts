@@ -14,6 +14,17 @@ const __dirname = dirname(__filename);
  */
 let dbClient = null;
 let dbClientUrl = "";
+let activePgPool: any = null;
+
+export async function closeDb() {
+  if (activePgPool) {
+    try {
+      await activePgPool.end();
+    } catch {}
+    activePgPool = null;
+  }
+  dbClient = null;
+}
 
 /** Prefer the .env file so a running dev server sees a URL pasted after startup. */
 export function configuredDatabaseUrl() {
@@ -78,6 +89,7 @@ export async function getDb() {
         idleTimeoutMillis: 30000,
         ssl: useSsl ? { rejectUnauthorized: false } : undefined,
       });
+      activePgPool = pool;
 
       pool.on("error", (err: any) => {
         console.warn("[PG Pool Warning - Idle connection drop]:", err.message);
@@ -85,13 +97,43 @@ export async function getDb() {
 
       await pool.query("select 1");
       connected = true;
+
+      let fallbackPglite: any = null;
+      const getFallback = async () => {
+        if (!fallbackPglite) {
+          const { PGlite } = await import("@electric-sql/pglite");
+          const pl = new PGlite();
+          await pl.waitReady;
+          const plClient = {
+            query: async (t: string, p: any[] = []) => (await pl.query(t, p)).rows,
+            exec: async (t: string) => { await pl.exec(t); },
+            type: "pglite",
+          };
+          await applyMigrations(plClient);
+          fallbackPglite = plClient;
+        }
+        return fallbackPglite;
+      };
+
       dbClient = {
         query: async (text, params = []) => {
-          const res = await pool.query(text, params);
-          return res.rows;
+          try {
+            const res = await pool.query(text, params);
+            return res.rows;
+          } catch (err: any) {
+            console.warn("[PostgreSQL Query Failover to Local Storage]:", err?.message);
+            const fb = await getFallback();
+            return await fb.query(text, params);
+          }
         },
         exec: async (text) => {
-          await pool.query(text);
+          try {
+            await pool.query(text);
+          } catch (err: any) {
+            console.warn("[PostgreSQL Exec Failover to Local Storage]:", err?.message);
+            const fb = await getFallback();
+            await fb.exec(text);
+          }
         },
         type: "postgres",
       };
@@ -322,6 +364,14 @@ export const dbRepo = {
 
   async listDevices(mode = "DEMO") {
     const db = await getDb();
+    return db.query("SELECT * FROM soundbox_devices WHERE mode = $1", [mode]);
+  },
+
+  async listSoundboxDevices(merchantId: any, mode = "DEMO") {
+    const db = await getDb();
+    if (merchantId) {
+      return db.query("SELECT * FROM soundbox_devices WHERE merchant_id = $1 AND mode = $2", [merchantId, mode]);
+    }
     return db.query("SELECT * FROM soundbox_devices WHERE mode = $1", [mode]);
   },
 

@@ -17,10 +17,12 @@ import { paytmGateway } from "./services/paytm-gateway.service.ts";
 import { paytmAdapter } from "./adapters/paytm.adapter.ts";
 import { sarvamAdapter } from "./adapters/sarvam.adapter.ts";
 import { soundboxAdapter } from "./adapters/soundbox.adapter.ts";
-import { dbRepo } from "./database/db.ts";
+import { dbRepo, closeDb } from "./database/db.ts";
 import { approvalService } from "./services/approval.service.ts";
 import { memoryHandoffService } from "./services/memory-handoff.service.ts";
 import { eventStream } from "./services/event-stream.service.ts";
+import { canaryMonitor } from "./services/canary-monitor.service.ts";
+import { samadhanSkill, surakshaSkill, vriddhiSkill, sancharSkill } from "./skills/index.ts";
 
 async function runBackendVerification() {
   console.log("==================================================");
@@ -245,16 +247,93 @@ async function runBackendVerification() {
   unsubscribe();
   assert(receivedSse === true, "Real-time SSE event received by subscriber");
 
+  // 16. Test 4 Scoped Domain Skills (Single-Loop Brain Architecture)
+  console.log("\n16. Testing 4 Scoped Domain Skills & ADMM / FSM Mathematical Upgrades...");
+  // Skill 1: Samadhan
+  const udirTriage = samadhanSkill.triageUdirError("U30", 1200, 0.92);
+  assert(udirTriage.recommendedAction === "PROVISIONAL_CREDIT", "Samadhan: U30 high-trust recommends PROVISIONAL_CREDIT");
+  assert(udirTriage.provisionalCreditAllowed === true, "Samadhan: Provisional credit allowed flag is true");
+
+  const defendPayload = samadhanSkill.generateDefendPayload({
+    merchantId: "DEMO_MERCHANT_RAMESH",
+    orderId: "DEMO_ORD_TEST",
+    disputeId: "DEMO_DISP_TEST",
+    amount: 1200,
+    rrn: "629910293847",
+    swarMudraHash: "abcdef0123456789abcdef0123456789",
+    kachaBillVerified: true,
+  });
+  assert(defendPayload.action === "DEFEND", "Samadhan: Dispute action is strictly DEFEND");
+  assert(defendPayload.orderStatus === "ORDER_DELIVERED", "Samadhan: Order status is ORDER_DELIVERED");
+
+  // Skill 2: Suraksha
+  const ocrCheck = surakshaSkill.evaluateKachaBillOcr("dummy_bill", 1200);
+  assert(ocrCheck.isVerified === true, "Suraksha: Handwritten kacha-bill OCR items sum matched total");
+  assert(ocrCheck.confidenceScore >= 0.90, "Suraksha: OCR confidence score >= 0.90");
+
+  const rcaPacket = surakshaSkill.generateRcaPacket({
+    merchantId: "DEMO_MERCHANT_RAMESH",
+    exceptionType: "HIGH_VALUE_HOLD",
+    orderAmount: 65000,
+    context: {},
+  });
+  assert(rcaPacket.severity === "CRITICAL", "Suraksha: High value hold > 50k flagged as CRITICAL severity");
+
+  // Skill 3: Vriddhi & ADMM Consensus
+  const vcgAdmm = vcgMechanism.solve({ orderAmount: 4280, customerTrustScore: 0.92 });
+  assert(vcgAdmm.admmTelemetry !== undefined, "Vriddhi: ADMM convergence telemetry generated");
+  assert(vcgAdmm.admmTelemetry.iterations <= 25, "Vriddhi: ADMM converged within 25 iterations");
+  assert(vcgAdmm.admmTelemetry.consensusAchieved === true, "Vriddhi: ADMM consensus achieved between customer & merchant");
+
+  const bridgeOffer = vriddhiSkill.evaluateWorkingCapitalBridge({
+    merchantId: "DEMO_MERCHANT_RAMESH",
+    heldSettlementAmount: 18000,
+  });
+  assert(bridgeOffer.feeInr === 0, "Vriddhi: 24h working capital bridge has zero fee under loyalty program");
+
+  // Skill 4: Sanchar
+  const apodChirp = sancharSkill.generateSwarMudraApod({
+    merchantId: "DEMO_MERCHANT_RAMESH",
+    orderId: "ORD_APOD_01",
+    rrn: "RRN_629910",
+    amountInr: 3500,
+  });
+  assert(apodChirp.frequencyBandHz[0] === 18500, "Sanchar: Swar-Mudra APOD frequency starts at 18.5 kHz");
+  assert(apodChirp.hmacSha256.length === 64, "Sanchar: Swar-Mudra acoustic HMAC-SHA256 signature generated");
+
+  // Dynamic Canary & FSM DFA Invariants
+  const canaryStatus = canaryMonitor.getStatus();
+  assert(typeof canaryStatus.currentZScore === "number", "Canary: Dynamic Z-score calculated via simple-statistics");
+  assert(canaryStatus.windowSampleSize >= 10, "Canary: Rolling window sample buffer populated");
+
+  const fsmDfa = fsmShield.validate("CALCULATE_MDR", { amount: 3500 });
+  assert(fsmDfa.dfaState === "STATE_EXECUTABLE", "FSM Shield: Valid action reached terminal STATE_EXECUTABLE");
+  assert(fsmDfa.transitionHistory.includes("STATE_LEXICAL_GUARD"), "FSM Shield: Traversed STATE_LEXICAL_GUARD");
+
+  // Brain Orchestrator Skill Integration Check
+  const brainRes = await brainOrchestrator.runCycle({
+    query: "Dispute resolution for customer debit",
+    merchantId: "DEMO_MERCHANT_RAMESH",
+    orderAmount: 1200,
+  });
+  assert(brainRes.executionOutput.activeSkill.includes("Samadhan"), "Brain Orchestrator: Dispute query activated Samadhan skill");
+
   console.log("\n==================================================");
   console.log(`VERIFICATION SUMMARY: ${passed}/${total} TESTS PASSED (100%)`);
   console.log("==================================================");
 
   if (passed === total) {
     console.log("\nAll core contracts, mathematical policies, database isolation, and security guardrails verified.");
-    process.exit(0);
+    try {
+      await closeDb();
+    } catch {}
+    setTimeout(() => process.exit(0), 100);
   } else {
     console.error(`\nFailure: ${total - passed} tests failed.`);
-    process.exit(1);
+    try {
+      await closeDb();
+    } catch {}
+    setTimeout(() => process.exit(1), 100);
   }
 }
 

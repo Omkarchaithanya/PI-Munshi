@@ -4,6 +4,8 @@ import { ShopkeeperView } from "./shopkeeper-view";
 import { FseView } from "./fse-view";
 import { JudgeView } from "./judge-view";
 import { SplitSettlementView } from "./split-settlement-view";
+import { SoundboxHubView } from "./soundbox-hub-view";
+import { DatabaseLedgerView } from "./database-ledger-view";
 import { getTranslation } from "@/lib/munshi/i18n";
 import {
   Home,
@@ -63,7 +65,8 @@ export function CommandCenter() {
               ? "receive"
               : "all";
 
-  const showShop = page !== "disputes" && page !== "reports" && page !== "split";
+  const showShop =
+    page !== "disputes" && page !== "reports" && page !== "split" && page !== "soundbox" && page !== "transfers";
 
   const getPageTitle = (p: Page): string => {
     switch (p) {
@@ -211,8 +214,10 @@ export function CommandCenter() {
 
         <main className="flex-1 px-4 sm:px-6 py-4">
           {showShop && <ShopkeeperView lang={lang} pane={shopPane} />}
+          {page === "soundbox" && <SoundboxHubView lang={lang} />}
           {page === "disputes" && <FseView lang={lang} />}
           {page === "reports" && <JudgeView lang={lang} />}
+          {page === "transfers" && <DatabaseLedgerView lang={lang} />}
           {page === "split" && (
             <div className="rounded-lg bg-white border border-[#e6e8ec] p-4 space-y-3">
               <div className="flex items-center gap-2 text-sm font-semibold text-[#1a1a1a]">
