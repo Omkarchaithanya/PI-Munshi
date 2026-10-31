@@ -19,12 +19,14 @@ import { useMunshi } from "@/lib/munshi/store";
 import { inrFormat } from "@/lib/munshi/backend";
 import { munshiApi } from "@/lib/api-client";
 import { speak } from "@/lib/munshi/audio";
+import { getTranslation } from "@/lib/munshi/i18n";
 
 interface JudgeViewProps {
   lang: string;
 }
 
 export function JudgeView({ lang }: JudgeViewProps) {
+  const t = getTranslation(lang);
   const okfDocs = useMunshi((s) => s.okfDocs);
   const activeOkfDoc = useMunshi((s) => s.activeOkfDoc);
   const setActiveOkfDoc = useMunshi((s) => s.setActiveOkfDoc);
@@ -59,8 +61,8 @@ export function JudgeView({ lang }: JudgeViewProps) {
   const handleNightlyDream = async () => {
     try {
       const res = await munshiApi.consolidateSettlement("DEMO_MERCHANT_RAMESH", "DEMO");
-      setDreamingMsg(`नाइटली ड्रीमिंग संपन्न: ₹${res.totalSettled} सेटलमेंट कंसोलिडेट हुआ (UTR: ${res.utr})`);
-      speak("नाइटली ड्रीमिंग सफलतापूर्वक संपन्न हुई।", lang);
+      setDreamingMsg(lang === "kn-IN" ? `ರಾತ್ರಿಯ ಸೆಟಲ್‌ಮೆಂಟ್ ಪೂರ್ಣಗೊಂಡಿದೆ: ₹${res.totalSettled} ಕ್ರೋಢೀಕರಿಸಲಾಗಿದೆ (UTR: ${res.utr})` : lang === "en-IN" ? `Nightly settlement completed: ₹${res.totalSettled} consolidated (UTR: ${res.utr})` : `नाइटली ड्रीमिंग संपन्न: ₹${res.totalSettled} सेटलमेंट कंसोलिडेट हुआ (UTR: ${res.utr})`);
+      speak(lang === "kn-IN" ? "ರಾತ್ರಿಯ ಸೆಟಲ್‌ಮೆಂಟ್ ಪ್ರಕ್ರಿಯೆ ಪೂರ್ಣಗೊಂಡಿದೆ." : lang === "en-IN" ? "Nightly settlement cycle completed successfully." : "नाइटली ड्रीमिंग सफलतापूर्वक संपन्न हुई।", lang);
       setTimeout(() => setDreamingMsg(null), 5000);
     } catch (err: any) {
       console.error(err);
@@ -81,10 +83,10 @@ export function JudgeView({ lang }: JudgeViewProps) {
             </span>
           </div>
           <h2 className="text-lg font-semibold tracking-tight text-[#1a1a1a]">
-            जज एवं सिस्टम आर्किटेक्चर कंसोल (Judge / Engine)
+            {t.judgeTitle}
           </h2>
           <p className="text-xs text-[#6b7280] mt-1 max-w-xl">
-            5 ऑप्ट-इन ट्रस्ट सिग्नल्स, आउटलाइन्स FSM शील्ड, 3-रंग कॉग्निशन लैडर एवं रीइन्फोर्समेंट लर्निंग।
+            {t.judgeSub}
           </p>
         </div>
 
@@ -94,7 +96,7 @@ export function JudgeView({ lang }: JudgeViewProps) {
           className="flex items-center gap-2 px-4 py-3 rounded-2xl bg-[#00BAF2] hover:bg-[#00a8dc] text-[#001738] font-black text-xs sm:text-sm shadow-md transition-all active:scale-95 cursor-pointer shrink-0"
         >
           <Zap className="size-4" />
-          नाइटली ड्रीमिंग चलाएं (Nightly Dream)
+          {t.nightlyDreamBtn}
         </button>
       </section>
 
@@ -106,7 +108,7 @@ export function JudgeView({ lang }: JudgeViewProps) {
           </div>
           <div>
             <span className="text-[11px] font-bold text-gray-500 uppercase tracking-wide block">
-              सिस्टम लोड (SPS)
+              {t.statSystemLoad}
             </span>
             <span className="text-xl sm:text-2xl font-black text-[#002970] mt-0.5 block font-mono">
               {spsRate}/s
@@ -120,7 +122,7 @@ export function JudgeView({ lang }: JudgeViewProps) {
           </div>
           <div>
             <span className="text-[11px] font-bold text-gray-500 uppercase tracking-wide block">
-              कैनरी Z-स्कोर
+              {t.statCanaryZ}
             </span>
             <span className="text-xl sm:text-2xl font-black text-emerald-600 mt-0.5 block font-mono">
               {canaryZ.toFixed(2)}σ
@@ -134,7 +136,7 @@ export function JudgeView({ lang }: JudgeViewProps) {
           </div>
           <div>
             <span className="text-[11px] font-bold text-gray-500 uppercase tracking-wide block">
-              प्रति कॉल टोकन लागत
+              {t.statCostPerCall}
             </span>
             <span className="text-xl sm:text-2xl font-black text-amber-600 mt-0.5 block font-mono">
               ₹{costInr.toFixed(3)}
@@ -148,7 +150,7 @@ export function JudgeView({ lang }: JudgeViewProps) {
           </div>
           <div>
             <span className="text-[11px] font-bold text-gray-500 uppercase tracking-wide block">
-              स्वायत्तता स्तर
+              {t.statAutonomyLevel}
             </span>
             <span className="text-xl sm:text-2xl font-black text-purple-700 mt-0.5 block font-mono">
               L2 (अर्जित)
@@ -173,7 +175,7 @@ export function JudgeView({ lang }: JudgeViewProps) {
               <div className="flex items-center gap-2">
                 <ShieldCheck className="size-4 text-[#00BAF2]" />
                 <h3 className="text-sm font-black text-[#002970] uppercase tracking-wide">
-                  Google Cloud OKF v0.2 ट्रस्ट सिग्नल्स
+                  {t.fiveTrustSignalsTitle}
                 </h3>
               </div>
               <button
@@ -189,13 +191,13 @@ export function JudgeView({ lang }: JudgeViewProps) {
             <div className="grid grid-cols-1 gap-4 mt-4 text-xs">
               <div className="p-4 rounded-2xl bg-[#F0F9FF] border border-blue-100 space-y-2">
                 <span className="font-extrabold text-[#002970] block">
-                  सक्रिय नीति फ़ाइल: {activeOkfDoc.filename}
+                  {t.activePolicyFile} {activeOkfDoc.filename}
                 </span>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-gray-700 pt-1">
                   <p><strong>1. उद्गम (Provenance):</strong> {activeOkfDoc.meta?.sources?.[0]?.authority || "Reserve Bank of India & NPCI"}</p>
                   <p><strong>2. ट्रस्ट टीयर:</strong> <span className="text-emerald-700 font-bold">{activeOkfDoc.meta?.trust?.verified?.tier || "tier-1-verified"}</span></p>
                   <p><strong>3. ताज़गी (Freshness):</strong> {activeOkfDoc.meta?.freshness?.effective_date || "2026-10-15"} तक मान्य</p>
-                  <p><strong>4. लाइफसाइकिल:</strong> <span className="text-blue-700 font-bold uppercase">{activeOkfDoc.meta?.status || "STABLE"}</span></p>
+                  <p><strong>4. {t.lifecycleLabel}</strong> <span className="text-blue-700 font-bold uppercase">{activeOkfDoc.meta?.status || "STABLE"}</span></p>
                 </div>
               </div>
 
@@ -236,7 +238,7 @@ export function JudgeView({ lang }: JudgeViewProps) {
             <div className="pb-3 border-b border-gray-100">
               <h3 className="text-sm font-black text-[#002970] uppercase tracking-wide flex items-center gap-2">
                 <Lock className="size-4 text-[#00BAF2]" />
-                आउटलाइन्स लेक्सिकल FSM शील्ड (Adversarial Shield)
+                {t.fsmShieldTitle} (Adversarial Shield)
               </h3>
               <p className="text-[11px] text-gray-500 mt-0.5">
                 प्रॉम्प्ट इंजेक्शन एवं अनधिकृत मनी वर्ब का तत्काल गणितीय अवरोध
@@ -257,7 +259,7 @@ export function JudgeView({ lang }: JudgeViewProps) {
                 className="w-full py-2.5 px-4 rounded-xl bg-red-600 hover:bg-red-700 text-white font-bold text-xs transition-colors flex items-center justify-center gap-2 cursor-pointer shadow-xs"
               >
                 <ShieldAlert className="size-4" />
-                प्रॉम्प्ट इंजेक्शन टेस्ट करें
+                {t.testPromptInjectionBtn}
               </button>
 
               {fsmResult && (

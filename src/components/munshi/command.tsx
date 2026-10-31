@@ -34,26 +34,11 @@ type Page =
   | "reports"
   | "accept";
 
-const PAGE_TITLE: Record<Page, string> = {
-  home: "Home",
-  payments: "Payments",
-  settlements: "Settlements",
-  disputes: "Disputes",
-  split: "Split settlement",
-  soundbox: "Soundbox",
-  voice: "Ask Pi Munshi",
-  transfers: "Accounts & Transfers",
-  history: "Transaction history",
-  reports: "Reports",
-  accept: "Accept payments",
-};
-
 export function CommandCenter() {
   const lang = useMunshi((s) => s.lang);
   const setLang = useMunshi((s) => s.setLang);
   const t = getTranslation(lang);
   const [page, setPage] = useState<Page>("home");
-  const [dateLabel] = useState("Today, 31 Oct");
 
   const running = useMunshi((s) => s.running);
   const scene = useMunshi((s) => s.scene);
@@ -79,6 +64,35 @@ export function CommandCenter() {
 
   const showShop = page !== "disputes" && page !== "reports" && page !== "split";
 
+  const getPageTitle = (p: Page): string => {
+    switch (p) {
+      case "home":
+        return t.navHome;
+      case "payments":
+        return t.navPayments;
+      case "settlements":
+        return t.navSettlement;
+      case "disputes":
+        return t.navDisputes;
+      case "split":
+        return t.navSplit;
+      case "soundbox":
+        return t.navSoundbox;
+      case "voice":
+        return t.navVoice;
+      case "transfers":
+        return t.navTransfers;
+      case "history":
+        return t.navHistory;
+      case "reports":
+        return t.navReports;
+      case "accept":
+        return t.navAccept;
+      default:
+        return t.navHome;
+    }
+  };
+
   const item = (id: Page, label: string, Icon: React.ComponentType<{ className?: string }>) => {
     const active = page === id;
     return (
@@ -103,29 +117,31 @@ export function CommandCenter() {
         <div className="h-16 flex items-center px-4 border-b border-[#eef0f3]">
           <div>
             <div className="text-[18px] font-extrabold text-[#002970] leading-none tracking-tight">Pi Munshi</div>
-            <div className="text-[11px] font-semibold text-[#00baf2] mt-1">पाई-मुंशी · Paytm PG</div>
+            <div className="text-[11px] font-semibold text-[#00baf2] mt-1">
+              {lang === "kn-IN" ? "ಪೈ-ಮುನ್ಷಿ · Paytm PG" : lang === "en-IN" ? "Pi-Munshi · Paytm PG" : "पाई-मुंशी · Paytm PG"}
+            </div>
           </div>
         </div>
 
         <nav className="flex-1 overflow-y-auto py-3">
-          <p className="px-4 pt-2 pb-1 text-[11px] font-semibold text-[#8b93a7]">Get Started</p>
-          {item("home", "Home", Home)}
+          <p className="px-4 pt-2 pb-1 text-[11px] font-semibold text-[#8b93a7] uppercase tracking-wider">{t.menuGetStarted}</p>
+          {item("home", t.navHome, Home)}
 
-          <p className="px-4 pt-4 pb-1 text-[11px] font-semibold text-[#8b93a7]">Dashboard</p>
-          {item("payments", "Payments", CreditCard)}
-          {item("settlements", "Settlements", Building2)}
-          {item("disputes", "Disputes", Scale)}
-          {item("split", "Split settlement", Split)}
-          {item("soundbox", "Soundbox", Volume2)}
-          {item("voice", "Ask Munshi", Mic)}
+          <p className="px-4 pt-4 pb-1 text-[11px] font-semibold text-[#8b93a7] uppercase tracking-wider">{t.menuDashboard}</p>
+          {item("payments", t.navPayments, CreditCard)}
+          {item("settlements", t.navSettlement, Building2)}
+          {item("disputes", t.navDisputes, Scale)}
+          {item("split", t.navSplit, Split)}
+          {item("soundbox", t.navSoundbox, Volume2)}
+          {item("voice", t.navVoice, Mic)}
 
-          <p className="px-4 pt-4 pb-1 text-[11px] font-semibold text-[#8b93a7]">Business Payments</p>
-          {item("transfers", "Accounts & Transfers", ArrowLeftRight)}
-          {item("history", "Transaction History", ScrollText)}
-          {item("reports", "Reports", BarChart3)}
+          <p className="px-4 pt-4 pb-1 text-[11px] font-semibold text-[#8b93a7] uppercase tracking-wider">{t.menuBusinessPayments}</p>
+          {item("transfers", t.navTransfers, ArrowLeftRight)}
+          {item("history", t.navHistory, ScrollText)}
+          {item("reports", t.navReports, BarChart3)}
 
-          <p className="px-4 pt-4 pb-1 text-[11px] font-semibold text-[#8b93a7]">Accept Payments</p>
-          {item("accept", "Show QR", QrCode)}
+          <p className="px-4 pt-4 pb-1 text-[11px] font-semibold text-[#8b93a7] uppercase tracking-wider">{t.menuAcceptPayments}</p>
+          {item("accept", t.navAccept, QrCode)}
         </nav>
 
         <div className="px-4 py-3 border-t border-[#eef0f3] text-[10px] text-[#8b93a7]">
@@ -139,31 +155,31 @@ export function CommandCenter() {
             <div className="min-w-0">
               <p className="text-[11px] font-semibold text-[#00baf2] leading-none">Pi Munshi</p>
               <h1 className="text-[15px] font-semibold text-[#1a1a1a] truncate mt-0.5">
-                {PAGE_TITLE[page]}
+                {getPageTitle(page)}
                 <span className="inline-flex items-center gap-1 ml-2 px-2.5 py-0.5 rounded-full border border-[#d9dee7] bg-white text-[12px] font-medium text-[#4a4a4a]">
-                  {dateLabel}
+                  {t.dateToday}
                   <ChevronDown className="size-3.5 text-[#6b7280]" />
                 </span>
               </h1>
             </div>
           </div>
           <div className="flex items-center gap-2">
-            <div className="hidden sm:flex rounded-md border border-[#e6e8ec] p-0.5 text-[11px]">
+            <div className="flex rounded-md border border-[#e6e8ec] p-0.5 text-[11px]">
               {(["hi-IN", "kn-IN", "en-IN"] as const).map((code) => (
                 <button
                   key={code}
                   type="button"
                   onClick={() => setLang(code)}
-                  className={`px-2 py-1 rounded cursor-pointer ${lang === code ? "bg-[#e8f7fd] text-[#0077a8] font-semibold" : "text-[#6b7280]"}`}
+                  className={`px-2 py-1 rounded cursor-pointer transition-colors ${lang === code ? "bg-[#e8f7fd] text-[#0077a8] font-bold shadow-2xs" : "text-[#6b7280] hover:text-[#1a1a1a]"}`}
                 >
                   {code === "hi-IN" ? "हिंदी" : code === "kn-IN" ? "ಕನ್ನಡ" : "EN"}
                 </button>
               ))}
             </div>
-            <button type="button" className="p-2 text-[#6b7280]" title="Notifications">
+            <button type="button" className="p-2 text-[#6b7280] hover:text-[#1a1a1a] transition-colors" title="Notifications">
               <Bell className="size-4" />
             </button>
-            <div className="size-8 rounded-full border border-[#e6e8ec] text-[11px] font-semibold text-[#002970] flex items-center justify-center">
+            <div className="size-8 rounded-full border border-[#e6e8ec] text-[11px] font-semibold text-[#002970] flex items-center justify-center bg-blue-50">
               RK
             </div>
           </div>
@@ -172,12 +188,12 @@ export function CommandCenter() {
         <div className="md:hidden flex gap-1 overflow-x-auto bg-white border-b border-[#e6e8ec] px-2 py-2">
           {(
             [
-              ["home", "Home"],
-              ["payments", "Payments"],
-              ["settlements", "Settlements"],
-              ["disputes", "Disputes"],
-              ["voice", "Voice"],
-              ["reports", "Reports"],
+              ["home", t.navHome],
+              ["payments", t.navPayments],
+              ["settlements", t.navSettlement],
+              ["disputes", t.navDisputes],
+              ["voice", t.navVoice],
+              ["reports", t.navReports],
             ] as const
           ).map(([id, label]) => (
             <button
@@ -200,7 +216,7 @@ export function CommandCenter() {
             <div className="rounded-lg bg-white border border-[#e6e8ec] p-4 space-y-3">
               <div className="flex items-center gap-2 text-sm font-semibold text-[#1a1a1a]">
                 <FileText className="size-4 text-[#00baf2]" />
-                Checkout defence scenarios
+                {lang === "kn-IN" ? "ಚೆಕ್‌ಔಟ್ ರಕ್ಷಣಾ ಸನ್ನಿವೇಶಗಳು" : lang === "en-IN" ? "Checkout Defence Scenarios" : "चेकआउट डिफेंस परिदृश्य"}
               </div>
               <div className="flex flex-wrap gap-2">
                 {(
@@ -231,7 +247,7 @@ export function CommandCenter() {
         </main>
 
         <footer className="bg-white border-t border-[#e6e8ec] px-4 sm:px-6 py-3 text-[11px] text-[#8b93a7] flex flex-wrap items-center justify-between gap-2">
-          <span>© 2026, Pi Munshi · Paytm for Business prototype</span>
+          <span>© 2026, Pi Munshi · {t.paytmForBusiness}</span>
           <span className="flex gap-3">
             <span>{t.footerCompliance}</span>
             <span>{t.okfBadge}</span>

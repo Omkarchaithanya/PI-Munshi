@@ -90,12 +90,24 @@ export interface TranslationDictionary {
   callFseBtn: string;
   helpTicketBtn: string;
 
-  // Mobile Bottom Navigation
+  // Mobile Bottom Navigation & Sidebar
+  menuGetStarted: string;
+  menuDashboard: string;
+  menuBusinessPayments: string;
+  menuAcceptPayments: string;
   navHome: string;
   navPayments: string;
   navSettlement: string;
   navSoundbox: string;
   navHelp: string;
+  navDisputes: string;
+  navSplit: string;
+  navVoice: string;
+  navTransfers: string;
+  navHistory: string;
+  navReports: string;
+  navAccept: string;
+  dateToday: string;
 
   // Footer
   footerHackathon: string;
@@ -284,12 +296,24 @@ export const I18N: Record<LangCode, TranslationDictionary> = {
     callFseBtn: "Call FSE",
     helpTicketBtn: "Help Ticket",
 
-    // Mobile Bottom Navigation
+    // Mobile Bottom Navigation & Sidebar
+    menuGetStarted: "Get Started",
+    menuDashboard: "Dashboard",
+    menuBusinessPayments: "Business Payments",
+    menuAcceptPayments: "Accept Payments",
     navHome: "Home",
     navPayments: "Payments",
-    navSettlement: "Settlement",
+    navSettlement: "Settlements",
     navSoundbox: "Soundbox",
     navHelp: "Support / FSE",
+    navDisputes: "Disputes",
+    navSplit: "Split Settlement",
+    navVoice: "Ask Munshi",
+    navTransfers: "Accounts & Transfers",
+    navHistory: "Transaction History",
+    navReports: "Reports",
+    navAccept: "Show QR",
+    dateToday: "Today, 31 Oct",
 
     // Footer
     footerHackathon: "Paytm Build for India AI Hackathon",
@@ -477,12 +501,24 @@ export const I18N: Record<LangCode, TranslationDictionary> = {
     callFseBtn: "कॉल करें",
     helpTicketBtn: "हेल्प टिकट",
 
-    // Mobile Bottom Navigation
+    // Mobile Bottom Navigation & Sidebar
+    menuGetStarted: "शुरुआत करें",
+    menuDashboard: "डैशबोर्ड",
+    menuBusinessPayments: "व्यापारिक भुगतान",
+    menuAcceptPayments: "भुगतान स्वीकारें",
     navHome: "होम",
     navPayments: "भुगतान",
     navSettlement: "सेटलमेंट",
     navSoundbox: "साउंडबॉक्स",
     navHelp: "सहायता / FSE",
+    navDisputes: "विवाद निवारण",
+    navSplit: "स्प्लिट सेटलमेंट",
+    navVoice: "मुंशी से पूछें",
+    navTransfers: "खाता एवं स्थानांतरण",
+    navHistory: "लेन-देन इतिहास",
+    navReports: "रिपोर्ट्स",
+    navAccept: "QR कोड दिखाएं",
+    dateToday: "आज, 31 अक्टूबर",
 
     // Footer
     footerHackathon: "Paytm Build for India AI Hackathon",
@@ -670,12 +706,24 @@ export const I18N: Record<LangCode, TranslationDictionary> = {
     callFseBtn: "ಕರೆ ಮಾಡಿ",
     helpTicketBtn: "ಸಹಾಯ ಟಿಕೆಟ್",
 
-    // Mobile Bottom Navigation
+    // Mobile Bottom Navigation & Sidebar
+    menuGetStarted: "ಪ್ರಾರಂಭಿಸಿ",
+    menuDashboard: "ಡ್ಯಾಶ್‌ಬೋರ್ಡ್",
+    menuBusinessPayments: "ವ್ಯಾಪಾರ ಪಾವತಿಗಳು",
+    menuAcceptPayments: "ಪಾವತಿ ಸ್ವೀಕರಿಸಿ",
     navHome: "ಮುಖಪುಟ",
     navPayments: "ಪಾವತಿಗಳು",
-    navSettlement: "ಸೆಟಲ್‌ಮೆಂಟ್",
+    navSettlement: "ಸೆಟಲ್‌ಮೆಂಟ್‌ಗಳು",
     navSoundbox: "ಸೌಂಡ್‌ಬಾಕ್ಸ್",
     navHelp: "ಸಹಾಯ / FSE",
+    navDisputes: "ವಿವಾದಗಳು",
+    navSplit: "ವಿಭಜಿತ ಸೆಟಲ್‌ಮೆಂಟ್",
+    navVoice: "ಮುನ್ಷಿ ಜೊತೆ ಮಾತನಾಡಿ",
+    navTransfers: "ಖಾತೆ ಮತ್ತು ವರ್ಗಾವಣೆ",
+    navHistory: "ವಹಿವಾಟು ಇತಿಹಾಸ",
+    navReports: "ವರದಿಗಳು",
+    navAccept: "QR ಕೋಡ್ ತೋರಿಸಿ",
+    dateToday: "ಇಂದು, 31 ಅಕ್ಟೋಬರ್",
 
     // Footer
     footerHackathon: "Paytm Build for India AI Hackathon",

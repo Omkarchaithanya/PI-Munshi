@@ -358,7 +358,7 @@ export function ShopkeeperView({ lang, pane = "all" }: ShopkeeperViewProps) {
                   type="button"
                   onClick={loadData}
                   className="p-1.5 rounded-lg text-gray-400 hover:text-[#002970] hover:bg-gray-100 transition-colors cursor-pointer"
-                  title="रीफ्रेश करें"
+                  title={lang === "kn-IN" ? "ರಿಫ್ರೆಶ್ ಮಾಡಿ" : lang === "en-IN" ? "Refresh" : "रीफ्रेश करें"}
                 >
                   <RefreshCw className="size-3.5" />
                 </button>
@@ -509,7 +509,7 @@ export function ShopkeeperView({ lang, pane = "all" }: ShopkeeperViewProps) {
 
             <div className="mt-3.5 flex items-center gap-3">
               <div className="size-11 rounded-2xl bg-blue-50 text-[#002970] flex items-center justify-center font-black text-sm shrink-0 border border-blue-200">
-                अरुण
+                {lang === "kn-IN" ? "ಅರುಣ್" : lang === "en-IN" ? "Arun" : "अरुण"}
               </div>
               <div className="min-w-0">
                 <span className="font-extrabold text-xs text-[#002970] block truncate">
@@ -524,7 +524,15 @@ export function ShopkeeperView({ lang, pane = "all" }: ShopkeeperViewProps) {
             <div className="mt-4 flex gap-2">
               <button
                 type="button"
-                onClick={() => alert("फ़ील्ड अधिकारी अरुण शर्मा को कॉल किया जा रहा है: +91 9123456780")}
+                onClick={() =>
+                  alert(
+                    lang === "kn-IN"
+                      ? "ಫೀಲ್ಡ್ ಅಧಿಕಾರಿ ಅರುಣ್ ಶರ್ಮಾ ಅವರಿಗೆ ಕರೆ ಮಾಡಲಾಗುತ್ತಿದೆ: +91 9123456780"
+                      : lang === "en-IN"
+                        ? "Calling Field Executive Arun Sharma: +91 9123456780"
+                        : "फ़ील्ड अधिकारी अरुण शर्मा को कॉल किया जा रहा है: +91 9123456780"
+                  )
+                }
                 className="flex-1 py-2 px-3 rounded-xl bg-[#002970] hover:bg-[#001738] text-white font-bold text-xs transition-colors flex items-center justify-center gap-1.5 cursor-pointer shadow-sm"
               >
                 <Phone className="size-3" />
@@ -532,7 +540,15 @@ export function ShopkeeperView({ lang, pane = "all" }: ShopkeeperViewProps) {
               </button>
               <button
                 type="button"
-                onClick={() => alert("Paytm मर्चेंट हेल्पडेस्क टिकट #TKT-884 दर्ज हो चुका है।")}
+                onClick={() =>
+                  alert(
+                    lang === "kn-IN"
+                      ? "ಪೇಟಿಎಂ ಮರ್ಚೆಂಟ್ ಸಹಾಯವಾಣಿ ಟಿಕೆಟ್ #TKT-884 ದಾಖಲಾಗಿದೆ."
+                      : lang === "en-IN"
+                        ? "Paytm Merchant Helpdesk Ticket #TKT-884 has been created."
+                        : "Paytm मर्चेंट हेल्पडेस्क टिकट #TKT-884 दर्ज हो चुका है।"
+                  )
+                }
                 className="flex-1 py-2 px-3 rounded-xl border border-gray-200 hover:border-[#00BAF2] text-gray-700 font-bold text-xs hover:bg-gray-50 transition-colors flex items-center justify-center gap-1.5 cursor-pointer"
               >
                 <HelpCircle className="size-3" />

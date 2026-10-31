@@ -20,12 +20,14 @@ import {
 } from "lucide-react";
 import { munshiApi } from "@/lib/api-client";
 import { speak } from "@/lib/munshi/audio";
+import { getTranslation } from "@/lib/munshi/i18n";
 
 interface FseViewProps {
   lang: string;
 }
 
 export function FseView({ lang }: FseViewProps) {
+  const t = getTranslation(lang);
   const [disputes, setDisputes] = useState<any[]>([]);
   const [memories, setMemories] = useState<any[]>([]);
   const [handoffSuccess, setHandoffSuccess] = useState<string | null>(null);
@@ -52,11 +54,15 @@ export function FseView({ lang }: FseViewProps) {
       await munshiApi.updateDispute(
         disputeId,
         action,
-        "FSE अरुण शर्मा द्वारा सत्यापित: बैंक यूडीआईआर रिवर्सल स्वीकृत",
+        lang === "kn-IN"
+          ? "FSE ಅರುಣ್ ಶರ್ಮಾ ಪರಿಶೀಲಿಸಿದ್ದಾರೆ: ಯುಡಿಐಆರ್ ರಿವರ್ಸಲ್ ಅನುಮೋದಿಸಲಾಗಿದೆ"
+          : lang === "en-IN"
+            ? "Verified by FSE Arun Sharma: Bank UDIR reversal approved"
+            : "FSE अरुण शर्मा द्वारा सत्यापित: बैंक यूडीआईआर रिवर्सल स्वीकृत",
         "DEMO"
       );
-      setActionMsg(`विवाद अद्यतन सफल (${action}): यूडीआईआर ऑटो-क्रेडिट लागू किया गया।`);
-      speak("विवाद का निपटारा कर दिया गया है।", lang);
+      setActionMsg(lang === "kn-IN" ? `ವಿವಾದ ನವೀಕರಣ ಯಶಸ್ವಿ (${action}): ಯುಡಿಐಆರ್ ಆಟೋ-ಕ್ರೆಡಿಟ್ ಅನ್ವಯಿಸಲಾಗಿದೆ.` : lang === "en-IN" ? `Dispute updated (${action}): UDIR auto-credit processed.` : `विवाद अद्यतन सफल (${action}): यूडीआईआर ऑटो-क्रेडिट लागू किया गया।`);
+      speak(lang === "kn-IN" ? "ವಿವಾದವನ್ನು ಇತ್ಯರ್ಥಪಡಿಸಲಾಗಿದೆ." : lang === "en-IN" ? "Dispute has been resolved." : "विवाद का निपटारा कर दिया गया है।", lang);
       loadFseData();
       setTimeout(() => setActionMsg(null), 4000);
     } catch (err: any) {
@@ -73,8 +79,8 @@ export function FseView({ lang }: FseViewProps) {
         "DEMO_MERCHANT_RAMESH",
         "DEMO"
       );
-      setHandoffSuccess("कार्यभार सफलतापूर्वक हस्तांतरित: FSE प्रिया नायर को संपूर्ण संदर्भ सौंपा गया।");
-      speak("सुरक्षित हैंडऑफ संपन्न हुआ।", lang);
+      setHandoffSuccess(lang === "kn-IN" ? "ಕಾರ್ಯಭಾರ ಯಶಸ್ವಿಯಾಗಿ ವರ್ಗಾವಣೆಯಾಗಿದೆ: FSE ಪ್ರಿಯಾ ನಾಯರ್ ಅವರಿಗೆ ವಿವರ ಒಪ್ಪಿಸಲಾಗಿದೆ." : lang === "en-IN" ? "Territory handoff successful: Full context transferred to FSE Priya Nair." : "कार्यभार सफलतापूर्वक हस्तांतरित: FSE प्रिया नायर को संपूर्ण संदर्भ सौंपा गया।");
+      speak(lang === "kn-IN" ? "ಸುರಕ್ಷಿತ ವರ್ಗಾವಣೆ ಪೂರ್ಣಗೊಂಡಿದೆ." : lang === "en-IN" ? "Safe territory handoff completed." : "सुरक्षित हैंडऑफ संपन्न हुआ।", lang);
       loadFseData();
       setTimeout(() => setHandoffSuccess(null), 5000);
     } catch (err: any) {
@@ -118,10 +124,10 @@ export function FseView({ lang }: FseViewProps) {
             </span>
           </div>
           <h2 className="text-lg font-semibold tracking-tight text-[#1a1a1a]">
-            फील्ड ऑपरेशंस डैशबोर्ड (FSE Operations Console)
+            {t.fseConsoleTitle}
           </h2>
           <p className="text-xs text-[#6b7280] mt-1 max-w-xl">
-            दुकानदार दौरे, शिकायत निवारण, साउंडबॉक्स सेवा एवं सुरक्षित हैंडऑफ प्रबंधन।
+            {t.fseConsoleSub}
           </p>
         </div>
 
@@ -131,7 +137,7 @@ export function FseView({ lang }: FseViewProps) {
           className="flex items-center gap-2 px-4 py-3 rounded-2xl bg-amber-500 hover:bg-amber-600 text-[#001738] font-black text-xs sm:text-sm shadow-md transition-all active:scale-95 cursor-pointer shrink-0"
         >
           <UserMinus className="size-4" />
-          क्षेत्र हैंडऑफ करें (Handover to Priya)
+          {t.handoverBtn}
         </button>
       </section>
 
@@ -139,27 +145,27 @@ export function FseView({ lang }: FseViewProps) {
       <section className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
         <div className="p-4 rounded-2xl bg-white border border-gray-100 shadow-[0_2px_12px_rgba(0,41,112,0.06)]">
           <span className="text-[11px] font-bold text-gray-500 uppercase tracking-wide block">
-            आवंटित दुकानें (Beat)
+            {t.statAssignedMerchants}
           </span>
           <span className="text-2xl sm:text-3xl font-black text-[#002970] mt-1 block">3</span>
           <span className="text-[10px] text-emerald-600 font-bold bg-emerald-50 px-1.5 py-0.5 rounded inline-block mt-0.5">
-            सभी सक्रिय
+            {t.allActivePill}
           </span>
         </div>
 
         <div className="p-4 rounded-2xl bg-white border border-gray-100 shadow-[0_2px_12px_rgba(0,41,112,0.06)]">
           <span className="text-[11px] font-bold text-gray-500 uppercase tracking-wide block">
-            सक्रिय विवाद (Disputes)
+            {t.statActiveDisputes}
           </span>
           <span className="text-2xl sm:text-3xl font-black text-amber-600 mt-1 block">1</span>
           <span className="text-[10px] text-amber-700 font-bold bg-amber-50 px-1.5 py-0.5 rounded inline-block mt-0.5">
-            ₹1,200 समीक्षाधीन
+            {t.underReviewPill}
           </span>
         </div>
 
         <div className="p-4 rounded-2xl bg-white border border-gray-100 shadow-[0_2px_12px_rgba(0,41,112,0.06)]">
           <span className="text-[11px] font-bold text-gray-500 uppercase tracking-wide block">
-            अगला दौरा (Next Visit)
+            {t.statNextVisit}
           </span>
           <span className="text-xl sm:text-2xl font-bold text-[#002970] mt-1 block">4:00 PM</span>
           <span className="text-[10px] text-gray-500 block mt-0.5">रमेश किराना स्टोर</span>
@@ -167,11 +173,11 @@ export function FseView({ lang }: FseViewProps) {
 
         <div className="p-4 rounded-2xl bg-white border border-gray-100 shadow-[0_2px_12px_rgba(0,41,112,0.06)]">
           <span className="text-[11px] font-bold text-gray-500 uppercase tracking-wide block">
-            साउंडबॉक्स 4G अपटाइम
+            {t.statSoundboxUptime}
           </span>
           <span className="text-2xl sm:text-3xl font-black text-emerald-600 mt-1 block">98.5%</span>
           <span className="text-[10px] text-emerald-700 font-bold bg-emerald-50 px-1.5 py-0.5 rounded inline-block mt-0.5">
-            100% सिग्नल कनेक्टेड
+            {t.connected100Pill}
           </span>
         </div>
       </section>
@@ -200,11 +206,11 @@ export function FseView({ lang }: FseViewProps) {
               <div className="flex items-center gap-2">
                 <Store className="size-4 text-[#00BAF2]" />
                 <h3 className="text-sm font-black text-[#002970] uppercase tracking-wide">
-                  आवंटित व्यापारी बीट (Assigned Merchants in Territory)
+                  {t.assignedMerchantsTitle}
                 </h3>
               </div>
               <span className="text-xs text-gray-500 font-bold bg-gray-50 px-2.5 py-1 rounded-full border border-gray-200">
-                3 सक्रिय दुकानें
+                3 {t.activeCountBadge}
               </span>
             </div>
 
@@ -226,7 +232,7 @@ export function FseView({ lang }: FseViewProps) {
                 <div className="text-left sm:text-right shrink-0 pt-2 sm:pt-0 border-t sm:border-0 border-blue-200">
                   <span className="text-[11px] font-bold text-[#002970] block">अगला दौरा: आज 4:00 PM</span>
                   <span className="text-xs text-[#00BAF2] font-black hover:underline cursor-pointer">
-                    प्रोफ़ाइल देखें &rarr;
+                    {t.viewProfile} &rarr;
                   </span>
                 </div>
               </div>
@@ -237,7 +243,7 @@ export function FseView({ lang }: FseViewProps) {
                   <div className="flex items-center gap-2">
                     <span className="font-bold text-sm text-gray-900">सुरेश जनरल स्टोर</span>
                     <span className="text-[10px] font-bold text-amber-700 bg-amber-100 px-2 py-0.5 rounded-full">
-                      बैटरी कम
+                      {t.lowBattery}
                     </span>
                   </div>
                   <p className="text-xs text-gray-600 mt-1">
@@ -277,7 +283,7 @@ export function FseView({ lang }: FseViewProps) {
               <div className="flex items-center gap-2">
                 <FileText className="size-4 text-[#00BAF2]" />
                 <h3 className="text-sm font-black text-[#002970] uppercase tracking-wide">
-                  व्यापारी मेमोरी एवं विज़िट नोट्स (Memory Stream)
+                  {t.memoryStreamTitle}
                 </h3>
               </div>
               <span className="text-xs text-gray-500 font-mono">रमेश किराना स्टोर</span>
@@ -304,7 +310,7 @@ export function FseView({ lang }: FseViewProps) {
                 value={newNote}
                 onChange={(e) => setNewNote(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && handleAddNote()}
-                placeholder="फील्ड विज़िट का नया नोट जोड़ें (उदा. साउंडबॉक्स 4G सिम टेस्ट किया)..."
+                placeholder={t.notePlaceholder}
                 className="flex-1 rounded-2xl border border-gray-200 px-4 py-2.5 text-xs focus:border-[#00BAF2] focus:bg-white focus:outline-hidden"
               />
               <button
@@ -313,7 +319,7 @@ export function FseView({ lang }: FseViewProps) {
                 className="px-4 py-2.5 rounded-2xl bg-[#002970] text-white font-bold text-xs hover:bg-[#001738] transition-colors flex items-center gap-1.5 cursor-pointer shrink-0"
               >
                 <Send className="size-3.5" />
-                नोट सेव करें
+                {t.saveNoteBtn}
               </button>
             </div>
           </div>
@@ -327,11 +333,11 @@ export function FseView({ lang }: FseViewProps) {
               <div className="flex items-center gap-2">
                 <AlertTriangle className="size-4 text-amber-500" />
                 <h3 className="text-sm font-black text-[#002970] uppercase tracking-wide">
-                  सक्रिय विवाद (Active Disputes)
+                  {t.activeDisputesTitle}
                 </h3>
               </div>
               <span className="text-xs text-amber-700 bg-amber-50 px-2.5 py-0.5 rounded-full font-bold border border-amber-200">
-                1 समीक्षाधीन
+                1 {t.reviewRequiredBadge}
               </span>
             </div>
 
@@ -359,14 +365,14 @@ export function FseView({ lang }: FseViewProps) {
                       onClick={() => handleResolveDispute(d.dispute_id, "SUBMIT_EVIDENCE")}
                       className="flex-1 py-2 px-3 rounded-xl bg-white border border-[#00BAF2] text-[#002970] font-bold hover:bg-blue-50 transition-colors text-center cursor-pointer"
                     >
-                      प्रमाण अपलोड करें
+                      {t.uploadEvidenceBtn}
                     </button>
                     <button
                       type="button"
                       onClick={() => handleResolveDispute(d.dispute_id, "ACCEPT_CHARGEBACK")}
                       className="flex-1 py-2 px-3 rounded-xl bg-[#00BAF2] text-[#002970] font-black hover:bg-[#00a8dc] transition-colors text-center cursor-pointer shadow-xs"
                     >
-                      तत्काल रिवर्सल दें
+                      {t.instantReversalBtn}
                     </button>
                   </div>
                 </div>
@@ -379,16 +385,16 @@ export function FseView({ lang }: FseViewProps) {
             <div className="flex items-center gap-2 pb-3.5 border-b border-gray-100">
               <UserMinus className="size-4 text-amber-500" />
               <h3 className="text-sm font-black text-[#002970] uppercase tracking-wide">
-                सुरक्षित क्षेत्र हैंडऑफ (Safe FSE Handoff)
+                {t.safeHandoffTitle}
               </h3>
             </div>
 
             <p className="text-xs text-gray-600 mt-3 leading-relaxed">
-              स्थान परिवर्तन या छुट्टी पर जाने की स्थिति में अपने सभी 3 व्यापारियों का संपूर्ण इतिहास एवं चालू प्रतिबद्धताएं FSE प्रिया नायर को ट्रांसफर करें।
+              {t.safeHandoffDesc}
             </p>
 
             <div className="mt-4 p-3 rounded-xl bg-blue-50 border border-blue-100 text-xs text-[#002970]">
-              <span className="font-bold block">प्राप्तकर्ता अधिकारी:</span>
+              <span className="font-bold block">{t.recipientOfficer}</span>
               <span>FSE प्रिया नायर (ID: DEMO_FSE_PRIYA • 9123456789)</span>
             </div>
 
@@ -398,7 +404,7 @@ export function FseView({ lang }: FseViewProps) {
               className="w-full mt-4 py-2.5 px-4 rounded-xl bg-[#002970] hover:bg-[#001738] text-white font-bold text-xs transition-colors flex items-center justify-center gap-2 cursor-pointer shadow-sm"
             >
               <UserCheck className="size-4" />
-              कार्यभार हस्तांतरित करें (Confirm Handoff)
+              {t.confirmHandoffBtn}
             </button>
           </div>
         </div>
