@@ -142,22 +142,22 @@ return result;
         dbRepo.getDevice("DEMO_SB_RAMESH", "DEMO"),
         dbRepo.listDisputes(merchantId, "DEMO"),
       ]);
-      const success = (txns || []).filter((t) => t.status === "SUCCESS");
-      const successToday = success.filter((t) => isToday(t.created_at));
+      const success = (txns || []).filter((t: any) => t.status === "SUCCESS");
+      const successToday = success.filter((t: any) => isToday(t.created_at));
       const use = successToday.length > 0 ? successToday : success;
-      const pendingTxns = success.filter((t) => t.settlement_status === "PENDING");
+      const pendingTxns = success.filter((t: any) => t.settlement_status === "PENDING");
       const latest = settlements?.[0];
       const lookupAmount = Number((qRaw.match(/(\d{2,})/) || [])[1] || 0);
       const match = lookupAmount
-        ? success.find((t) => Math.abs(asAmount(t.amount) - lookupAmount) < 0.01)
+        ? success.find((t: any) => Math.abs(asAmount(t.amount) - lookupAmount) < 0.01)
         : null;
       const dispute = disputes?.[0];
       ledger = {
         ok: true,
-        total: use.reduce((s, t) => s + asAmount(t.amount), 0),
+        total: use.reduce((s: number, t: any) => s + asAmount(t.amount), 0),
         count: use.length,
         settled: latest ? asAmount(latest.net_payout ?? latest.total_amount) : 0,
-        pending: pendingTxns.reduce((s, t) => s + asAmount(t.amount), 0),
+        pending: pendingTxns.reduce((s: number, t: any) => s + asAmount(t.amount), 0),
         utr: String(latest?.utr || "—"),
         mdrFee: latest ? asAmount(latest.mdr_fee) : 0,
         battery: Number(device?.battery_level ?? 0),

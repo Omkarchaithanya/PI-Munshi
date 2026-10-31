@@ -5,10 +5,7 @@
  */
 
 /** Same-origin in dev (Vite proxy → :8082); falls back to direct port if needed. */
-const BACKEND_BASE =
-  typeof window !== "undefined" && window.location.hostname === "localhost"
-    ? ""
-    : "http://localhost:8082";
+const BACKEND_BASE = typeof window !== "undefined" ? "" : "http://127.0.0.1:8082";
 
 async function request<T>(endpoint: string, method: "GET" | "POST" = "GET", body?: any): Promise<T> {
   const url = `${BACKEND_BASE}${endpoint}`;
@@ -87,7 +84,7 @@ export class MunshiApiClient {
       mimeType: "audio/wav",
       mode: "LIVE",
     });
-    return json.data as { transcript?: string; isDemo?: boolean };
+    return json.data as { transcript?: string; isDemo?: boolean; error?: string };
   }
 
   public async getSystemHealth(): Promise<{

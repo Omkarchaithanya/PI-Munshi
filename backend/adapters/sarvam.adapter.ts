@@ -33,7 +33,7 @@ export class SarvamAdapter implements ISarvamAdapter {
       try {
         const formData = new FormData();
         const bytes = audioBuffer instanceof Uint8Array ? audioBuffer : new Uint8Array(audioBuffer);
-        const blob = new Blob([bytes], { type: mimeType || "audio/wav" });
+        const blob = new Blob([bytes as unknown as BlobPart], { type: mimeType || "audio/wav" });
         const ext = mimeType.includes("webm") ? "webm" : mimeType.includes("mpeg") ? "mp3" : "wav";
         formData.append("file", blob, `audio.${ext}`);
         formData.append("language_code", languageCode === "en-IN" ? "en-IN" : languageCode);

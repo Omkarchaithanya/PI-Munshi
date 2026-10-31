@@ -32,7 +32,7 @@ export function ReceiveMoneyModal({ isOpen, onClose, lang, onPaymentSuccess }: R
       width: 320,
       color: { dark: "#111827", light: "#ffffff" },
     })
-      .then((url) => {
+      .then((url: string) => {
         if (!cancel) setQrUrl(url);
       })
       .catch(() => {
@@ -62,16 +62,16 @@ export function ReceiveMoneyModal({ isOpen, onClose, lang, onPaymentSuccess }: R
         lang === "kn-IN"
           ? `Paytm ನಲ್ಲಿ ${amount} ರೂಪಾಯಿ ಸ್ವೀಕರಿಸಲಾಗಿದೆ.`
           : lang === "en-IN"
-          ? `Received rupees ${amount} on Paytm.`
-          : `पेटीएम पर ${amount} रुपये प्राप्त हुए।`;
+            ? `Received rupees ${amount} on Paytm.`
+            : `पेटीएम पर ${amount} रुपये प्राप्त हुए।`;
 
       speak(phrase, lang);
       setSuccessMsg(
         lang === "kn-IN"
           ? `ಪಾವತಿ ಸ್ವೀಕರಿಸಲಾಗಿದೆ: ₹${amount}`
           : lang === "en-IN"
-          ? `Payment received: ₹${amount}`
-          : `भुगतान प्राप्त: ₹${amount}`
+            ? `Payment received: ₹${amount}`
+            : `भुगतान प्राप्त: ₹${amount}`
       );
       onPaymentSuccess?.();
       setTimeout(() => {
@@ -149,11 +149,10 @@ export function ReceiveMoneyModal({ isOpen, onClose, lang, onPaymentSuccess }: R
                   key={val}
                   type="button"
                   onClick={() => setAmount(val)}
-                  className={`flex-1 py-1.5 text-xs font-bold rounded-lg border transition-all cursor-pointer ${
-                    amount === val
+                  className={`flex-1 py-1.5 text-xs font-bold rounded-lg border transition-all cursor-pointer ${amount === val
                       ? "bg-[#00BAF2] text-[#002970] border-[#00BAF2] shadow-sm"
                       : "bg-white text-gray-700 border-gray-200 hover:border-[#00BAF2]"
-                  }`}
+                    }`}
                 >
                   ₹{val}
                 </button>

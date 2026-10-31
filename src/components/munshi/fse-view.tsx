@@ -113,7 +113,7 @@ export function FseView({ lang }: FseViewProps) {
   const handleAddNote = async () => {
     if (!newNote.trim()) return;
     try {
-      await fetch("http://localhost:8082/api/v1/memory/record", {
+      await fetch("/api/v1/memory/record", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
