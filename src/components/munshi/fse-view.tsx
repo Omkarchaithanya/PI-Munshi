@@ -75,7 +75,11 @@ export function FseView({ lang }: FseViewProps) {
       const res = await munshiApi.initiateHandoff(
         "DEMO_FSE_ARUN",
         "DEMO_FSE_PRIYA",
-        "रमेश जी शाम 6 से 9 बजे व्यस्त रहते हैं; साउंडबॉक्स 88% बैटरी पर है; कोई लंबित शिकायत नहीं।",
+        lang === "kn-IN"
+          ? "ರಮೇಶ್ ಜಿ ಸಂಜೆ 6 ರಿಂದ 9 ರವರೆಗೆ ಕಾರ್ಯನಿರತರಾಗಿರುತ್ತಾರೆ; ಸೌಂಡ್‌ಬಾಕ್ಸ್ 88% ಬ್ಯಾಟರಿಯಲ್ಲಿದೆ; ಯಾವುದೇ ಬಾಕಿ ದೂರುಗಳಿಲ್ಲ."
+          : lang === "en-IN"
+            ? "Ramesh ji is busy 6-9 PM; Soundbox at 88% battery; zero pending issues."
+            : "रमेश जी शाम 6 से 9 बजे व्यस्त रहते हैं; साउंडबॉक्स 88% बैटरी पर है; कोई लंबित शिकायत नहीं।",
         "DEMO_MERCHANT_RAMESH",
         "DEMO"
       );
@@ -116,11 +120,19 @@ export function FseView({ lang }: FseViewProps) {
           <div className="flex flex-wrap items-center gap-2 mb-1.5">
             <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-semibold">
               <UserCheck className="size-3" />
-              FSE अरुण शर्मा (ID: DEMO_FSE_ARUN • 9123456780)
+              {lang === "hi-IN"
+                ? "FSE अरुण शर्मा (ID: DEMO_FSE_ARUN • 9123456780)"
+                : lang === "kn-IN"
+                  ? "FSE ಅರುಣ್ ಶರ್ಮಾ (ID: DEMO_FSE_ARUN • 9123456780)"
+                  : "FSE Arun Sharma (ID: DEMO_FSE_ARUN • 9123456780)"}
             </span>
             <span className="text-xs text-[#536e92] font-mono bg-[#f4f6f9] px-2 py-0.5 rounded flex items-center gap-1">
               <MapPin className="size-3 text-[#00BAF2]" />
-              कोरमंगला 4th ब्लॉक, बैंगलोर
+              {lang === "hi-IN"
+                ? "कोरमंगला 4th ब्लॉक, बैंगलोर"
+                : lang === "kn-IN"
+                  ? "ಕೋರಮಂಗಲ 4 ನೇ ಬ್ಲಾಕ್, ಬೆಂಗಳೂರು"
+                  : "Koramangala 4th Block, Bangalore"}
             </span>
           </div>
           <h2 className="text-lg font-semibold tracking-tight text-[#1a1a1a]">
@@ -168,7 +180,9 @@ export function FseView({ lang }: FseViewProps) {
             {t.statNextVisit}
           </span>
           <span className="text-xl sm:text-2xl font-bold text-[#002970] mt-1 block">4:00 PM</span>
-          <span className="text-[10px] text-gray-500 block mt-0.5">रमेश किराना स्टोर</span>
+          <span className="text-[10px] text-gray-500 block mt-0.5">
+            {lang === "hi-IN" ? "रमेश किराना स्टोर" : lang === "kn-IN" ? "ರಮೇಶ್ ಕಿರಾಣಿ ಸ್ಟೋರ್" : "Ramesh Kirana Store"}
+          </span>
         </div>
 
         <div className="p-4 rounded-2xl bg-white border border-gray-100 shadow-[0_2px_12px_rgba(0,41,112,0.06)]">
@@ -219,18 +233,24 @@ export function FseView({ lang }: FseViewProps) {
               <div className="p-4 rounded-2xl border-2 border-[#00BAF2] bg-[#F0F9FF] flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xs">
                 <div>
                   <div className="flex items-center gap-2">
-                    <span className="font-black text-sm text-[#002970]">रमेश किराना स्टोर</span>
+                    <span className="font-black text-sm text-[#002970]">
+                      {lang === "hi-IN" ? "रमेश किराना स्टोर" : lang === "kn-IN" ? "ರಮೇಶ್ ಕಿರಾಣಿ ಸ್ಟೋರ್" : "Ramesh Kirana Store"}
+                    </span>
                     <span className="text-[10px] font-bold text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded-full">
-                      सक्रिय • प्राथमिकता
+                      {lang === "hi-IN" ? "सक्रिय • प्राथमिकता" : lang === "kn-IN" ? "ಸಕ್ರಿಯ • ಆದ್ಯತೆ" : "Active • Priority"}
                     </span>
                   </div>
                   <p className="text-xs text-gray-600 mt-1">
-                    मालिक: रमेश कुमार • दैनिक बिक्री: ₹4,500.00
+                    {lang === "hi-IN" ? "मालिक: रमेश कुमार • दैनिक बिक्री: ₹4,500.00" : lang === "kn-IN" ? "ಮಾಲೀಕ: ರಮೇಶ್ ಕುಮಾರ್ • ದೈನಂದಿನ ಮಾರಾಟ: ₹4,500.00" : "Owner: Ramesh Kumar • Daily Sales: ₹4,500.00"}
                   </p>
-                  <p className="text-xs text-gray-500">साउंडबॉक्स 4.0: 88% बैटरी • 4G VoLTE</p>
+                  <p className="text-xs text-gray-500">
+                    {lang === "hi-IN" ? "साउंडबॉक्स 4.0: 88% बैटरी • 4G VoLTE" : lang === "kn-IN" ? "ಸೌಂಡ್‌ಬಾಕ್ಸ್ 4.0: 88% ಬ್ಯಾಟರಿ • 4G VoLTE" : "Soundbox 4.0: 88% Battery • 4G VoLTE"}
+                  </p>
                 </div>
                 <div className="text-left sm:text-right shrink-0 pt-2 sm:pt-0 border-t sm:border-0 border-blue-200">
-                  <span className="text-[11px] font-bold text-[#002970] block">अगला दौरा: आज 4:00 PM</span>
+                  <span className="text-[11px] font-bold text-[#002970] block">
+                    {lang === "hi-IN" ? "अगला दौरा: आज 4:00 PM" : lang === "kn-IN" ? "ಮುಂದಿನ ಭೇಟಿ: ಇಂದು 4:00 PM" : "Next Visit: Today 4:00 PM"}
+                  </span>
                   <span className="text-xs text-[#00BAF2] font-black hover:underline cursor-pointer">
                     {t.viewProfile} &rarr;
                   </span>
@@ -241,18 +261,24 @@ export function FseView({ lang }: FseViewProps) {
               <div className="p-4 rounded-2xl border border-gray-200 bg-white flex flex-col sm:flex-row sm:items-center justify-between gap-3 hover:border-gray-300 transition-colors">
                 <div>
                   <div className="flex items-center gap-2">
-                    <span className="font-bold text-sm text-gray-900">सुरेश जनरल स्टोर</span>
+                    <span className="font-bold text-sm text-gray-900">
+                      {lang === "hi-IN" ? "सुरेश जनरल स्टोर" : lang === "kn-IN" ? "ಸುರೇಶ್ ಜನರಲ್ ಸ್ಟೋರ್" : "Suresh General Store"}
+                    </span>
                     <span className="text-[10px] font-bold text-amber-700 bg-amber-100 px-2 py-0.5 rounded-full">
                       {t.lowBattery}
                     </span>
                   </div>
                   <p className="text-xs text-gray-600 mt-1">
-                    मालिक: सुरेश वर्मा • दैनिक बिक्री: ₹2,100.00
+                    {lang === "hi-IN" ? "मालिक: सुरेश वर्मा • दैनिक बिक्री: ₹2,100.00" : lang === "kn-IN" ? "ಮಾಲೀಕ: ಸುರೇಶ್ ವರ್ಮಾ • ದೈನಂದಿನ ಮಾರಾಟ: ₹2,100.00" : "Owner: Suresh Verma • Daily Sales: ₹2,100.00"}
                   </p>
-                  <p className="text-xs text-amber-600 font-medium">साउंडबॉक्स: 14% बैटरी (चार्जर केबल जांचें)</p>
+                  <p className="text-xs text-amber-600 font-medium">
+                    {lang === "hi-IN" ? "साउंडबॉक्स: 14% बैटरी (चार्जर केबल जांचें)" : lang === "kn-IN" ? "ಸೌಂಡ್‌ಬಾಕ್ಸ್: 14% ಬ್ಯಾಟರಿ (ಚಾರ್ಜರ್ ಕೇಬಲ್ ಪರಿಶೀಲಿಸಿ)" : "Soundbox: 14% Battery (Check charger cable)"}
+                  </p>
                 </div>
                 <div className="text-left sm:text-right shrink-0 pt-2 sm:pt-0 border-t sm:border-0 border-gray-100">
-                  <span className="text-[11px] text-gray-500 block">अगला दौरा: कल 11:30 AM</span>
+                  <span className="text-[11px] text-gray-500 block">
+                    {lang === "hi-IN" ? "अगला दौरा: कल 11:30 AM" : lang === "kn-IN" ? "ಮುಂದಿನ ಭೇಟಿ: ನಾಳೆ 11:30 AM" : "Next Visit: Tomorrow 11:30 AM"}
+                  </span>
                 </div>
               </div>
 
@@ -260,18 +286,24 @@ export function FseView({ lang }: FseViewProps) {
               <div className="p-4 rounded-2xl border border-gray-200 bg-white flex flex-col sm:flex-row sm:items-center justify-between gap-3 hover:border-gray-300 transition-colors">
                 <div>
                   <div className="flex items-center gap-2">
-                    <span className="font-bold text-sm text-gray-900">अन्नपूर्णा प्रोविजन्स</span>
+                    <span className="font-bold text-sm text-gray-900">
+                      {lang === "hi-IN" ? "अन्नपूर्णा प्रोविजन्स" : lang === "kn-IN" ? "ಅನ್ನಪೂರ್ಣ ಪ್ರಾವಿಷನ್ಸ್" : "Annapurna Provisions"}
+                    </span>
                     <span className="text-[10px] font-bold text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded-full">
-                      सक्रिय
+                      {lang === "hi-IN" ? "सक्रिय" : lang === "kn-IN" ? "ಸಕ್ರಿಯ" : "Active"}
                     </span>
                   </div>
                   <p className="text-xs text-gray-600 mt-1">
-                    मालिक: अन्नपूर्णा देवी • दैनिक बिक्री: ₹1,850.00
+                    {lang === "hi-IN" ? "मालिक: अन्नपूर्णा देवी • दैनिक बिक्री: ₹1,850.00" : lang === "kn-IN" ? "ಮಾಲೀಕ: ಅನ್ನಪೂರ್ಣ ದೇವಿ • ದೈನಂದಿನ ಮಾರಾಟ: ₹1,850.00" : "Owner: Annapurna Devi • Daily Sales: ₹1,850.00"}
                   </p>
-                  <p className="text-xs text-gray-500">साउंडबॉक्स: 95% बैटरी • ऑनलाइन</p>
+                  <p className="text-xs text-gray-500">
+                    {lang === "hi-IN" ? "साउंडबॉक्स: 95% बैटरी • ऑनलाइन" : lang === "kn-IN" ? "ಸೌಂಡ್‌ಬಾಕ್ಸ್: 95% ಬ್ಯಾಟರಿ • ಆನ್‌ಲೈನ್" : "Soundbox: 95% Battery • Online"}
+                  </p>
                 </div>
                 <div className="text-left sm:text-right shrink-0 pt-2 sm:pt-0 border-t sm:border-0 border-gray-100">
-                  <span className="text-[11px] text-gray-500 block">अगला दौरा: परसों 2:00 PM</span>
+                  <span className="text-[11px] text-gray-500 block">
+                    {lang === "hi-IN" ? "अगला दौरा: परसों 2:00 PM" : lang === "kn-IN" ? "ಮುಂದಿನ ಭೇಟಿ: ನಾಡಿದ್ದು 2:00 PM" : "Next Visit: Day after tomorrow 2:00 PM"}
+                  </span>
                 </div>
               </div>
             </div>
@@ -286,7 +318,9 @@ export function FseView({ lang }: FseViewProps) {
                   {t.memoryStreamTitle}
                 </h3>
               </div>
-              <span className="text-xs text-gray-500 font-mono">रमेश किराना स्टोर</span>
+              <span className="text-xs text-gray-500 font-mono">
+                {lang === "hi-IN" ? "रमेश किराना स्टोर" : lang === "kn-IN" ? "ರಮೇಶ್ ಕಿರಾಣಿ ಸ್ಟೋರ್" : "Ramesh Kirana Store"}
+              </span>
             </div>
 
             <div className="mt-3.5 space-y-2.5 max-h-56 overflow-y-auto">
@@ -355,7 +389,7 @@ export function FseView({ lang }: FseViewProps) {
                     <span className="text-gray-500 font-mono text-[11px] block">Txn: {d.txn_id}</span>
                     <p className="text-gray-800 font-semibold mt-1">{d.reason}</p>
                     <span className="text-[11px] text-gray-500 block mt-1">
-                      स्थिति: {d.status} • {d.resolution_notes || "ग्राहक बैंक से पुष्टि प्रतीक्षित"}
+                      {lang === "hi-IN" ? "स्थिति:" : lang === "kn-IN" ? "ಸ್ಥಿತಿ:" : "Status:"} {d.status} • {d.resolution_notes || (lang === "hi-IN" ? "ग्राहक बैंक से पुष्टि प्रतीक्षित" : lang === "kn-IN" ? "ಗ್ರಾಹಕರ ಬ್ಯಾಂಕ್‌ನಿಂದ ದೃಢೀಕರಣ ನಿರೀಕ್ಷಿಸಲಾಗಿದೆ" : "Awaiting customer bank reversal confirmation")}
                     </span>
                   </div>
 
@@ -395,7 +429,6 @@ export function FseView({ lang }: FseViewProps) {
 
             <div className="mt-4 p-3 rounded-xl bg-blue-50 border border-blue-100 text-xs text-[#002970]">
               <span className="font-bold block">{t.recipientOfficer}</span>
-              <span>FSE प्रिया नायर (ID: DEMO_FSE_PRIYA • 9123456789)</span>
             </div>
 
             <button

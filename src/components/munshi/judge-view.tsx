@@ -153,7 +153,7 @@ export function JudgeView({ lang }: JudgeViewProps) {
               {t.statAutonomyLevel}
             </span>
             <span className="text-xl sm:text-2xl font-black text-purple-700 mt-0.5 block font-mono">
-              L2 (अर्जित)
+              L2 ({lang === "hi-IN" ? "अर्जित" : lang === "kn-IN" ? "ಗಳಿಸಿದ್ದು" : "Earned"})
             </span>
           </div>
         </div>
@@ -184,7 +184,7 @@ export function JudgeView({ lang }: JudgeViewProps) {
                 className="flex items-center gap-1.5 px-3 py-1 rounded-xl bg-[#00BAF2] text-[#001738] font-bold text-xs hover:bg-[#00a8dc] transition-colors cursor-pointer"
               >
                 <RefreshCw className="size-3.5" />
-                CRAG सत्यापित करें
+                {t.cragValidateBtn}
               </button>
             </div>
 
@@ -194,16 +194,16 @@ export function JudgeView({ lang }: JudgeViewProps) {
                   {t.activePolicyFile} {activeOkfDoc.filename}
                 </span>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-gray-700 pt-1">
-                  <p><strong>1. उद्गम (Provenance):</strong> {activeOkfDoc.meta?.sources?.[0]?.authority || "Reserve Bank of India & NPCI"}</p>
-                  <p><strong>2. ट्रस्ट टीयर:</strong> <span className="text-emerald-700 font-bold">{activeOkfDoc.meta?.trust?.verified?.tier || "tier-1-verified"}</span></p>
-                  <p><strong>3. ताज़गी (Freshness):</strong> {activeOkfDoc.meta?.freshness?.effective_date || "2026-10-15"} तक मान्य</p>
+                  <p><strong>{lang === "hi-IN" ? "1. उद्गम (Provenance):" : lang === "kn-IN" ? "1. ಮೂಲ (Provenance):" : "1. Provenance:"}</strong> {activeOkfDoc.meta?.sources?.[0]?.authority || "Reserve Bank of India & NPCI"}</p>
+                  <p><strong>{lang === "hi-IN" ? "2. ट्रस्ट टीयर:" : lang === "kn-IN" ? "2. ಟ್ರಸ್ಟ್ ಶ್ರೇಣಿ:" : "2. Trust Tier:"}</strong> <span className="text-emerald-700 font-bold">{activeOkfDoc.meta?.trust?.verified?.tier || "tier-1-verified"}</span></p>
+                  <p><strong>{lang === "hi-IN" ? "3. ताज़गी (Freshness):" : lang === "kn-IN" ? "3. ತಾಜಾತನ (Freshness):" : "3. Freshness:"}</strong> {activeOkfDoc.meta?.freshness?.effective_date || "2026-10-15"} {lang === "hi-IN" ? "तक मान्य" : lang === "kn-IN" ? "ರವರೆಗೆ ಮಾನ್ಯ" : "valid"}</p>
                   <p><strong>4. {t.lifecycleLabel}</strong> <span className="text-blue-700 font-bold uppercase">{activeOkfDoc.meta?.status || "STABLE"}</span></p>
                 </div>
               </div>
 
               <div className="p-4 rounded-2xl bg-gray-50 border border-gray-100 space-y-2">
                 <span className="font-extrabold text-[#002970] block">
-                  5. क्रिप्टोग्राफिक SHA-256 बाइट अटेस्टेशन हैश:
+                  {t.attestationLabel}
                 </span>
                 <span className="font-mono text-[11px] break-all text-gray-800 bg-white p-2.5 rounded-xl block border border-gray-200">
                   {activeOkfDoc.meta?.attestation?.upstream_sha256 || "9a7f3c1b82d40e6e7193b2a0c8419fec502476b7e614bb5333f2187b5a8d7904"}
@@ -211,7 +211,9 @@ export function JudgeView({ lang }: JudgeViewProps) {
 
                 <div className="pt-2">
                   <div className="flex justify-between items-center text-xs mb-1">
-                    <span className="font-bold text-gray-700">CRAG कॉन्फिडेंस स्कोर:</span>
+                    <span className="font-bold text-gray-700">
+                      {lang === "hi-IN" ? "CRAG कॉन्फ़िडेंस स्कोर:" : lang === "kn-IN" ? "CRAG ಕಾನ್ಫಿಡೆನ್ಸ್ ಸ್ಕೋರ್:" : "CRAG Confidence Score:"}
+                    </span>
                     <span className="font-mono font-bold text-emerald-600">
                       {((cragResult?.confidence || 0.98) * 100).toFixed(0)}%
                     </span>
@@ -223,7 +225,7 @@ export function JudgeView({ lang }: JudgeViewProps) {
                     />
                   </div>
                   <span className="text-[11px] text-emerald-700 font-semibold block mt-1.5">
-                    ✓ HIGH_CONFIDENCE_AUTHORITATIVE (फेल-क्लोज्ड सत्यापित)
+                    {t.highConfidenceVerified}
                   </span>
                 </div>
               </div>
@@ -238,10 +240,10 @@ export function JudgeView({ lang }: JudgeViewProps) {
             <div className="pb-3 border-b border-gray-100">
               <h3 className="text-sm font-black text-[#002970] uppercase tracking-wide flex items-center gap-2">
                 <Lock className="size-4 text-[#00BAF2]" />
-                {t.fsmShieldTitle} (Adversarial Shield)
+                {t.fsmShieldTitle}
               </h3>
               <p className="text-[11px] text-gray-500 mt-0.5">
-                प्रॉम्प्ट इंजेक्शन एवं अनधिकृत मनी वर्ब का तत्काल गणितीय अवरोध
+                {t.fsmShieldSub}
               </p>
             </div>
 
@@ -250,7 +252,7 @@ export function JudgeView({ lang }: JudgeViewProps) {
                 type="text"
                 value={promptInput}
                 onChange={(e) => setPromptInput(e.target.value)}
-                placeholder="हमलावर प्रॉम्प्ट दर्ज करें..."
+                placeholder={lang === "hi-IN" ? "हमलावर प्रॉम्प्ट दर्ज करें..." : lang === "kn-IN" ? "ದಾಳಿಕೋರ ಪ್ರಾಂಪ್ಟ್ ನಮೂದಿಸಿ..." : "Enter adversarial prompt..."}
                 className="w-full rounded-xl border border-gray-200 px-3 py-2 text-xs font-mono focus:border-[#00BAF2] focus:outline-hidden"
               />
               <button
@@ -276,7 +278,9 @@ export function JudgeView({ lang }: JudgeViewProps) {
                     ) : (
                       <CheckCircle2 className="size-4 text-emerald-600" />
                     )}
-                    {fsmResult.blocked ? "आक्रमण अवरुद्ध (ATTACK BLOCKED)" : "मान्य ट्रांसमिशन (PASSED)"}
+                    {fsmResult.blocked
+                      ? (lang === "hi-IN" ? "आक्रमण अवरुद्ध (ATTACK BLOCKED)" : lang === "kn-IN" ? "ದಾಳಿ ನಿರ್ಬಂಧಿಸಲಾಗಿದೆ (ATTACK BLOCKED)" : "ATTACK BLOCKED")
+                      : (lang === "hi-IN" ? "मान्य ट्रांसमिशन (PASSED)" : lang === "kn-IN" ? "ಮಾನ್ಯ ಪ್ರಸರಣ (PASSED)" : "TRANSMISSION PASSED")}
                   </div>
                   <p className="font-mono text-[11px] leading-relaxed">{fsmResult.reason}</p>
                 </div>
@@ -289,36 +293,36 @@ export function JudgeView({ lang }: JudgeViewProps) {
             <div className="pb-3 border-b border-gray-100 flex items-center justify-between">
               <h3 className="text-sm font-black text-[#002970] uppercase tracking-wide flex items-center gap-2">
                 <Layers className="size-4 text-[#00BAF2]" />
-                CEEcil 3-रंग कॉग्निशन लैडर
+                {t.ceecilLadderTitle}
               </h3>
               <span className="text-[10px] font-bold bg-blue-50 text-[#002970] px-2 py-0.5 rounded-md">
-                सिंगल-लूप O-P-E-V
+                {t.singleLoopOpev}
               </span>
             </div>
 
             <div className="mt-3.5 space-y-2.5 text-xs">
               <div className="p-3 rounded-xl bg-gray-50 border border-gray-100 flex justify-between items-center">
                 <div>
-                  <span className="font-bold text-[#002970] block">रंग 1: रिफ्लेक्स कन्फर्म</span>
-                  <span className="text-[10px] text-gray-500">0 LLM टोकन • 180ms विलंबता</span>
+                  <span className="font-bold text-[#002970] block">{t.rung1Title}</span>
+                  <span className="text-[10px] text-gray-500">{t.rung1Desc}</span>
                 </div>
-                <span className="text-emerald-600 font-bold font-mono">100% सटीक</span>
+                <span className="text-emerald-600 font-bold font-mono">{t.rung1Accuracy}</span>
               </div>
 
               <div className="p-3 rounded-xl bg-gray-50 border border-gray-100 flex justify-between items-center">
                 <div>
-                  <span className="font-bold text-[#002970] block">रंग 2: पॉलिसी आर्बिट्रेट</span>
-                  <span className="text-[10px] text-gray-500">~450 टोकन • CRAG इवैल्यूएशन</span>
+                  <span className="font-bold text-[#002970] block">{t.rung2Title}</span>
+                  <span className="text-[10px] text-gray-500">{t.rung2Desc}</span>
                 </div>
-                <span className="text-blue-600 font-bold font-mono">L2 स्वायत्तता</span>
+                <span className="text-blue-600 font-bold font-mono">{t.rung2Autonomy}</span>
               </div>
 
               <div className="p-3 rounded-xl bg-gray-50 border border-gray-100 flex justify-between items-center">
                 <div>
-                  <span className="font-bold text-[#002970] block">रंग 3: VCG मैकेनिज्म डिजाइन</span>
-                  <span className="text-[10px] text-gray-500">फ्लो प्रो बहु-पक्षीय अनुबंध मेनू</span>
+                  <span className="font-bold text-[#002970] block">{t.rung3Title}</span>
+                  <span className="text-[10px] text-gray-500">{t.rung3Desc}</span>
                 </div>
-                <span className="text-purple-600 font-bold font-mono">सत्यापित</span>
+                <span className="text-purple-600 font-bold font-mono">{t.rung3Status}</span>
               </div>
             </div>
           </div>
@@ -331,11 +335,11 @@ export function JudgeView({ lang }: JudgeViewProps) {
           <div className="flex items-center gap-2">
             <FileCode className="size-4 text-[#00BAF2]" />
             <h3 className="text-sm font-black text-[#002970] uppercase tracking-wide">
-              राइट-अहेड लॉग (WAL) एवं ऑडिट ट्रेल्स
+              {t.walTitleBadge}
             </h3>
           </div>
           <span className="text-xs text-gray-500 font-mono bg-gray-50 px-2.5 py-1 rounded-full border border-gray-200">
-            आइडमपोटेंसी गारंटीकृत
+            {t.idempotencyGuaranteed}
           </span>
         </div>
 

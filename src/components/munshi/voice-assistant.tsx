@@ -214,7 +214,7 @@ export function VoiceAssistant({ lang }: VoiceAssistantProps) {
           <button
             onClick={() => speakMunshi(answer.reply, munshiLang)}
             className="p-1.5 rounded-lg text-[#002970] hover:bg-blue-100 transition-colors shrink-0 cursor-pointer"
-            title="पुनः सुनें"
+            title={lang === "hi-IN" ? "पुनः सुनें" : lang === "kn-IN" ? "ಮತ್ತೆ ಕೇಳಿ" : "Listen again"}
           >
             <Volume2 className="size-4" />
           </button>
