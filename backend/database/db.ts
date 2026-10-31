@@ -1,4 +1,5 @@
 // @ts-nocheck
+import { readFileSync } from "node:fs";
 import { readFile, readdir } from "node:fs/promises";
 import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -12,16 +13,67 @@ const __dirname = dirname(__filename);
  * or embedded PGlite (WASM Postgres) with automatic schema migration.
  */
 let dbClient = null;
+let dbClientUrl = "";
+
+/** Prefer the .env file so a running dev server sees a URL pasted after startup. */
+export function configuredDatabaseUrl() {
+  try {
+    const raw = readFileSync(join(process.cwd(), ".env"), "utf8");
+    const line = raw.split(/\r?\n/).find((row) => row.startsWith("DATABASE_URL="));
+    if (line) {
+      let value = line.slice("DATABASE_URL=".length).trim();
+      if (
+        (value.startsWith('"') && value.endsWith('"')) ||
+        (value.startsWith("'") && value.endsWith("'"))
+      ) {
+        value = value.slice(1, -1);
+      }
+      if (value) return value;
+    }
+  } catch {
+    // Fall through to the process environment.
+  }
+  return (process.env.DATABASE_URL || "").trim();
+}
 
 export async function getDb() {
-  if (dbClient) return dbClient;
-
-  const databaseUrl = process.env.DATABASE_URL;
+  const databaseUrl = configuredDatabaseUrl();
+  if (dbClient && dbClientUrl === databaseUrl) return dbClient;
+  dbClient = null;
+  dbClientUrl = databaseUrl;
 
   if (databaseUrl && databaseUrl.trim()) {
     // Live PostgreSQL / Neon connection
-    const pg = await import("pg");
-    const pool = new pg.default.Pool({ connectionString: databaseUrl });
+    const pgMod = await import("pg");
+    const PG = pgMod.default || pgMod;
+    const tlsMod = await import("node:tls");
+    if (!globalThis.__piMunshiPgSslPatched) {
+      globalThis.__piMunshiPgSslPatched = true;
+      // Node 24 writes the startup packet before TLS is ready and Render drops the socket.
+      PG.Connection.prototype.upgradeToSSL = function (host, reportStreamError) {
+        const self = this;
+        self.stream = tlsMod.connect({
+          socket: self.stream,
+          host,
+          servername: host,
+          rejectUnauthorized: false,
+        });
+        if (typeof reportStreamError === "function") {
+          self.stream.on("error", reportStreamError);
+        }
+        self.stream.once("secureConnect", () => {
+          self.attachListeners(self.stream);
+          self.emit("sslconnect");
+        });
+      };
+    }
+    const useSsl = /render\.com|sslmode=require/i.test(databaseUrl);
+    const pool = new PG.Pool({
+      connectionString: databaseUrl,
+      connectionTimeoutMillis: 8000,
+      ssl: useSsl ? { rejectUnauthorized: false } : undefined,
+    });
+    await pool.query("select 1");
     dbClient = {
       query: async (text, params = []) => {
         const res = await pool.query(text, params);

@@ -1,6 +1,7 @@
+import type { IncomingMessage } from "node:http";
 import { readdirSync } from "node:fs";
 import { join } from "node:path";
-import type { Plugin } from "vite";
+import type { Plugin, ViteDevServer } from "vite";
 import { defineConfig } from "vite";
 import { tanstackStart } from "@tanstack/react-start/plugin/vite";
 import viteReact from "@vitejs/plugin-react";
@@ -142,6 +143,127 @@ function authPopupPlugin(): Plugin {
   };
 }
 
+function readJsonBody(req: IncomingMessage): Promise<Record<string, unknown>> {
+  return new Promise((resolve, reject) => {
+    const chunks: Buffer[] = [];
+    req.on("data", (chunk) => chunks.push(chunk as Buffer));
+    req.on("end", () => {
+      const raw = Buffer.concat(chunks).toString("utf-8").trim();
+      if (!raw) {
+        resolve({});
+        return;
+      }
+      try {
+        resolve(JSON.parse(raw) as Record<string, unknown>);
+      } catch {
+        reject(new Error("Malformed JSON payload"));
+      }
+    });
+    req.on("error", reject);
+  });
+}
+
+/**
+ * Serve Pi Munshi REST routes inside the Vite dev server.
+ * not require a separate process on :8082 (avoids ECONNREFUSED proxy noise).
+ */
+function munshiApiDevPlugin(): Plugin {
+  let dispatchRoute: (
+    path: string,
+    method: string,
+    body: Record<string, unknown>,
+  ) => Promise<{ status: number; body: unknown }>;
+
+  async function loadDispatcher(server: ViteDevServer) {
+    const mod = (await server.ssrLoadModule("/backend/routes.ts")) as {
+      dispatchApiRoute: typeof dispatchRoute;
+    };
+    dispatchRoute = mod.dispatchApiRoute;
+  }
+
+  return {
+    name: "app-builder:munshi-api-dev",
+    apply: "serve",
+    configureServer(server) {
+      server.middlewares.use(async (req, res, next) => {
+        const rawUrl = req.url ?? "";
+        const pathOnly = rawUrl.split("?", 1)[0] ?? "";
+        if (!pathOnly.startsWith("/api/v1")) {
+          next();
+          return;
+        }
+
+        const method = (req.method ?? "GET").toUpperCase();
+        res.setHeader("Access-Control-Allow-Origin", "*");
+        res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
+        res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization, X-Idempotency-Key");
+
+        if (method === "OPTIONS") {
+          res.statusCode = 204;
+          res.end();
+          return;
+        }
+
+        if (method === "GET" && pathOnly === "/api/v1/events/stream") {
+          try {
+            await loadDispatcher(server);
+            const streamMod = (await server.ssrLoadModule(
+              "/backend/services/event-stream.service.ts",
+            )) as {
+              eventStream: {
+                subscribe: (handler: (event: unknown) => void) => () => void;
+              };
+            };
+            res.writeHead(200, {
+              "Content-Type": "text/event-stream",
+              "Cache-Control": "no-cache",
+              Connection: "keep-alive",
+            });
+            res.write(`data: ${JSON.stringify({ type: "STREAM_CONNECTED", timestamp: new Date().toISOString() })}\n\n`);
+            const unsubscribe = streamMod.eventStream.subscribe((event) => {
+              res.write(`data: ${JSON.stringify(event)}\n\n`);
+            });
+            const ping = setInterval(() => {
+              res.write(": ping\n\n");
+            }, 15000);
+            req.on("close", () => {
+              clearInterval(ping);
+              unsubscribe();
+            });
+          } catch (err) {
+            console.error("[app-builder] SSE failed:", err);
+            if (!res.headersSent) {
+              res.statusCode = 500;
+              res.end();
+            }
+          }
+          return;
+        }
+
+        try {
+          await loadDispatcher(server);
+          let body: Record<string, unknown> = {};
+          if (method === "POST" || method === "PUT") {
+            body = await readJsonBody(req);
+          }
+          const routePath = rawUrl.split("#", 1)[0] ?? rawUrl;
+          const response = await dispatchRoute(routePath, method, body);
+          res.statusCode = response.status;
+          res.setHeader("Content-Type", "application/json; charset=utf-8");
+          res.end(JSON.stringify(response.body));
+        } catch (err) {
+          console.error("[app-builder] /api/v1 handler failed:", err);
+          if (!res.headersSent) {
+            res.statusCode = 500;
+            res.setHeader("Content-Type", "application/json; charset=utf-8");
+            res.end(JSON.stringify({ success: false, error: "Pi Munshi API handler failed" }));
+          }
+        }
+      });
+    },
+  };
+}
+
 // `0.0.0.0:8080` is the live-preview contract — don't change host/port.
 // The dev server starts once `src/router.tsx` and `src/routes/` exist — see
 // AGENTS.md § "First scaffold".
@@ -159,7 +281,8 @@ export default defineConfig(({ command, isPreview }) => ({
   resolve: { tsconfigPaths: true },
   plugins: [
     pgliteBootstrapPlugin(),
-    // Before tanstackStart so /auth/popup never falls through to the SPA.
+    // Before tanstackStart so /api/v1 and /auth/popup never hit the SPA fallback.
+    munshiApiDevPlugin(),
     authPopupPlugin(),
     // Dev-only /__app-env, read by scripts/check-auth-invariant.mjs.
     appEnvPlugin(),

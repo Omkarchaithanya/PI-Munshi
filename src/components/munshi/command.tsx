@@ -3,31 +3,57 @@ import { useMunshi } from "@/lib/munshi/store";
 import { ShopkeeperView } from "./shopkeeper-view";
 import { FseView } from "./fse-view";
 import { JudgeView } from "./judge-view";
-import { I18N, getTranslation } from "@/lib/munshi/i18n";
+import { getTranslation } from "@/lib/munshi/i18n";
 import {
-  ShieldCheck,
-  Store,
-  UserCheck,
-  Terminal,
   Home,
   CreditCard,
   Building2,
+  FileText,
+  Scale,
+  Split,
   Volume2,
-  HelpCircle,
+  Mic,
+  ArrowLeftRight,
+  ScrollText,
+  BarChart3,
+  QrCode,
+  ChevronDown,
   Bell,
-  Play,
-  RotateCw,
-  User,
-  ExternalLink,
 } from "lucide-react";
+
+type Page =
+  | "home"
+  | "payments"
+  | "settlements"
+  | "disputes"
+  | "split"
+  | "soundbox"
+  | "voice"
+  | "transfers"
+  | "history"
+  | "reports"
+  | "accept";
+
+const PAGE_TITLE: Record<Page, string> = {
+  home: "Home",
+  payments: "Payments",
+  settlements: "Settlements",
+  disputes: "Disputes",
+  split: "Split settlement",
+  soundbox: "Soundbox",
+  voice: "Ask Pi Munshi",
+  transfers: "Accounts & Transfers",
+  history: "Transaction history",
+  reports: "Reports",
+  accept: "Accept payments",
+};
 
 export function CommandCenter() {
   const lang = useMunshi((s) => s.lang);
   const setLang = useMunshi((s) => s.setLang);
   const t = getTranslation(lang);
-
-  // 3 Primary User Experiences
-  const [activeTab, setActiveTab] = useState<"shopkeeper" | "fse" | "judge">("shopkeeper");
+  const [page, setPage] = useState<Page>("home");
+  const [dateLabel] = useState("Today, 31 Oct");
 
   const running = useMunshi((s) => s.running);
   const scene = useMunshi((s) => s.scene);
@@ -36,266 +62,186 @@ export function CommandCenter() {
   const runAttack = useMunshi((s) => s.runAttack);
   const runDream = useMunshi((s) => s.runDream);
 
-  const scenes = [
-    { id: 1, title: t.scene1Short, hint: "", run: "defend" as const },
-    { id: 2, title: t.scene2Short, hint: "", run: "checkout" as const },
-    { id: 3, title: t.scene3Short, hint: "", run: "attack" as const },
-    { id: 4, title: t.scene4Short, hint: "", run: "dream" as const },
-  ];
+  const go = (next: Page) => setPage(next);
 
-  const launch = (id: (typeof scenes)[number]["run"]) => {
-    if (id === "defend") runDefend();
-    else if (id === "checkout") runCheckout();
-    else if (id === "attack") runAttack();
-    else runDream();
+  const shopPane =
+    page === "payments" || page === "history"
+      ? "payments"
+      : page === "settlements" || page === "transfers"
+        ? "settlements"
+        : page === "soundbox"
+          ? "soundbox"
+          : page === "voice"
+            ? "voice"
+            : page === "accept"
+              ? "receive"
+              : "all";
+
+  const showShop = page !== "disputes" && page !== "reports" && page !== "split";
+
+  const item = (id: Page, label: string, Icon: React.ComponentType<{ className?: string }>) => {
+    const active = page === id;
+    return (
+      <button
+        key={id}
+        type="button"
+        onClick={() => go(id)}
+        className={`w-full flex items-center gap-3 px-4 py-2 text-[13px] text-left cursor-pointer ${
+          active
+            ? "text-[#00baf2] bg-[#f3fbfe] border-l-2 border-[#00baf2] font-semibold"
+            : "text-[#4a4a4a] border-l-2 border-transparent hover:bg-[#f7f8fa]"
+        }`}
+      >
+        <Icon className="size-4 shrink-0" />
+        <span className="truncate">{label}</span>
+      </button>
+    );
   };
 
   return (
-    <div className="flex min-h-screen flex-col bg-[#F4F7FB] text-gray-900 font-sans antialiased selection:bg-[#00BAF2] selection:text-[#002970]">
-      {/* 1. COMPACT ~72px DEEP PAYTM-BLUE HEADER */}
-      <header className="sticky top-0 z-40 bg-[#002970] text-white shadow-md border-b border-[#001f54] h-[72px] flex items-center">
-        <div className="w-full max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between gap-4">
-          {/* Left: Branding & Merchant Indicator */}
-          <div className="flex items-center gap-3.5 shrink-0">
-            <div className="flex items-center rounded-xl bg-gradient-to-r from-[#001738] to-[#002970] px-3.5 py-1.5 border border-[#00BAF2]/40 shadow-xs">
-              <span className="text-white font-black text-2xl tracking-tighter">Pay</span>
-              <span className="text-[#00BAF2] font-black text-2xl tracking-tighter">tm</span>
-              <span className="ml-2 rounded-md bg-[#00BAF2] px-2 py-0.5 text-xs font-black text-[#001738] tracking-tight">
-                मुंशी AI
-              </span>
-            </div>
+    <div className="flex min-h-screen bg-[#f5f7fb] text-[#1a1a1a] font-sans antialiased">
+      <aside className="hidden md:flex w-[232px] shrink-0 flex-col bg-white border-r border-[#e6e8ec]">
+        <div className="h-16 flex items-center px-4 border-b border-[#eef0f3]">
+          <div>
+            <div className="text-[18px] font-extrabold text-[#002970] leading-none tracking-tight">Pi Munshi</div>
+            <div className="text-[11px] font-semibold text-[#00baf2] mt-1">पाई-मुंशी · Paytm PG</div>
+          </div>
+        </div>
 
-            <div className="hidden sm:block">
-              <div className="flex items-center gap-2">
-                <span className="text-sm font-extrabold text-white tracking-wide">
-                  {t.paytmForBusiness}
+        <nav className="flex-1 overflow-y-auto py-3">
+          <p className="px-4 pt-2 pb-1 text-[11px] font-semibold text-[#8b93a7]">Get Started</p>
+          {item("home", "Home", Home)}
+
+          <p className="px-4 pt-4 pb-1 text-[11px] font-semibold text-[#8b93a7]">Dashboard</p>
+          {item("payments", "Payments", CreditCard)}
+          {item("settlements", "Settlements", Building2)}
+          {item("disputes", "Disputes", Scale)}
+          {item("split", "Split settlement", Split)}
+          {item("soundbox", "Soundbox", Volume2)}
+          {item("voice", "Ask Munshi", Mic)}
+
+          <p className="px-4 pt-4 pb-1 text-[11px] font-semibold text-[#8b93a7]">Business Payments</p>
+          {item("transfers", "Accounts & Transfers", ArrowLeftRight)}
+          {item("history", "Transaction History", ScrollText)}
+          {item("reports", "Reports", BarChart3)}
+
+          <p className="px-4 pt-4 pb-1 text-[11px] font-semibold text-[#8b93a7]">Accept Payments</p>
+          {item("accept", "Show QR", QrCode)}
+        </nav>
+
+        <div className="px-4 py-3 border-t border-[#eef0f3] text-[10px] text-[#8b93a7]">
+          {t.demoBadge} · {t.okfBadge}
+        </div>
+      </aside>
+
+      <div className="flex min-w-0 flex-1 flex-col">
+        <header className="h-14 bg-white border-b border-[#e6e8ec] flex items-center justify-between px-4 sm:px-6">
+          <div className="flex items-center gap-2 min-w-0">
+            <div className="min-w-0">
+              <p className="text-[11px] font-semibold text-[#00baf2] leading-none">Pi Munshi</p>
+              <h1 className="text-[15px] font-semibold text-[#1a1a1a] truncate mt-0.5">
+                {PAGE_TITLE[page]}
+                <span className="inline-flex items-center gap-1 ml-2 px-2.5 py-0.5 rounded-full border border-[#d9dee7] bg-white text-[12px] font-medium text-[#4a4a4a]">
+                  {dateLabel}
+                  <ChevronDown className="size-3.5 text-[#6b7280]" />
                 </span>
-                <span className="inline-flex items-center gap-1 rounded-full bg-[#00BAF2]/20 px-2 py-0.5 text-[10px] font-bold text-[#00BAF2] border border-[#00BAF2]/30">
-                  <ShieldCheck className="size-3" />
-                  {t.okfBadge}
-                </span>
-                <span className="inline-flex items-center gap-1 rounded-full bg-amber-500/20 px-2 py-0.5 text-[10px] font-bold text-amber-300 border border-amber-500/40">
-                  <span className="size-1.5 rounded-full bg-amber-400 animate-pulse" />
-                  {t.demoBadge}
-                </span>
-              </div>
+              </h1>
             </div>
           </div>
-
-          {/* Center/Right: View Switcher, Language & Profile Controls */}
-          <div className="flex items-center gap-2 sm:gap-3">
-            {/* View Switcher Segment */}
-            <div className="flex rounded-xl bg-white/10 p-1 text-xs border border-white/15">
-              <button
-                type="button"
-                onClick={() => setActiveTab("shopkeeper")}
-                className={`flex items-center gap-1.5 rounded-lg px-2.5 sm:px-3 py-1 font-bold transition-all cursor-pointer ${
-                  activeTab === "shopkeeper"
-                    ? "bg-white text-[#002970] shadow-sm"
-                    : "text-blue-100 hover:text-white"
-                }`}
-              >
-                <Store className="size-3.5" />
-                <span className="hidden xs:inline">{t.shopkeeperTab}</span>
-              </button>
-              <button
-                type="button"
-                onClick={() => setActiveTab("fse")}
-                className={`flex items-center gap-1.5 rounded-lg px-2.5 sm:px-3 py-1 font-bold transition-all cursor-pointer ${
-                  activeTab === "fse"
-                    ? "bg-white text-[#002970] shadow-sm"
-                    : "text-blue-100 hover:text-white"
-                }`}
-              >
-                <UserCheck className="size-3.5" />
-                <span className="hidden xs:inline">{t.fseTab}</span>
-              </button>
-              <button
-                type="button"
-                onClick={() => setActiveTab("judge")}
-                className={`flex items-center gap-1.5 rounded-lg px-2.5 sm:px-3 py-1 font-bold transition-all cursor-pointer ${
-                  activeTab === "judge"
-                    ? "bg-[#00BAF2] text-[#002970] shadow-sm font-black"
-                    : "text-blue-100 hover:text-white"
-                }`}
-              >
-                <Terminal className="size-3.5" />
-                <span className="hidden xs:inline">{t.judgeTab}</span>
-              </button>
+          <div className="flex items-center gap-2">
+            <div className="hidden sm:flex rounded-md border border-[#e6e8ec] p-0.5 text-[11px]">
+              {(["hi-IN", "kn-IN", "en-IN"] as const).map((code) => (
+                <button
+                  key={code}
+                  type="button"
+                  onClick={() => setLang(code)}
+                  className={`px-2 py-1 rounded cursor-pointer ${lang === code ? "bg-[#e8f7fd] text-[#0077a8] font-semibold" : "text-[#6b7280]"}`}
+                >
+                  {code === "hi-IN" ? "हिंदी" : code === "kn-IN" ? "ಕನ್ನಡ" : "EN"}
+                </button>
+              ))}
             </div>
-
-            {/* Language Selector */}
-            <div className="hidden md:flex rounded-xl bg-white/10 p-1 text-xs border border-white/15">
-              <button
-                type="button"
-                onClick={() => setLang("hi-IN")}
-                className={`rounded-lg px-2 py-0.5 font-bold transition-all cursor-pointer ${
-                  lang === "hi-IN" ? "bg-[#00BAF2] text-[#002970]" : "text-blue-100 hover:text-white"
-                }`}
-              >
-                हिंदी
-              </button>
-              <button
-                type="button"
-                onClick={() => setLang("kn-IN")}
-                className={`rounded-lg px-2 py-0.5 font-bold transition-all cursor-pointer ${
-                  lang === "kn-IN" ? "bg-[#00BAF2] text-[#002970]" : "text-blue-100 hover:text-white"
-                }`}
-              >
-                ಕನ್ನಡ
-              </button>
-              <button
-                type="button"
-                onClick={() => setLang("en-IN")}
-                className={`rounded-lg px-2 py-0.5 font-bold transition-all cursor-pointer ${
-                  lang === "en-IN" ? "bg-[#00BAF2] text-[#002970]" : "text-blue-100 hover:text-white"
-                }`}
-              >
-                EN
-              </button>
-            </div>
-
-            {/* Bell & User Avatar */}
-            <button
-              type="button"
-              onClick={() => alert("कोई नई चेतावनी नहीं। सभी 3 साउंडबॉक्स ऑनलाइन हैं।")}
-              className="relative p-2 rounded-xl bg-white/10 hover:bg-white/20 text-white transition-colors cursor-pointer"
-              title="सूचनाएं"
-            >
+            <button type="button" className="p-2 text-[#6b7280]" title="Notifications">
               <Bell className="size-4" />
-              <span className="absolute top-1.5 right-1.5 size-2 rounded-full bg-emerald-400" />
             </button>
-
-            <div className="size-8 rounded-full bg-[#00BAF2] text-[#002970] flex items-center justify-center font-black text-xs shadow-inner cursor-pointer" title="रमेश किराना स्टोर प्रोफ़ाइल">
+            <div className="size-8 rounded-full border border-[#e6e8ec] text-[11px] font-semibold text-[#002970] flex items-center justify-center">
               RK
             </div>
           </div>
-        </div>
-      </header>
+        </header>
 
-      {/* Slim One-Click Evaluation Triggers Strip */}
-      <div className="border-b border-[#001f54]/40 bg-[#001738] px-4 py-1.5 text-xs text-blue-200">
-        <div className="w-full max-w-[1400px] mx-auto flex flex-wrap items-center justify-between gap-2">
-          <div className="flex items-center gap-1.5 font-bold text-[11px] text-[#00BAF2]">
-            <Play className="size-3 fill-current" />
-            <span>{t.scenarioBarTitle}</span>
-          </div>
-
-          <div className="flex flex-wrap items-center gap-1.5">
-            {scenes.map((item) => (
-              <button
-                key={item.id}
-                type="button"
-                disabled={running}
-                onClick={() => launch(item.run)}
-                className={`px-2 py-0.5 rounded-md text-[11px] font-semibold border transition-all cursor-pointer ${
-                  scene === item.id
-                    ? "bg-[#00BAF2] text-[#002970] border-[#00BAF2] shadow-xs"
-                    : "bg-white/5 border-white/10 text-blue-100 hover:bg-white/15"
-                }`}
-              >
-                {item.title}
-              </button>
-            ))}
-          </div>
+        <div className="md:hidden flex gap-1 overflow-x-auto bg-white border-b border-[#e6e8ec] px-2 py-2">
+          {(
+            [
+              ["home", "Home"],
+              ["payments", "Payments"],
+              ["settlements", "Settlements"],
+              ["disputes", "Disputes"],
+              ["voice", "Voice"],
+              ["reports", "Reports"],
+            ] as const
+          ).map(([id, label]) => (
+            <button
+              key={id}
+              type="button"
+              onClick={() => go(id)}
+              className={`shrink-0 px-3 py-1 rounded-full text-xs cursor-pointer ${
+                page === id ? "bg-[#e8f7fd] text-[#0077a8] font-semibold" : "text-[#4a4a4a]"
+              }`}
+            >
+              {label}
+            </button>
+          ))}
         </div>
+
+        <main className="flex-1 px-4 sm:px-6 py-4">
+          {showShop && <ShopkeeperView lang={lang} pane={shopPane} />}
+          {page === "disputes" && <FseView lang={lang} />}
+          {page === "reports" && <JudgeView lang={lang} />}
+          {page === "split" && (
+            <div className="rounded-lg bg-white border border-[#e6e8ec] p-4 space-y-3">
+              <div className="flex items-center gap-2 text-sm font-semibold text-[#1a1a1a]">
+                <FileText className="size-4 text-[#00baf2]" />
+                Checkout defence scenarios
+              </div>
+              <div className="flex flex-wrap gap-2">
+                {(
+                  [
+                    ["defend", t.scene1Short, runDefend, 1],
+                    ["checkout", t.scene2Short, runCheckout, 2],
+                    ["attack", t.scene3Short, runAttack, 3],
+                    ["dream", t.scene4Short, runDream, 4],
+                  ] as const
+                ).map(([id, label, run, n]) => (
+                  <button
+                    key={id}
+                    type="button"
+                    disabled={running}
+                    onClick={() => run()}
+                    className={`px-3 py-1.5 rounded-md text-xs border cursor-pointer ${
+                      scene === n
+                        ? "bg-[#00baf2] text-white border-[#00baf2]"
+                        : "bg-white text-[#1a1a1a] border-[#d9dee7]"
+                    }`}
+                  >
+                    {label}
+                  </button>
+                ))}
+              </div>
+              <JudgeView lang={lang} />
+            </div>
+          )}
+        </main>
+
+        <footer className="bg-white border-t border-[#e6e8ec] px-4 sm:px-6 py-3 text-[11px] text-[#8b93a7] flex flex-wrap items-center justify-between gap-2">
+          <span>© 2026, Pi Munshi · Paytm for Business prototype</span>
+          <span className="flex gap-3">
+            <span>{t.footerCompliance}</span>
+            <span>{t.okfBadge}</span>
+          </span>
+        </footer>
+        <div className="h-1 bg-[#00baf2]" />
       </div>
-
-      {/* 2. MAIN ACTIVE EXPERIENCE VIEW */}
-      <main className="flex-1">
-        {activeTab === "shopkeeper" && <ShopkeeperView lang={lang} />}
-        {activeTab === "fse" && <FseView lang={lang} />}
-        {activeTab === "judge" && <JudgeView lang={lang} />}
-      </main>
-
-      {/* 3. DOCKED BOTTOM NAVIGATION (Home | Payments | Settlements | Soundbox | Help) - MOBILE ONLY */}
-      <nav className="md:hidden fixed bottom-0 inset-x-0 z-30 bg-white/95 backdrop-blur-md border-t border-gray-200 shadow-xl py-2 px-4">
-        <div className="max-w-md mx-auto flex items-center justify-between text-center">
-          <button
-            type="button"
-            onClick={() => setActiveTab("shopkeeper")}
-            className={`flex flex-col items-center gap-1 text-[11px] font-bold cursor-pointer transition-colors ${
-              activeTab === "shopkeeper" ? "text-[#002970]" : "text-gray-400 hover:text-gray-600"
-            }`}
-          >
-            <Home className="size-5" />
-            <span>{t.navHome}</span>
-          </button>
-
-          <button
-            type="button"
-            onClick={() => {
-              setActiveTab("shopkeeper");
-              setTimeout(() => {
-                document.getElementById("transactions-list")?.scrollIntoView({ behavior: "smooth" });
-              }, 50);
-            }}
-            className="flex flex-col items-center gap-1 text-[11px] font-bold text-gray-400 hover:text-[#002970] cursor-pointer transition-colors"
-          >
-            <CreditCard className="size-5" />
-            <span>{t.navPayments}</span>
-          </button>
-
-          <button
-            type="button"
-            onClick={() => {
-              setActiveTab("shopkeeper");
-              const el = document.querySelector('button:has-text("बैंक सेटलमेंट")') as HTMLButtonElement;
-              el?.click();
-            }}
-            className="flex flex-col items-center gap-1 text-[11px] font-bold text-gray-400 hover:text-[#002970] cursor-pointer transition-colors"
-          >
-            <Building2 className="size-5" />
-            <span>{t.navSettlement}</span>
-          </button>
-
-          <button
-            type="button"
-            onClick={() => {
-              setActiveTab("shopkeeper");
-              const el = document.querySelector('button:has-text("साउंडबॉक्स")') as HTMLButtonElement;
-              el?.click();
-            }}
-            className="flex flex-col items-center gap-1 text-[11px] font-bold text-gray-400 hover:text-[#002970] cursor-pointer transition-colors"
-          >
-            <Volume2 className="size-5" />
-            <span>{t.navSoundbox}</span>
-          </button>
-
-          <button
-            type="button"
-            onClick={() => {
-              setActiveTab("fse");
-            }}
-            className="flex flex-col items-center gap-1 text-[11px] font-bold text-gray-400 hover:text-[#002970] cursor-pointer transition-colors"
-          >
-            <HelpCircle className="size-5" />
-            <span>{t.navHelp}</span>
-          </button>
-        </div>
-      </nav>
-
-      {/* 4. FOOTER */}
-      <footer className="border-t border-gray-200 bg-white py-3 px-4 text-xs text-gray-500 mb-14 md:mb-0">
-        <div className="w-full max-w-[1400px] mx-auto flex flex-wrap items-center justify-between gap-2">
-          <div className="flex items-center gap-2">
-            <span className="font-bold text-[#002970]">{t.footerHackathon}</span>
-            <span>·</span>
-            <span>{t.footerTrack}</span>
-            <span>·</span>
-            <span className="text-[#00BAF2] font-black">{t.appName}</span>
-          </div>
-
-          <div className="flex items-center gap-3">
-            <span className="flex items-center gap-1 text-emerald-600 font-bold">
-              <ShieldCheck className="size-3.5" />
-              {t.footerCompliance}
-            </span>
-            <span>·</span>
-            <span className="font-mono text-[#002970] font-bold">Google Cloud {t.okfBadge}</span>
-          </div>
-        </div>
-      </footer>
     </div>
   );
 }

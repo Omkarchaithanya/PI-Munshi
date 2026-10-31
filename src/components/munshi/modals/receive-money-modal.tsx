@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import QRCode from "qrcode";
 import { X, QrCode, Volume2, CheckCircle2, Copy, Check } from "lucide-react";
 import { munshiApi } from "@/lib/api-client";
 import { playSwarChirp, speak } from "@/lib/munshi/audio";
@@ -17,11 +18,32 @@ export function ReceiveMoneyModal({ isOpen, onClose, lang, onPaymentSuccess }: R
   const [copied, setCopied] = useState(false);
   const [simulating, setSimulating] = useState(false);
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
-
-  if (!isOpen) return null;
+  const [qrUrl, setQrUrl] = useState("");
 
   const upiId = "ramesh.kirana@paytm";
-  const upiUri = `upi://pay?pa=${upiId}&pn=Ramesh%20Kirana%20Store&am=${amount}&cu=INR`;
+  const upiUri = `upi://pay?pa=${encodeURIComponent(upiId)}&pn=${encodeURIComponent("Ramesh Kirana Store")}&am=${amount.toFixed(2)}&cu=INR`;
+
+  useEffect(() => {
+    if (!isOpen) return;
+    let cancel = false;
+    QRCode.toDataURL(upiUri, {
+      errorCorrectionLevel: "M",
+      margin: 1,
+      width: 320,
+      color: { dark: "#111827", light: "#ffffff" },
+    })
+      .then((url) => {
+        if (!cancel) setQrUrl(url);
+      })
+      .catch(() => {
+        if (!cancel) setQrUrl("");
+      });
+    return () => {
+      cancel = true;
+    };
+  }, [isOpen, upiUri]);
+
+  if (!isOpen) return null;
 
   const handleCopyUpi = () => {
     navigator.clipboard?.writeText(upiId);
@@ -101,22 +123,18 @@ export function ReceiveMoneyModal({ isOpen, onClose, lang, onPaymentSuccess }: R
             </div>
           </div>
 
-          {/* SVG QR Code Simulation */}
-          <div className="relative p-4 rounded-2xl bg-white shadow-md border-2 border-[#00BAF2]/30 flex flex-col items-center justify-center size-52">
-            <div className="grid grid-cols-6 gap-1.5 size-40 p-2">
-              {Array.from({ length: 36 }).map((_, i) => (
-                <div
-                  key={i}
-                  className={`rounded-sm transition-colors ${
-                    i % 3 === 0 || i % 7 === 0 || i < 6 || i > 29 ? "bg-[#002970]" : "bg-[#00BAF2]"
-                  }`}
-                />
-              ))}
-            </div>
-            {/* Center Paytm Logo Badge */}
-            <div className="absolute inset-0 m-auto size-10 rounded-xl bg-white shadow-lg border border-[#00BAF2] flex items-center justify-center font-black text-[10px] text-[#002970]">
-              Pay<span className="text-[#00BAF2]">tm</span>
-            </div>
+          <div className="rounded-2xl bg-white border border-gray-200 p-3">
+            {qrUrl ? (
+              <img
+                src={qrUrl}
+                alt={`UPI QR for ${upiId}, ₹${amount}`}
+                width={208}
+                height={208}
+                className="size-52"
+              />
+            ) : (
+              <div className="size-52 bg-gray-100" />
+            )}
           </div>
 
           {/* Amount Modifier */}

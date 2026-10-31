@@ -1,8 +1,18 @@
-import React, { useState } from "react";
-import { Mic, MicOff, Send, Sparkles, Volume2, Bot, CheckCircle2 } from "lucide-react";
-import { speak } from "@/lib/munshi/audio";
+import React, { useCallback, useEffect, useRef, useState } from "react";
+import { Mic, MicOff, Send, Sparkles, Volume2, Bot, Database } from "lucide-react";
+import { speakMunshi, preloadSpeechVoices } from "@/lib/munshi/audio";
 import { munshiApi } from "@/lib/api-client";
 import { getTranslation } from "@/lib/munshi/i18n";
+import {
+  resolveMerchantAnswer,
+  type MunshiLang,
+  type MerchantAnswer,
+} from "@/lib/munshi/merchant-query-service";
+import { isGenericBrainVoiceReadout } from "@/lib/munshi/merchant-query";
+import {
+  startWavRecorder,
+  type WavRecorder,
+} from "@/lib/munshi/voice-input";
 
 interface VoiceAssistantProps {
   lang: string;
@@ -10,10 +20,20 @@ interface VoiceAssistantProps {
 
 export function VoiceAssistant({ lang }: VoiceAssistantProps) {
   const t = getTranslation(lang);
+  const munshiLang = (lang === "kn-IN" || lang === "en-IN" ? lang : "hi-IN") as MunshiLang;
+
   const [listening, setListening] = useState(false);
   const [query, setQuery] = useState("");
   const [loading, setLoading] = useState(false);
-  const [response, setResponse] = useState<string | null>(null);
+  const [lastQuestion, setLastQuestion] = useState<string | null>(null);
+  const [answer, setAnswer] = useState<MerchantAnswer | null>(null);
+  const [micHint, setMicHint] = useState<string | null>(null);
+  const [voiceEngine, setVoiceEngine] = useState<"sarvam" | "browser" | null>(null);
+  const recorderRef = useRef<WavRecorder | null>(null);
+
+  useEffect(() => {
+    preloadSpeechVoices();
+  }, []);
 
   const suggestedQuestions = [
     { hi: "मेरा आज का पेमेंट कितना आया?", kn: "ಇಂದಿನ ಒಟ್ಟು ಪಾವತಿ ಎಷ್ಟು?", en: "What is my total payment today?" },
@@ -22,97 +42,114 @@ export function VoiceAssistant({ lang }: VoiceAssistantProps) {
     { hi: "क्या ₹500 का पेमेंट आया है?", kn: "₹500 ಪಾವತಿ ಸ್ವೀಕರಿಸಲಾಗಿದೆಯೇ?", en: "Did the ₹500 payment arrive?" },
   ];
 
-  const handleAsk = async (questionText: string) => {
-    const q = questionText || query;
-    if (!q.trim()) return;
+  const stopListening = useCallback(() => {
+    recorderRef.current = null;
+    setListening(false);
+  }, []);
 
-    setLoading(true);
-    setResponse(null);
+  const handleAsk = useCallback(
+    async (questionText: string) => {
+      const q = (questionText || query).trim();
+      if (!q) return;
 
-    try {
-      // Connect to Brain Cycle backend
-      const res = await munshiApi.runBrainCycle({
-        query: q,
-        merchantId: "DEMO_MERCHANT_RAMESH",
-        language: lang as any,
-      });
+      stopListening();
+      setLoading(true);
+      setAnswer(null);
+      setMicHint(null);
+      setLastQuestion(q);
+      setQuery(q);
 
-      const reply = res.voiceReadout || (
-        lang === "kn-IN"
-          ? "ನಿಮ್ಮ ವಿನಂತಿಯನ್ನು ಯಶಸ್ವಿಯಾಗಿ ಪ್ರಕ್ರಿಯೆಗೊಳಿಸಲಾಗಿದೆ."
-          : lang === "en-IN"
-          ? "Your request has been successfully processed."
-          : "आपका अनुरोध सफलतापूर्वक संसाधित कर दिया गया है।"
-      );
-      setResponse(reply);
-      speak(reply, lang);
-    } catch (err) {
-      // Local fallback answering with real data in selected language
-      let fallback = "";
-      if (lang === "kn-IN") {
-        if (q.includes("ಪಾವತಿ") || q.includes("payment")) {
-          fallback = "ರಮೇಶ್ ಅವರೇ, ಇಂದು ನಿಮ್ಮ ಅಂಗಡಿಗೆ ಒಟ್ಟು ₹2,150 ಪಾವತಿ ಬಂದಿದೆ, ಇದರಲ್ಲಿ 3 ಯಶಸ್ವಿ ವಹಿವಾಟುಗಳಿವೆ.";
-        } else if (q.includes("ಸೆಟಲ್ಮೆಂಟ್") || q.includes("settlement")) {
-          fallback = "ನಿಮ್ಮ ₹1,650 ಸೆಟಲ್‌ಮೆಂಟ್ ಎಸ್‌ಬಿಐ ಬ್ಯಾಂಕ್ ಖಾತೆಗೆ ಜಮೆಯಾಗಿದೆ. ಉಳಿದ ₹500 ಇಂದು ರಾತ್ರಿ 11:59 ಕ್ಕೆ ಜಮೆಯಾಗಲಿದೆ.";
-        } else if (q.includes("ಸೌಂಡ್‌ಬಾಕ್ಸ್") || q.includes("soundbox")) {
-          fallback = "ಸೌಂಡ್‌ಬಾಕ್ಸ್ ಆನ್‌ಲೈನ್‌ನಲ್ಲಿದೆ, 88% ಬ್ಯಾಟರಿ ಮತ್ತು ಪೂರ್ಣ 4G ಸಿಗ್ನಲ್ ಹೊಂದಿದೆ.";
-        } else {
-          fallback = "ನಮಸ್ಕಾರ ರಮೇಶ್ ಅವರೇ! ನಿಮ್ಮ ಎಲ್ಲಾ ಡಿಜಿಟಲ್ ಪಾವತಿಗಳು ಸುರಕ್ಷಿತವಾಗಿವೆ.";
+      let resolved = await resolveMerchantAnswer(q, munshiLang);
+
+      try {
+        const res = await munshiApi.runBrainCycle({
+          query: q,
+          merchantId: "DEMO_MERCHANT_RAMESH",
+          language: munshiLang,
+        });
+        if (res.voiceReadout && !isGenericBrainVoiceReadout(q, res.voiceReadout)) {
+          resolved = { ...resolved, reply: res.voiceReadout, source: "mdr_engine" };
         }
-      } else if (lang === "en-IN") {
-        if (q.toLowerCase().includes("payment") || q.toLowerCase().includes("received") || q.toLowerCase().includes("total")) {
-          fallback = "Ramesh ji, today your store received a total of ₹2,150 across 3 successful transactions.";
-        } else if (q.toLowerCase().includes("settlement") || q.toLowerCase().includes("bank")) {
-          fallback = "Your ₹1,650 settlement has been credited to your SBI account. Remaining ₹500 will settle tonight at 11:59 PM.";
-        } else if (q.toLowerCase().includes("soundbox") || q.toLowerCase().includes("working") || q.toLowerCase().includes("audio")) {
-          fallback = "Paytm Soundbox 4.0 is online with 88% battery and full 4G VoLTE signal.";
-        } else {
-          fallback = "Namaste Ramesh ji! All your digital payments and settlements are fully verified.";
-        }
-      } else {
-        if (q.includes("पेमेंट") || q.includes("payment")) {
-          fallback = "रमेश जी, आज आपकी दुकान पर कुल ₹2,150 का भुगतान प्राप्त हुआ है, जिसमें 3 सफल ट्रांजैक्शन हैं।";
-        } else if (q.includes("सेटलमेंट") || q.includes("settlement")) {
-          fallback = "आपका ₹1,650 का सेटलमेंट एसबीआई बैंक खाते में जमा हो चुका है। शेष ₹500 आज रात 11:59 बजे ट्रांसफर होगा।";
-        } else if (q.includes("साउंडबॉक्स") || q.includes("soundbox")) {
-          fallback = "साउंडबॉक्स ऑनलाइन है, 88% बैटरी और 4G सिग्नल पूर्ण है। कोई समस्या नहीं है।";
-        } else {
-          fallback = "नमस्ते रमेश जी! आपकी दुकान के सभी डिजिटल भुगतान एवं सेटलमेंट सुरक्षित हैं।";
-        }
+      } catch {
+        /* ledger answer already computed */
       }
-      setResponse(fallback);
-      speak(fallback, lang);
-    } finally {
+
+      setAnswer(resolved);
+      const engine = await speakMunshi(resolved.reply, munshiLang);
+      setVoiceEngine(engine);
       setLoading(false);
-      setListening(false);
-      setQuery("");
+    },
+    [query, munshiLang, stopListening],
+  );
+
+  const finishListening = useCallback(async () => {
+    const recorder = recorderRef.current;
+    recorderRef.current = null;
+    setListening(false);
+    setLoading(true);
+    setMicHint(null);
+    let spoken = "";
+    if (recorder) {
+      try {
+        const audioBase64 = await recorder.stop();
+        const heard = await munshiApi.transcribeVoice(audioBase64, munshiLang);
+        if (heard?.error) {
+          setMicHint(String(heard.error));
+        }
+        spoken = (heard?.transcript || "").trim();
+      } catch (err) {
+        setMicHint(err instanceof Error ? err.message : "Sarvam transcription failed");
+      }
     }
-  };
+    setLoading(false);
+    if (spoken) {
+      void handleAsk(spoken);
+    } else if (!recorder) {
+      setMicHint(t.voiceRetryHint);
+    } else {
+      setMicHint((prev) => prev || t.voiceRetryHint);
+    }
+  }, [handleAsk, munshiLang, t.voiceRetryHint]);
+
+  const startListening = useCallback(() => {
+    setQuery("");
+    setMicHint(null);
+    setLastQuestion(null);
+    startWavRecorder()
+      .then((recorder) => {
+        recorderRef.current = recorder;
+        setListening(true);
+      })
+      .catch(() => {
+        setMicHint(t.voiceMicBlockedHint);
+      });
+  }, [t.voiceMicBlockedHint]);
 
   const toggleMic = () => {
     if (listening) {
-      setListening(false);
+      void finishListening();
     } else {
-      setListening(true);
-      // Simulate speech recognition trigger with localized question
-      setTimeout(() => {
-        const testQ =
-          lang === "kn-IN"
-            ? "ಇಂದಿನ ಒಟ್ಟು ಪಾವತಿ ಎಷ್ಟು?"
-            : lang === "en-IN"
-            ? "What is my total payment today?"
-            : "मेरा आज का पेमेंट कितना आया?";
-        handleAsk(testQ);
-      }, 2500);
+      startListening();
     }
   };
 
+  useEffect(() => {
+    return () => stopListening();
+  }, [stopListening]);
+
+  const sourceLabel =
+    answer?.source === "demo_ledger"
+      ? t.voiceSourceLedger
+      : answer?.source === "mdr_engine"
+        ? t.voiceSourceMdr
+        : answer?.source === "static_fallback"
+          ? t.voiceSourceFallback
+          : null;
+
   return (
     <div className="rounded-3xl bg-white p-5 shadow-sm border border-blue-100 relative overflow-hidden">
-      {/* Decorative Gradient Background */}
       <div className="absolute top-0 right-0 w-64 h-32 bg-gradient-to-bl from-[#E0F6FD]/60 to-transparent pointer-events-none rounded-bl-full" />
 
-      {/* Title */}
       <div className="flex items-center justify-between mb-3 relative z-10">
         <div className="flex items-center gap-2">
           <div className="size-8 rounded-full bg-[#00BAF2]/15 border border-[#00BAF2]/30 flex items-center justify-center text-[#002970]">
@@ -125,7 +162,8 @@ export function VoiceAssistant({ lang }: VoiceAssistantProps) {
         </div>
       </div>
 
-      {/* Suggested Chips */}
+      <p className="text-[10px] text-gray-500 mb-3 relative z-10 leading-snug">{t.voiceHowItWorks}</p>
+
       <div className="flex flex-wrap gap-1.5 mb-4 relative z-10">
         {suggestedQuestions.map((q, idx) => {
           const label = lang === "kn-IN" ? q.kn : lang === "en-IN" ? q.en : q.hi;
@@ -142,27 +180,53 @@ export function VoiceAssistant({ lang }: VoiceAssistantProps) {
         })}
       </div>
 
-      {/* Active Response Display */}
-      {response && (
+      {micHint && (
+        <p className="text-[11px] text-amber-700 bg-amber-50 border border-amber-200 rounded-xl px-3 py-2 mb-3 relative z-10">
+          {micHint}
+        </p>
+      )}
+
+      {lastQuestion && (
+        <p className="text-[11px] text-[#002970]/80 mb-2 relative z-10">
+          <span className="font-bold">{t.voiceHeardLabel}</span> {lastQuestion}
+        </p>
+      )}
+
+      {answer && (
         <div className="mb-4 p-4 rounded-2xl bg-gradient-to-r from-[#F0F8FF] to-white border border-[#00BAF2]/30 flex items-start gap-3 animate-in fade-in">
           <div className="size-8 rounded-full bg-[#002970] text-[#00BAF2] flex items-center justify-center shrink-0 mt-0.5 shadow-sm">
             <Bot className="size-4" />
           </div>
-          <div className="flex-1">
-            <span className="text-[11px] font-bold text-[#002970] block mb-0.5">{t.aiResponseLabel}</span>
-            <p className="text-xs text-gray-800 leading-relaxed font-medium">{response}</p>
+          <div className="flex-1 min-w-0">
+            <div className="flex flex-wrap items-center gap-2 mb-0.5">
+              <span className="text-[11px] font-bold text-[#002970]">{t.aiResponseLabel}</span>
+              {sourceLabel && (
+                <span className="inline-flex items-center gap-1 text-[9px] font-semibold uppercase tracking-wide text-emerald-800 bg-emerald-50 border border-emerald-200 rounded-full px-2 py-0.5">
+                  <Database className="size-3" />
+                  {sourceLabel}
+                </span>
+              )}
+              {voiceEngine && (
+                <span className="text-[9px] text-gray-500">
+                  {voiceEngine === "sarvam" ? t.voiceTtsSarvam : t.voiceTtsBrowser}
+                </span>
+              )}
+            </div>
+            <p className="text-xs text-gray-800 leading-relaxed font-medium">{answer.reply}</p>
           </div>
           <button
-            onClick={() => speak(response, lang)}
+            type="button"
+            onClick={() => {
+              void speakMunshi(answer.reply, munshiLang).then(setVoiceEngine);
+            }}
             className="p-1.5 rounded-lg text-[#002970] hover:bg-blue-100 transition-colors shrink-0 cursor-pointer"
-            title="पुनः सुनें"
+            title={t.voiceReplay}
           >
             <Volume2 className="size-4" />
           </button>
         </div>
       )}
 
-      {/* Voice Controls: Large Mic Button & Text Box */}
       <div className="flex items-center gap-2 relative z-10">
         <button
           type="button"
@@ -172,7 +236,7 @@ export function VoiceAssistant({ lang }: VoiceAssistantProps) {
               ? "bg-red-500 text-white animate-pulse ring-4 ring-red-200"
               : "bg-[#00BAF2] hover:bg-[#00a8dc] text-[#002970]"
           }`}
-          title="माइक से पूछें"
+          title={listening ? t.voiceTapToSend : t.voiceTapToSpeak}
         >
           {listening ? <MicOff className="size-6" /> : <Mic className="size-6" />}
         </button>

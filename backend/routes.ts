@@ -16,6 +16,7 @@ import { dbRepo } from "./database/db.ts";
 import { approvalService } from "./services/approval.service.ts";
 import { memoryHandoffService } from "./services/memory-handoff.service.ts";
 import { eventStream } from "./services/event-stream.service.ts";
+import { configuredDatabaseUrl, getDb } from "./database/db.ts";
 
 export async function dispatchApiRoute(
   path: string,
@@ -29,14 +30,31 @@ export async function dispatchApiRoute(
 
   // 1. Health & Discovery
   if (method === "GET" && (normPath === "/api/v1/health" || normPath === "/health")) {
+    let database: { ok: boolean; engine: string; error: string | null } = {
+      ok: false,
+      engine: configuredDatabaseUrl() ? "postgres" : "pglite",
+      error: null,
+    };
+    try {
+      const db = await getDb();
+      database = { ok: true, engine: db.type || "postgres", error: null };
+    } catch (err: any) {
+      const raw = String(err?.message || "database unreachable");
+      database = {
+        ok: false,
+        engine: configuredDatabaseUrl() ? "postgres" : "pglite",
+        error: raw.replace(/postgres(?:ql)?:\/\/\S+/gi, "postgresql://…"),
+      };
+    }
     return {
       status: 200,
       body: {
-        status: "UP",
+        status: database.ok ? "UP" : "DEGRADED",
         service: "Pi Munshi Backend Gateway",
         rbiCompliant: true,
         okfVersion: "0.2.0",
         activeSseClients: eventStream.getClientCount(),
+        database,
         timestamp: new Date().toISOString(),
       },
     };
@@ -230,7 +248,8 @@ export async function dispatchApiRoute(
     const res = await sarvamAdapter.transcribe(
       body.audioBase64 ? Buffer.from(body.audioBase64, "base64") : Buffer.alloc(0),
       body.languageCode || "hi-IN",
-      mode
+      mode,
+      body.mimeType || "audio/wav"
     );
     return { status: 200, body: { success: true, mode, data: res } };
   }

@@ -1,4 +1,6 @@
 import type { ISarvamAdapter, ProviderStatus } from "./provider.interface.ts";
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
 
 export class SarvamAdapter implements ISarvamAdapter {
   private apiKey: string;
@@ -8,24 +10,39 @@ export class SarvamAdapter implements ISarvamAdapter {
     this.apiKey = process.env.SARVAM_API_KEY || "";
   }
 
+  private liveKey(): string {
+    const fromProcess = (process.env.SARVAM_API_KEY || this.apiKey || "").trim();
+    if (fromProcess) return fromProcess;
+    try {
+      const raw = readFileSync(join(process.cwd(), ".env"), "utf8");
+      const line = raw.split(/\r?\n/).find((row) => row.startsWith("SARVAM_API_KEY="));
+      return (line?.slice("SARVAM_API_KEY=".length) || "").trim().replace(/^"|"$/g, "");
+    } catch {
+      return "";
+    }
+  }
+
   async transcribe(
     audioBuffer: Buffer | Uint8Array,
     languageCode = "hi-IN",
-    mode: "LIVE" | "DEMO" = "DEMO"
+    mode: "LIVE" | "DEMO" = "DEMO",
+    mimeType = "audio/wav"
   ) {
-    if (mode === "LIVE" && this.apiKey) {
-      const startTime = Date.now();
+    const apiKey = this.liveKey();
+    if (apiKey && audioBuffer.length > 0) {
       try {
         const formData = new FormData();
-        const blob = new Blob([audioBuffer as any], { type: "audio/wav" });
-        formData.append("file", blob, "audio.wav");
-        formData.append("language_code", languageCode);
-        formData.append("model", "saaras:v1");
+        const bytes = audioBuffer instanceof Uint8Array ? audioBuffer : new Uint8Array(audioBuffer);
+        const blob = new Blob([bytes], { type: mimeType || "audio/wav" });
+        const ext = mimeType.includes("webm") ? "webm" : mimeType.includes("mpeg") ? "mp3" : "wav";
+        formData.append("file", blob, `audio.${ext}`);
+        formData.append("language_code", languageCode === "en-IN" ? "en-IN" : languageCode);
+        formData.append("model", "saaras:v3");
 
         const res = await fetch(`${this.baseUrl}/speech-to-text`, {
           method: "POST",
           headers: {
-            "api-subscription-key": this.apiKey,
+            "api-subscription-key": apiKey,
           },
           body: formData,
         });
@@ -36,14 +53,20 @@ export class SarvamAdapter implements ISarvamAdapter {
 
         const data = await res.json();
         return {
-          transcript: data.transcript || "",
+          transcript: (data.transcript || "").trim(),
           languageCode: data.language_code || languageCode,
           confidence: data.confidence || 0.95,
           isDemo: false,
         };
       } catch (err: any) {
         console.error("[Sarvam STT Live Error]:", err.message);
-        throw err;
+        return {
+          transcript: "",
+          languageCode,
+          confidence: 0,
+          isDemo: false,
+          error: String(err.message || err).slice(0, 280),
+        };
       }
     } else {
       // DEMO mode fallback: honest demo transcription
@@ -61,24 +84,21 @@ export class SarvamAdapter implements ISarvamAdapter {
     languageCode = "hi-IN",
     mode: "LIVE" | "DEMO" = "DEMO"
   ) {
-    if (mode === "LIVE" && this.apiKey) {
+    const apiKey = this.liveKey();
+    if (apiKey && text.trim()) {
       try {
         const res = await fetch(`${this.baseUrl}/text-to-speech`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            "api-subscription-key": this.apiKey,
+            "api-subscription-key": apiKey,
           },
           body: JSON.stringify({
-            inputs: [text],
+            text,
             target_language_code: languageCode,
-            speaker: "meera",
-            pitch: 0,
+            speaker: "priya",
             pace: 1.0,
-            loudness: 1.5,
-            speech_sample_rate: 8000,
-            enable_preprocessing: true,
-            model: "bulbul:v1",
+            model: "bulbul:v3",
           }),
         });
 
@@ -95,7 +115,7 @@ export class SarvamAdapter implements ISarvamAdapter {
         };
       } catch (err: any) {
         console.error("[Sarvam TTS Live Error]:", err.message);
-        throw err;
+        return { text, languageCode, isDemo: true, error: String(err.message || err).slice(0, 280) };
       }
     } else {
       return {
@@ -162,7 +182,7 @@ export class SarvamAdapter implements ISarvamAdapter {
   }
 
   async getConnectionStatus(): Promise<ProviderStatus> {
-    const isConfigured = Boolean(this.apiKey && this.apiKey.length > 5);
+    const isConfigured = Boolean(this.liveKey().length > 5);
     return {
       provider: "sarvam",
       mode: isConfigured ? "LIVE" : "DEMO",

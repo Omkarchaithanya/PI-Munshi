@@ -29,9 +29,10 @@ import { getTranslation } from "@/lib/munshi/i18n";
 
 interface ShopkeeperViewProps {
   lang: string;
+  pane?: "all" | "payments" | "settlements" | "soundbox" | "voice" | "receive";
 }
 
-export function ShopkeeperView({ lang }: ShopkeeperViewProps) {
+export function ShopkeeperView({ lang, pane = "all" }: ShopkeeperViewProps) {
   const t = getTranslation(lang);
   const [receiveModalOpen, setReceiveModalOpen] = useState(false);
   const [settlementModalOpen, setSettlementModalOpen] = useState(false);
@@ -41,6 +42,8 @@ export function ShopkeeperView({ lang }: ShopkeeperViewProps) {
   const [transactions, setTransactions] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeFilter, setActiveFilter] = useState<"ALL" | "SUCCESS" | "SETTLED">("ALL");
+  const [dbLive, setDbLive] = useState<{ ok: boolean; engine: string; error: string | null } | null>(null);
+  const [livePulse, setLivePulse] = useState(false);
 
   const loadData = async () => {
     try {
@@ -55,9 +58,44 @@ export function ShopkeeperView({ lang }: ShopkeeperViewProps) {
 
   useEffect(() => {
     loadData();
-    const interval = setInterval(loadData, 10000);
-    return () => clearInterval(interval);
+    const interval = setInterval(loadData, 8000);
+    munshiApi.getSystemHealth().then((health) => {
+      if (health.database) setDbLive(health.database);
+    }).catch(() => {
+      setDbLive({ ok: false, engine: "postgres", error: "Health check failed" });
+    });
+    const stream = new EventSource("/api/v1/events/stream");
+    stream.onmessage = (event) => {
+      try {
+        const payload = JSON.parse(event.data) as { type?: string };
+        if (!payload.type || payload.type === "STREAM_CONNECTED") {
+          setLivePulse(true);
+          return;
+        }
+        setLivePulse(true);
+        void loadData();
+      } catch {
+        /* ignore keepalives */
+      }
+    };
+    return () => {
+      clearInterval(interval);
+      stream.close();
+    };
   }, []);
+
+  useEffect(() => {
+    if (pane === "receive") setReceiveModalOpen(true);
+  }, [pane]);
+
+  const settledTotal = transactions
+    .filter((row) => row.status === "SUCCESS" && row.settlement_status === "SETTLED")
+    .reduce((sum, row) => sum + Number(row.amount || 0), 0);
+  const pendingTotal = transactions
+    .filter((row) => row.status === "SUCCESS" && row.settlement_status !== "SETTLED")
+    .reduce((sum, row) => sum + Number(row.amount || 0), 0);
+  const rupee = (n: number) =>
+    n.toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
   const totalToday = transactions.reduce(
     (acc, t) => acc + (t.status === "SUCCESS" ? Number(t.amount) : 0),
@@ -72,49 +110,67 @@ export function ShopkeeperView({ lang }: ShopkeeperViewProps) {
   });
 
   return (
-    <div className="w-full max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-5 space-y-6 pb-28">
-      {/* 1. GREETING & ACTION HEADER BANNER */}
-      <section className="rounded-3xl bg-gradient-to-r from-[#002970] via-[#002e6e] to-[#001738] p-5 sm:p-6 text-white shadow-lg border border-[#001f54] flex flex-col md:flex-row md:items-center justify-between gap-4">
+    <div className="w-full space-y-4 pb-8">
+      <section className={`${pane === "all" || pane === "receive" ? "" : "hidden"} rounded-lg bg-white border border-[#e6e8ec] px-5 py-4 flex flex-col md:flex-row md:items-center justify-between gap-4`}>
         <div>
           <div className="flex flex-wrap items-center gap-2 mb-1.5">
-            <span className="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full bg-[#00BAF2]/20 border border-[#00BAF2]/40 text-[#00BAF2] text-xs font-bold">
+            <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-[#e8f7fd] text-[#0077a8] text-xs font-semibold">
               <Sparkles className="size-3" />
               {t.storeName}
             </span>
-            <span className="text-xs text-blue-200/90 font-mono bg-white/10 px-2 py-0.5 rounded-md">
+            <span className="text-xs text-[#536e92] font-mono bg-[#f4f6f9] px-2 py-0.5 rounded">
               {t.upiId}
             </span>
+            <span
+              className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-semibold ${
+                dbLive?.ok
+                  ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
+                  : "bg-amber-50 text-amber-800 border border-amber-200"
+              }`}
+            >
+              <span className={`size-1.5 rounded-full ${livePulse && dbLive?.ok ? "bg-emerald-500 animate-pulse" : "bg-current"}`} />
+              {dbLive == null
+                ? "Checking database…"
+                : dbLive.ok
+                  ? `Live ${dbLive.engine === "postgres" ? "PostgreSQL" : "PGlite"}`
+                  : "PostgreSQL not connected"}
+            </span>
           </div>
-          <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-white">
+          <h2 className="text-lg font-semibold tracking-tight text-[#1a1a1a]">
             {t.greetingTitle}
-          </h1>
-          <p className="text-xs sm:text-sm text-blue-100/80 mt-1 max-w-xl">
+          </h2>
+          <p className="text-xs text-[#6b7280] mt-1 max-w-xl">
             {t.greetingSub}
           </p>
+          {dbLive && !dbLive.ok && (
+            <p className="text-[11px] text-amber-800 mt-2 max-w-xl">
+              Render PostgreSQL refused this DATABASE_URL. Copy External Database URL from the Render Connections panel. Until then the payment list is a local fallback, not the hosted database.
+            </p>
+          )}
         </div>
 
-        <div className="flex items-center gap-2.5 shrink-0">
+        <div className="flex items-center gap-2 shrink-0">
           <button
             type="button"
             onClick={() => setReceiveModalOpen(true)}
-            className="flex items-center gap-2 px-4 py-3 rounded-2xl bg-[#00BAF2] hover:bg-[#00a8dc] text-[#002970] font-black text-xs sm:text-sm shadow-md transition-all active:scale-95 cursor-pointer"
+            className="flex items-center gap-2 px-3.5 py-2 rounded-md bg-[#00baf2] hover:bg-[#00a8dc] text-white font-semibold text-xs shadow-sm cursor-pointer"
           >
-            <QrCode className="size-4 sm:size-5" />
+            <QrCode className="size-4" />
             {t.showQrBtn}
           </button>
           <button
             type="button"
             onClick={() => setSettlementModalOpen(true)}
-            className="flex items-center gap-1.5 px-4 py-3 rounded-2xl bg-white/10 hover:bg-white/20 border border-white/20 text-white font-bold text-xs sm:text-sm transition-all cursor-pointer"
+            className="flex items-center gap-1.5 px-3.5 py-2 rounded-md bg-white border border-[#d9dee7] text-[#1a1a1a] font-semibold text-xs cursor-pointer"
           >
-            <Zap className="size-4 text-amber-300" />
+            <Zap className="size-4 text-[#00baf2]" />
             {t.instantSettlementBtn}
           </button>
         </div>
       </section>
 
       {/* 2. FOUR EQUAL-WIDTH QUICK ACTIONS IN ONE HORIZONTAL ROW */}
-      <section>
+      <section className={pane === "all" ? "" : "hidden"}>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
           {/* Quick Action 1: Receive Money */}
           <button
@@ -202,9 +258,9 @@ export function ShopkeeperView({ lang }: ShopkeeperViewProps) {
         {/* ============================================================== */}
         {/* LEFT COLUMN (lg:col-span-7 xl:col-span-8)                      */}
         {/* ============================================================== */}
-        <div className="lg:col-span-7 xl:col-span-8 space-y-6">
+        <div className={`${pane === "all" || pane === "payments" || pane === "settlements" ? "" : "hidden"} ${pane === "all" ? "lg:col-span-7 xl:col-span-8" : "lg:col-span-12"} space-y-6`}>
           {/* Today's Business Card */}
-          <div className="rounded-3xl bg-white p-5 sm:p-6 shadow-[0_2px_12px_rgba(0,41,112,0.05)] border border-gray-100">
+          <div className={`${pane === "all" || pane === "settlements" ? "" : "hidden"} rounded-3xl bg-white p-5 sm:p-6 shadow-[0_2px_12px_rgba(0,41,112,0.05)] border border-gray-100`}>
             <div className="flex items-center justify-between pb-3.5 border-b border-gray-100">
               <div className="flex items-center gap-2">
                 <span className="size-2.5 rounded-full bg-emerald-500 animate-pulse" />
@@ -225,11 +281,11 @@ export function ShopkeeperView({ lang }: ShopkeeperViewProps) {
                   {t.totalPaymentsReceived}
                 </span>
                 <span className="text-2xl sm:text-3xl font-black text-[#002970] mt-1 block">
-                  ₹{totalToday > 0 ? totalToday.toFixed(2) : "2,150.00"}
+                  ₹{loading ? "…" : rupee(totalToday)}
                 </span>
                 <span className="inline-flex items-center gap-1 text-[11px] text-emerald-700 font-bold mt-1 bg-emerald-100/70 px-2 py-0.5 rounded-md">
                   <CheckCircle2 className="size-3" />
-                  {successCount > 0 ? successCount : 3} {t.successfulPaymentsCount}
+                  {successCount} {t.successfulPaymentsCount}
                 </span>
               </div>
 
@@ -239,7 +295,7 @@ export function ShopkeeperView({ lang }: ShopkeeperViewProps) {
                   {t.bankSettledTitle}
                 </span>
                 <span className="text-xl sm:text-2xl font-bold text-emerald-700 mt-1 block">
-                  ₹1,650.00
+                  ₹{loading ? "…" : rupee(settledTotal)}
                 </span>
                 <span className="text-[10px] text-gray-500 font-mono block mt-1">
                   {t.bankSettledSub}
@@ -252,7 +308,7 @@ export function ShopkeeperView({ lang }: ShopkeeperViewProps) {
                   {t.pendingSettlementTitle}
                 </span>
                 <span className="text-xl sm:text-2xl font-bold text-amber-600 mt-1 block">
-                  ₹500.00
+                  ₹{loading ? "…" : rupee(pendingTotal)}
                 </span>
                 <span className="text-[10px] text-gray-500 block mt-1">
                   {t.pendingSettlementSub}
@@ -275,7 +331,7 @@ export function ShopkeeperView({ lang }: ShopkeeperViewProps) {
           </div>
 
           {/* Recent Payments Card (Readable Table/List) */}
-          <div id="transactions-list" className="rounded-3xl bg-white p-5 sm:p-6 shadow-[0_2px_12px_rgba(0,41,112,0.05)] border border-gray-100">
+          <div id="transactions-list" className={`${pane === "all" || pane === "payments" ? "" : "hidden"} rounded-3xl bg-white p-5 sm:p-6 shadow-[0_2px_12px_rgba(0,41,112,0.05)] border border-gray-100`}>
             <div className="flex flex-wrap items-center justify-between gap-3 pb-3.5 border-b border-gray-100">
               <div className="flex items-center gap-2">
                 <CreditCard className="size-4 text-[#00BAF2]" />
@@ -375,12 +431,13 @@ export function ShopkeeperView({ lang }: ShopkeeperViewProps) {
         {/* ============================================================== */}
         {/* RIGHT COLUMN (lg:col-span-5 xl:col-span-4)                     */}
         {/* ============================================================== */}
-        <div className="lg:col-span-5 xl:col-span-4 space-y-6">
-          {/* Ask Pi Munshi Voice Assistant Card */}
-          <VoiceAssistant lang={lang} />
+        <div className={`${pane === "all" || pane === "voice" || pane === "soundbox" ? "" : "hidden"} ${pane === "all" ? "lg:col-span-5 xl:col-span-4" : "lg:col-span-12"} space-y-6`}>
+          <div id="voice-panel" className={pane === "all" || pane === "voice" ? "" : "hidden"}>
+            <VoiceAssistant lang={lang} />
+          </div>
 
           {/* Soundbox 4.0 Telemetry Card */}
-          <div className="rounded-3xl bg-white p-5 shadow-[0_2px_12px_rgba(0,41,112,0.05)] border border-gray-100">
+          <div id="soundbox-panel" className={`${pane === "all" || pane === "soundbox" ? "" : "hidden"} rounded-lg bg-white p-5 shadow-sm border border-[#e6e8ec]`}>
             <div className="flex items-center justify-between pb-3 border-b border-gray-100">
               <div className="flex items-center gap-2">
                 <Volume2 className="size-4 text-[#00BAF2]" />
@@ -445,7 +502,7 @@ export function ShopkeeperView({ lang }: ShopkeeperViewProps) {
           </div>
 
           {/* Merchant Support / Field Executive Contact Card */}
-          <div className="rounded-3xl bg-white p-5 shadow-[0_2px_12px_rgba(0,41,112,0.05)] border border-gray-100">
+          <div className={`${pane === "all" ? "" : "hidden"} rounded-3xl bg-white p-5 shadow-[0_2px_12px_rgba(0,41,112,0.05)] border border-gray-100`}>
             <div className="flex items-center gap-2 pb-3 border-b border-gray-100">
               <ShieldCheck className="size-4 text-[#00BAF2]" />
               <h3 className="text-xs sm:text-sm font-black text-[#002970] uppercase tracking-wide">
