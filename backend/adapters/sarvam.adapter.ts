@@ -181,6 +181,46 @@ export class SarvamAdapter implements ISarvamAdapter {
     }
   }
 
+  async chatCompletion(
+    messages: Array<{ role: string; content: string }>,
+    options: { max_tokens?: number } = {}
+  ): Promise<{ content: string; model: string; tokensUsed: number } | null> {
+    const apiKey = this.liveKey();
+    if (!apiKey) return null;
+
+    try {
+      const res = await fetch(`${this.baseUrl}/v1/chat/completions`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "api-subscription-key": apiKey,
+        },
+        body: JSON.stringify({
+          model: "sarvam-105b-conversations",
+          messages,
+          max_tokens: options.max_tokens || 180,
+        }),
+      });
+
+      if (!res.ok) {
+        console.warn(`[Sarvam LLM Error] HTTP ${res.status}: ${await res.text()}`);
+        return null;
+      }
+
+      const data = await res.json();
+      const content = data?.choices?.[0]?.message?.content?.trim() || "";
+      const tokensUsed = data?.usage?.total_tokens || 0;
+      return {
+        content,
+        model: "sarvam-105b-conversations",
+        tokensUsed,
+      };
+    } catch (err: any) {
+      console.warn("[Sarvam LLM Dispatch Error]:", err.message);
+      return null;
+    }
+  }
+
   async getConnectionStatus(): Promise<ProviderStatus> {
     const isConfigured = Boolean(this.liveKey().length > 5);
     return {

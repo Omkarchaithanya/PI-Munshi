@@ -67,8 +67,8 @@ export function VoiceAssistant({ lang }: VoiceAssistantProps) {
             language: munshiLang,
           });
           const brainReadout = (brain?.voiceReadout || "").trim();
-          if (brainReadout && !isGenericBrainVoiceReadout(q, brainReadout)) {
-            resolved = { ...resolved, reply: brainReadout };
+          if (brainReadout) {
+            resolved = { ...resolved, reply: brainReadout, source: "brain_llm" };
           }
         } catch {
           // Brain API call is optional; local ledger-backed answer is primary
@@ -141,13 +141,15 @@ export function VoiceAssistant({ lang }: VoiceAssistantProps) {
   }, [stopListening]);
 
   const sourceLabel =
-    answer?.source === "demo_ledger"
-      ? t.voiceSourceLedger
-      : answer?.source === "mdr_engine"
-        ? t.voiceSourceMdr
-        : answer?.source === "static_fallback"
-          ? t.voiceSourceFallback
-          : null;
+    answer?.source === "brain_llm"
+      ? (lang === "kn-IN" ? "ಸರ್ವಂ AI · ಇಂಡಸ್ LLM" : lang === "en-IN" ? "Sarvam AI · Indus LLM" : "सर्वम AI · इंडस LLM")
+      : answer?.source === "demo_ledger"
+        ? t.voiceSourceLedger
+        : answer?.source === "mdr_engine"
+          ? t.voiceSourceMdr
+          : answer?.source === "static_fallback"
+            ? t.voiceSourceFallback
+            : null;
 
   return (
     <div className="rounded-3xl bg-white p-5 shadow-sm border border-blue-100 relative overflow-hidden">

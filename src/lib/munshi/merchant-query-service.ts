@@ -12,7 +12,7 @@ export type MerchantAnswer = {
   reply: string;
   intent: QueryIntent;
   /** Where numbers were computed from */
-  source: "demo_ledger" | "mdr_engine" | "static_fallback";
+  source: "brain_llm" | "demo_ledger" | "mdr_engine" | "static_fallback";
   facts: Record<string, string | number>;
 };
 

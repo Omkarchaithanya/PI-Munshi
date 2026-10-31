@@ -9,6 +9,7 @@ import { okfKnowledge } from "./okf-knowledge.service.ts";
 import { fsmShield } from "./fsm-shield.service.ts";
 import { walLedger } from "./wal-ledger.service.ts";
 import { cryptoVault } from "./crypto-vault.service.ts";
+import { sarvamAdapter } from "../adapters/sarvam.adapter.ts";
 import { dbRepo } from "../database/db.ts";
 import type { BrainCycleRequest, BrainCycleResponse } from "../types.ts";
 
@@ -189,95 +190,141 @@ return result;
     const menu = executionOutput.vcgMenu;
 
     let voiceReadout = "";
-    if (!ledger.ok) {
-      voiceReadout =
-        lang === "kn-IN"
-          ? "ಲೆಡ್ಜರ್ ಓದಲಾಗಲಿಲ್ಲ. ಡೇಟಾಬೇಸ್ ಸಂಪರ್ಕ ಪರಿಶೀಲಿಸಿ."
-          : lang === "en-IN"
-            ? "The ledger could not be read. Check the database connection."
-            : "लेजर नहीं पढ़ा जा सका। डेटाबेस कनेक्शन जाँचें।";
-    } else if (isGrowth && menu) {
-      voiceReadout =
-        lang === "en-IN"
-          ? `Three contracts from the ledger amount ${inr(menu.orderAmount)}: ${menu.contractA.title}; ${menu.contractB.title}; ${menu.contractC.title}.`
-          : lang === "kn-IN"
-            ? `${inr(menu.orderAmount)} ಮೇಲೆ 3 ಆಯ್ಕೆಗಳು: ${menu.contractA.title}; ${menu.contractB.title}; ${menu.contractC.title}.`
-            : `${inr(menu.orderAmount)} पर तीन विकल्प: ${menu.contractA.title}; ${menu.contractB.title}; ${menu.contractC.title}.`;
-    } else if (isDispute) {
-      voiceReadout =
-        lang === "en-IN"
-          ? ledger.disputeAmount
-            ? `Open dispute ${inr(ledger.disputeAmount)}: ${ledger.disputeReason}`
-            : "No open dispute on this merchant ledger."
-          : lang === "kn-IN"
+    let usedLlm = false;
+
+    // Call Sarvam Indus LLM (sarvam-105b-conversations) with grounded merchant ledger context
+    if (sarvamAdapter.chatCompletion && !isAmountLookup) {
+      try {
+        const langName = lang === "kn-IN" ? "Kannada" : lang === "en-IN" ? "Indian English" : "Hindi";
+        const shopSummary = [
+          `Merchant: Ramesh Kumar`,
+          `Shop: Ramesh Kirana Store (UPI: ramesh.kirana@paytm)`,
+          `Today's Total Payments: ${inr(ledger.total)} across ${ledger.count} successful transactions`,
+          `Bank Settled: ${inr(ledger.settled)} (UTR: ${ledger.utr})`,
+          `Pending Settlement: ${inr(ledger.pending)} (settles tonight by 11:59 PM)`,
+          `Paytm Soundbox 4.0: Status ${ledger.soundboxStatus}, Battery ${ledger.battery}%, 4G VoLTE Connected`,
+          `RBI MDR Subsidy: ₹0 fee (100% Government of India MDR subsidy waived)`,
+          `Disputes: ${ledger.disputeAmount > 0 ? `${inr(ledger.disputeAmount)} (${ledger.disputeReason})` : "Zero open disputes"}`,
+        ].join("\n");
+
+        const systemPrompt = `You are Pi Munshi, an intelligent, respectful, and helpful AI teammate for Indian shopkeepers using Paytm Soundbox and Paytm Payment Gateway.
+Current Verified Shop Data:
+${shopSummary}
+
+Instructions:
+1. Always respond in ${langName}.
+2. Keep the answer direct, practical, concise, and friendly (1-2 sentences).
+3. If the user asks about payments, settlements, Soundbox, disputes, fees, or business operations, answer accurately using the verified shop data above.
+4. If the user greets or asks what you can do, greet them respectfully (address as Ramesh ji) and state how you can help.`;
+
+        const llmResult = await sarvamAdapter.chatCompletion([
+          { role: "system", content: systemPrompt },
+          { role: "user", content: qRaw },
+        ]);
+
+        if (llmResult?.content) {
+          voiceReadout = llmResult.content;
+          tokenBudget = llmResult.tokensUsed || 140;
+          rung = 2;
+          usedLlm = true;
+          executionOutput = { ...executionOutput, llmModel: llmResult.model, tokensUsed: llmResult.tokensUsed };
+        }
+      } catch (err) {
+        console.warn("[BrainOrchestrator] Sarvam LLM error, falling back to deterministic response:", err);
+      }
+    }
+
+    if (!usedLlm) {
+      if (!ledger.ok) {
+        voiceReadout =
+          lang === "kn-IN"
+            ? "ಲೆಡ್ಜರ್ ಓದಲಾಗಲಿಲ್ಲ. ಡೇಟಾಬೇಸ್ ಸಂಪರ್ಕ ಪರಿಶೀಲಿಸಿ."
+            : lang === "en-IN"
+              ? "The ledger could not be read. Check the database connection."
+              : "लेजर नहीं पढ़ा जा सका। डेटाबेस कनेक्शन जाँचें।";
+      } else if (isGrowth && menu) {
+        voiceReadout =
+          lang === "en-IN"
+            ? `Three contracts from the ledger amount ${inr(menu.orderAmount)}: ${menu.contractA.title}; ${menu.contractB.title}; ${menu.contractC.title}.`
+            : lang === "kn-IN"
+              ? `${inr(menu.orderAmount)} ಮೇಲೆ 3 ಆಯ್ಕೆಗಳು: ${menu.contractA.title}; ${menu.contractB.title}; ${menu.contractC.title}.`
+              : `${inr(menu.orderAmount)} पर तीन विकल्प: ${menu.contractA.title}; ${menu.contractB.title}; ${menu.contractC.title}.`;
+      } else if (isDispute) {
+        voiceReadout =
+          lang === "en-IN"
             ? ledger.disputeAmount
-              ? `${inr(ledger.disputeAmount)} ವಿವಾದ ತೆರೆದಿದೆ: ${ledger.disputeReason}`
-              : "ಈ ಲೆಡ್ಜರ್‌ನಲ್ಲಿ ತೆರೆದ ವಿವಾದವಿಲ್ಲ."
-            : ledger.disputeAmount
-              ? `${inr(ledger.disputeAmount)} का विवाद खुला है: ${ledger.disputeReason}`
-              : "इस लेजर पर कोई खुला विवाद नहीं है।";
-    } else if (isAmountLookup) {
-      voiceReadout =
-        lang === "en-IN"
-          ? ledger.lookupFound
-            ? `Yes — ${inr(ledger.lookupAmount)} is on the ledger. RRN ${ledger.lookupRrn}.`
-            : `No successful ${inr(ledger.lookupAmount)} payment on the ledger.`
-          : lang === "kn-IN"
+              ? `Open dispute ${inr(ledger.disputeAmount)}: ${ledger.disputeReason}`
+              : "No open dispute on this merchant ledger."
+            : lang === "kn-IN"
+              ? ledger.disputeAmount
+                ? `${inr(ledger.disputeAmount)} ವಿವಾದ ತೆರೆದಿದೆ: ${ledger.disputeReason}`
+                : "ಈ ಲೆಡ್ಜರ್‌ನಲ್ಲಿ ತೆರೆದ ವಿವಾದವಿಲ್ಲ."
+              : ledger.disputeAmount
+                ? `${inr(ledger.disputeAmount)} का विवाद खुला है: ${ledger.disputeReason}`
+                : "इस लेजर पर कोई खुला विवाद नहीं है।";
+      } else if (isAmountLookup) {
+        voiceReadout =
+          lang === "en-IN"
             ? ledger.lookupFound
-              ? `ಹೌದು — ${inr(ledger.lookupAmount)} ಲೆಡ್ಜರ್‌ನಲ್ಲಿದೆ. RRN ${ledger.lookupRrn}.`
-              : `${inr(ledger.lookupAmount)} ಯಶಸ್ವಿ ಪಾವತಿ ಲೆಡ್ಜರ್‌ನಲ್ಲಿ ಇಲ್ಲ.`
-            : ledger.lookupFound
-              ? `हाँ — ${inr(ledger.lookupAmount)} लेजर में है। RRN ${ledger.lookupRrn}।`
-              : `लेजर में ${inr(ledger.lookupAmount)} का सफल पेमेंट नहीं है।`;
-    } else if (isSoundbox) {
-      voiceReadout =
-        lang === "en-IN"
-          ? `Soundbox ${ledger.soundboxStatus}, battery ${ledger.battery}%.`
-          : lang === "kn-IN"
-            ? `ಸೌಂಡ್‌ಬಾಕ್ಸ್ ${ledger.soundboxStatus}, ಬ್ಯಾಟರಿ ${ledger.battery}%.`
-            : `साउंडबॉक्स ${ledger.soundboxStatus}, बैटरी ${ledger.battery}%।`;
-    } else if (isSettlement) {
-      voiceReadout =
-        lang === "en-IN"
-          ? `${inr(ledger.settled)} credited (UTR ${ledger.utr}). Pending ${inr(ledger.pending)}.`
-          : lang === "kn-IN"
-            ? `${inr(ledger.settled)} ಜಮೆ (UTR ${ledger.utr}). ಬಾಕಿ ${inr(ledger.pending)}.`
-            : `${inr(ledger.settled)} जमा (UTR ${ledger.utr})। बाकी ${inr(ledger.pending)}।`;
-    } else if (isMdr || rung === 2) {
-      voiceReadout =
-        lang === "en-IN"
-          ? `MDR ${inr(Number(mdrFee) || 0)} on ${inr(amount)}. Net ${inr(Number(net) || 0)}.`
-          : lang === "kn-IN"
-            ? `${inr(amount)} ಮೇಲೆ MDR ${inr(Number(mdrFee) || 0)}. ನಿವ್ವಳ ${inr(Number(net) || 0)}.`
-            : `${inr(amount)} पर MDR ${inr(Number(mdrFee) || 0)}। शुद्ध ${inr(Number(net) || 0)}।`;
-    } else if (isGreeting) {
-      voiceReadout =
-        lang === "en-IN"
-          ? "Namaste Ramesh ji! I am Pi Munshi, your digital shop assistant. How can I help you today with your payments, settlement, or Soundbox?"
-          : lang === "kn-IN"
-            ? "ನಮಸ್ಕಾರ ರಮೇಶ್ ಅವರೇ! ನಾನು ನಿಮ್ಮ ಮುನ್ಷಿ AI ಸಹಾಯಕ. ಇಂದಿನ ಪಾವತಿ, ಸೆಟಲ್‌ಮೆಂಟ್ ಅಥವಾ ಸೌಂಡ್‌ಬಾಕ್ಸ್ ಬಗ್ಗೆ ಹೇಗೆ ಸಹಾಯ ಮಾಡಲಿ?"
-            : "नमस्ते रमेश जी! मैं आपका मुंशी AI सहायक हूँ। आज आपकी दुकान के पेमेंट, सेटलमेंट या साउंडबॉक्स में क्या मदद करूँ?";
-    } else if (isHelp) {
-      voiceReadout =
-        lang === "en-IN"
-          ? "I can check your live payments, bank settlement status, UTR numbers, Soundbox health, verify specific customer payments, and explain RBI MDR rules."
-          : lang === "kn-IN"
-            ? "ನಾನು ನಿಮ್ಮ ಲೈವ್ ಪಾವತಿಗಳು, ಬ್ಯಾಂಕ್ ಸೆಟಲ್‌ಮೆಂಟ್, UTR ಸಂಖ್ಯೆಗಳು, ಸೌಂಡ್‌ಬಾಕ್ಸ್ ಸ್ಥಿತಿ ಮತ್ತು ಆರ್‌ಬಿಐ ಎಂಡಿಆರ್ ನಿಯಮಗಳನ್ನು ಪರಿಶೀಲಿಸಬಲ್ಲೆ."
-            : "मैं आपके लाइव पेमेंट, बैंक सेटलमेंट, UTR नंबर, साउंडबॉक्स स्थिति, किसी खास पेमेंट की जांच और RBI MDR नियमों की जानकारी दे सकता हूँ।";
-    } else if (isPaymentTotal) {
-      voiceReadout =
-        lang === "en-IN"
-          ? `Today's total collection is ${inr(ledger.total)} across ${ledger.count} successful UPI payments.`
-          : lang === "kn-IN"
-            ? `ಇಂದು ನಿಮ್ಮ ಅಂಗಡಿಗೆ ಒಟ್ಟು ${inr(ledger.total)} ಪಾವತಿ ಬಂದಿದೆ (${ledger.count} ಯಶಸ್ವಿ UPI).`
-            : `आज कुल ${inr(ledger.total)} का भुगतान प्राप्त हुआ है (${ledger.count} सफल UPI लेन-देन)।`;
-    } else {
-      voiceReadout =
-        lang === "en-IN"
-          ? `I heard "${qRaw}". You can ask about today's payments (${inr(ledger.total)}), settlement (${inr(ledger.settled)}), or Soundbox status.`
-          : lang === "kn-IN"
-            ? `"${qRaw}" ಗೆ ಸಂಬಂಧಿಸಿದಂತೆ: ನೀವು ಇಂದಿನ ಪಾವತಿ (${inr(ledger.total)}), ಸೆಟಲ್‌ಮೆಂಟ್ (${inr(ledger.settled)}), ಅಥವಾ ಸೌಂಡ್‌ಬಾಕ್ಸ್ ಬಗ್ಗೆ ಕೇಳಬಹುದು.`
-            : `मैंने सुना: "${qRaw}"। आप आज के कुल पेमेंट (${inr(ledger.total)}), सेटलमेंट (${inr(ledger.settled)}), या साउंडबॉक्स स्थिति के बारे में पूछ सकते हैं।`;
+              ? `Yes — ${inr(ledger.lookupAmount)} is on the ledger. RRN ${ledger.lookupRrn}.`
+              : `No successful ${inr(ledger.lookupAmount)} payment on the ledger.`
+            : lang === "kn-IN"
+              ? ledger.lookupFound
+                ? `ಹೌದು — ${inr(ledger.lookupAmount)} ಲೆಡ್ಜರ್‌ನಲ್ಲಿದೆ. RRN ${ledger.lookupRrn}.`
+                : `${inr(ledger.lookupAmount)} ಯಶಸ್ವಿ ಪಾವತಿ ಲೆಡ್ಜರ್‌ನಲ್ಲಿ ಇಲ್ಲ.`
+              : ledger.lookupFound
+                ? `हाँ — ${inr(ledger.lookupAmount)} लेजर में है। RRN ${ledger.lookupRrn}।`
+                : `लेजर में ${inr(ledger.lookupAmount)} का सफल पेमेंट नहीं है।`;
+      } else if (isSoundbox) {
+        voiceReadout =
+          lang === "en-IN"
+            ? `Soundbox ${ledger.soundboxStatus}, battery ${ledger.battery}%.`
+            : lang === "kn-IN"
+              ? `ಸೌಂಡ್‌ಬಾಕ್ಸ್ ${ledger.soundboxStatus}, ಬ್ಯಾಟರಿ ${ledger.battery}%.`
+              : `साउंडबॉक्स ${ledger.soundboxStatus}, बैटरी ${ledger.battery}%।`;
+      } else if (isSettlement) {
+        voiceReadout =
+          lang === "en-IN"
+            ? `${inr(ledger.settled)} credited (UTR ${ledger.utr}). Pending ${inr(ledger.pending)}.`
+            : lang === "kn-IN"
+              ? `${inr(ledger.settled)} ಜಮೆ (UTR ${ledger.utr}). ಬಾಕಿ ${inr(ledger.pending)}.`
+              : `${inr(ledger.settled)} जमा (UTR ${ledger.utr})। बाकी ${inr(ledger.pending)}।`;
+      } else if (isMdr || rung === 2) {
+        voiceReadout =
+          lang === "en-IN"
+            ? `MDR ${inr(Number(mdrFee) || 0)} on ${inr(amount)}. Net ${inr(Number(net) || 0)}.`
+            : lang === "kn-IN"
+              ? `${inr(amount)} ಮೇಲೆ MDR ${inr(Number(mdrFee) || 0)}. ನಿವ್ವಳ ${inr(Number(net) || 0)}.`
+              : `${inr(amount)} पर MDR ${inr(Number(mdrFee) || 0)}। शुद्ध ${inr(Number(net) || 0)}।`;
+      } else if (isGreeting) {
+        voiceReadout =
+          lang === "en-IN"
+            ? "Namaste Ramesh ji! I am Pi Munshi, your digital shop assistant. How can I help you today with your payments, settlement, or Soundbox?"
+            : lang === "kn-IN"
+              ? "ನಮಸ್ಕಾರ ರಮೇಶ್ ಅವರೇ! ನಾನು ನಿಮ್ಮ ಮುನ್ಷಿ AI ಸಹಾಯಕ. ಇಂದಿನ ಪಾವತಿ, ಸೆಟಲ್‌ಮೆಂಟ್ ಅಥವಾ ಸೌಂಡ್‌ಬಾಕ್ಸ್ ಬಗ್ಗೆ ಹೇಗೆ ಸಹಾಯ ಮಾಡಲಿ?"
+              : "नमस्ते रमेश जी! मैं आपका मुंशी AI सहायक हूँ। आज आपकी दुकान के पेमेंट, सेटलमेंट या साउंडबॉक्स में क्या मदद करूँ?";
+      } else if (isHelp) {
+        voiceReadout =
+          lang === "en-IN"
+            ? "I can check your live payments, bank settlement status, UTR numbers, Soundbox health, verify specific customer payments, and explain RBI MDR rules."
+            : lang === "kn-IN"
+              ? "ನಾನು ನಿಮ್ಮ ಲೈವ್ ಪಾವತಿಗಳು, ಬ್ಯಾಂಕ್ ಸೆಟಲ್‌ಮೆಂಟ್, UTR ಸಂಖ್ಯೆಗಳು, ಸೌಂಡ್‌ಬಾಕ್ಸ್ ಸ್ಥಿತಿ ಮತ್ತು ಆರ್‌ಬಿಐ ಎಂಡಿಆರ್ ನಿಯಮಗಳನ್ನು ಪರಿಶೀಲಿಸಬಲ್ಲೆ."
+              : "मैं आपके लाइव पेमेंट, बैंक सेटलमेंट, UTR नंबर, साउंडबॉक्स स्थिति, किसी खास पेमेंट की जांच और RBI MDR नियमों की जानकारी दे सकता हूँ।";
+      } else if (isPaymentTotal) {
+        voiceReadout =
+          lang === "en-IN"
+            ? `Today's total collection is ${inr(ledger.total)} across ${ledger.count} successful UPI payments.`
+            : lang === "kn-IN"
+              ? `ಇಂದು ನಿಮ್ಮ ಅಂಗಡಿಗೆ ಒಟ್ಟು ${inr(ledger.total)} ಪಾವತಿ ಬಂದಿದೆ (${ledger.count} ಯಶಸ್ವಿ UPI).`
+              : `आज कुल ${inr(ledger.total)} का भुगतान प्राप्त हुआ है (${ledger.count} सफल UPI लेन-देन)।`;
+      } else {
+        voiceReadout =
+          lang === "en-IN"
+            ? `I heard "${qRaw}". You can ask about today's payments (${inr(ledger.total)}), settlement (${inr(ledger.settled)}), or Soundbox status.`
+            : lang === "kn-IN"
+              ? `"${qRaw}" ಗೆ ಸಂಬಂಧಿಸಿದಂತೆ: ನೀವು ಇಂದಿನ ಪಾವತಿ (${inr(ledger.total)}), ಸೆಟಲ್‌ಮೆಂಟ್ (${inr(ledger.settled)}), ಅಥವಾ ಸೌಂಡ್‌ಬಾಕ್ಸ್ ಬಗ್ಗೆ ಕೇಳಬಹುದು.`
+              : `मैंने सुना: "${qRaw}"। आप आज के कुल पेमेंट (${inr(ledger.total)}), सेटलमेंट (${inr(ledger.settled)}), या साउंडबॉक्स स्थिति के बारे में पूछ सकते हैं।`;
+      }
     }
 
     const estimatedLatencyMs = Date.now() - startedAt;

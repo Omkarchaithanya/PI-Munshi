@@ -52,6 +52,10 @@ export interface ISarvamAdapter {
     targetLang: string;
     isDemo: boolean;
   }>;
+  chatCompletion?(
+    messages: Array<{ role: string; content: string }>,
+    options?: { max_tokens?: number }
+  ): Promise<{ content: string; model: string; tokensUsed: number } | null>;
   getConnectionStatus(): Promise<ProviderStatus>;
 }
 
