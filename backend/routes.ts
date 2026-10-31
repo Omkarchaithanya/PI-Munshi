@@ -164,6 +164,24 @@ export async function dispatchApiRoute(
     return { status: 200, body: { success: true, disputeId, status: newStatus, mode } };
   }
 
+  if (method === "POST" && normPath === "/api/v1/disputes/create") {
+    const { txnId, amount, reason, merchantId = "DEMO_MERCHANT_RAMESH" } = body;
+    const disputeId = `DEMO_DISP_${Date.now().toString().slice(-4)}`;
+    const created = await dbRepo.createDispute({
+      dispute_id: disputeId,
+      mode,
+      merchant_id: merchantId,
+      txn_id: txnId || `TXN_${Date.now()}`,
+      amount: Number(amount) || 100,
+      reason: reason || "Customer reported debit without credit",
+      status: "UNDER_REVIEW",
+      evidence_submitted: false,
+      resolution_notes: "Awaiting customer bank reversal confirmation",
+    });
+    eventStream.broadcast("DISPUTE_CREATED", { disputeId, txnId, amount }, mode);
+    return { status: 200, body: { success: true, disputeId, mode, data: created } };
+  }
+
   // 7. Soundbox IoT & Chimes
   if (method === "GET" && normPath === "/api/v1/soundbox/status") {
     const deviceId = searchParams.get("deviceId") || body.deviceId || "DEMO_SB_RAMESH";

@@ -142,6 +142,10 @@ export class MunshiApiClient {
     return request<any>("/api/v1/disputes/action", "POST", { disputeId, action, resolutionNotes, mode });
   }
 
+  public async createDispute(txnId: string, amount: number, reason: string, merchantId = "DEMO_MERCHANT_RAMESH", mode = "DEMO") {
+    return request<any>("/api/v1/disputes/create", "POST", { txnId, amount, reason, merchantId, mode });
+  }
+
   public async getSoundboxStatus(deviceId = "DEMO_SB_RAMESH", mode = "DEMO") {
     try {
       const json = await request<any>(`/api/v1/soundbox/status?deviceId=${deviceId}&mode=${mode}`, "GET");

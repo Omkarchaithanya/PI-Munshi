@@ -3,6 +3,7 @@ import { useMunshi } from "@/lib/munshi/store";
 import { ShopkeeperView } from "./shopkeeper-view";
 import { FseView } from "./fse-view";
 import { JudgeView } from "./judge-view";
+import { SplitSettlementView } from "./split-settlement-view";
 import { getTranslation } from "@/lib/munshi/i18n";
 import {
   Home,
@@ -241,7 +242,7 @@ export function CommandCenter() {
                   </button>
                 ))}
               </div>
-              <JudgeView lang={lang} />
+              <SplitSettlementView lang={lang} />
             </div>
           )}
         </main>

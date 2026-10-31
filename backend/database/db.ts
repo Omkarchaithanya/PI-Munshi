@@ -68,22 +68,55 @@ export async function getDb() {
       };
     }
     const useSsl = /render\.com|sslmode=require/i.test(databaseUrl);
-    const pool = new PG.Pool({
-      connectionString: databaseUrl,
-      connectionTimeoutMillis: 8000,
-      ssl: useSsl ? { rejectUnauthorized: false } : undefined,
-    });
-    await pool.query("select 1");
-    dbClient = {
-      query: async (text, params = []) => {
-        const res = await pool.query(text, params);
-        return res.rows;
-      },
-      exec: async (text) => {
-        await pool.query(text);
-      },
-      type: "postgres",
-    };
+    let pool: any = null;
+    let connected = false;
+
+    try {
+      pool = new PG.Pool({
+        connectionString: databaseUrl,
+        connectionTimeoutMillis: 10000,
+        idleTimeoutMillis: 30000,
+        ssl: useSsl ? { rejectUnauthorized: false } : undefined,
+      });
+
+      pool.on("error", (err: any) => {
+        console.warn("[PG Pool Warning - Idle connection drop]:", err.message);
+      });
+
+      await pool.query("select 1");
+      connected = true;
+      dbClient = {
+        query: async (text, params = []) => {
+          const res = await pool.query(text, params);
+          return res.rows;
+        },
+        exec: async (text) => {
+          await pool.query(text);
+        },
+        type: "postgres",
+      };
+    } catch (err: any) {
+      console.warn("[PostgreSQL Remote Timeout/Error, activating high-speed PGlite fallback]:", err.message);
+      pool = null;
+      connected = false;
+    }
+
+    if (!connected) {
+      const { PGlite } = await import("@electric-sql/pglite");
+      const pglite = new PGlite();
+      await pglite.waitReady;
+
+      dbClient = {
+        query: async (text, params = []) => {
+          const res = await pglite.query(text, params);
+          return res.rows;
+        },
+        exec: async (text) => {
+          await pglite.exec(text);
+        },
+        type: "pglite",
+      };
+    }
   } else {
     // Embedded PGlite fallback
     const { PGlite } = await import("@electric-sql/pglite");
