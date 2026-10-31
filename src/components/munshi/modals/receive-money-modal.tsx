@@ -150,8 +150,8 @@ export function ReceiveMoneyModal({ isOpen, onClose, lang, onPaymentSuccess }: R
                   type="button"
                   onClick={() => setAmount(val)}
                   className={`flex-1 py-1.5 text-xs font-bold rounded-lg border transition-all cursor-pointer ${amount === val
-                      ? "bg-[#00BAF2] text-[#002970] border-[#00BAF2] shadow-sm"
-                      : "bg-white text-gray-700 border-gray-200 hover:border-[#00BAF2]"
+                    ? "bg-[#00BAF2] text-[#002970] border-[#00BAF2] shadow-sm"
+                    : "bg-white text-gray-700 border-gray-200 hover:border-[#00BAF2]"
                     }`}
                 >
                   ₹{val}

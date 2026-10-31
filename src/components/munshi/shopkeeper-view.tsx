@@ -122,11 +122,10 @@ export function ShopkeeperView({ lang, pane = "all" }: ShopkeeperViewProps) {
               {t.upiId}
             </span>
             <span
-              className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-semibold ${
-                dbLive?.ok
+              className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-semibold ${dbLive?.ok
                   ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
                   : "bg-amber-50 text-amber-800 border border-amber-200"
-              }`}
+                }`}
             >
               <span className={`size-1.5 rounded-full ${livePulse && dbLive?.ok ? "bg-emerald-500 animate-pulse" : "bg-current"}`} />
               {dbLive == null
@@ -347,11 +346,10 @@ export function ShopkeeperView({ lang, pane = "all" }: ShopkeeperViewProps) {
                     key={filterKey}
                     type="button"
                     onClick={() => setActiveFilter(filterKey)}
-                    className={`px-2.5 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${
-                      activeFilter === filterKey
+                    className={`px-2.5 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${activeFilter === filterKey
                         ? "bg-[#002970] text-white"
                         : "bg-gray-100 text-gray-600 hover:bg-gray-200"
-                    }`}
+                      }`}
                   >
                     {filterKey === "ALL" ? t.filterAll : filterKey === "SUCCESS" ? t.filterSuccess : t.filterSettled}
                   </button>
@@ -410,11 +408,10 @@ export function ShopkeeperView({ lang, pane = "all" }: ShopkeeperViewProps) {
                           +₹{Number(txn.amount).toFixed(2)}
                         </span>
                         <span
-                          className={`inline-block text-[10px] font-bold px-1.5 py-0.5 rounded ${
-                            txn.settlement_status === "SETTLED"
+                          className={`inline-block text-[10px] font-bold px-1.5 py-0.5 rounded ${txn.settlement_status === "SETTLED"
                               ? "bg-emerald-50 text-emerald-700"
                               : "bg-amber-50 text-amber-700"
-                          }`}
+                            }`}
                         >
                           {txn.settlement_status === "SETTLED" ? t.creditedToBank : t.settlingTonight}
                         </span>
@@ -482,8 +479,8 @@ export function ShopkeeperView({ lang, pane = "all" }: ShopkeeperViewProps) {
                     lang === "kn-IN"
                       ? "ಪೇಟಿಎಂ ನಲ್ಲಿ ₹100 ಸ್ವೀಕರಿಸಲಾಗಿದೆ."
                       : lang === "en-IN"
-                      ? "Received 100 rupees on Paytm."
-                      : "पेटीएम पर एक सौ रुपये प्राप्त हुए।";
+                        ? "Received 100 rupees on Paytm."
+                        : "पेटीएम पर एक सौ रुपये प्राप्त हुए।";
                   speak(phrase, lang);
                 }}
                 className="py-2.5 px-3 rounded-xl bg-[#F0F8FF] hover:bg-[#E0F6FD] text-[#002970] font-black text-xs border border-blue-100 transition-colors flex items-center justify-center gap-1.5 cursor-pointer"

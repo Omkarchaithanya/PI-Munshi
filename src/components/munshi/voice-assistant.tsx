@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import { Mic, MicOff, Send, Sparkles, Volume2, Bot, Database } from "lucide-react";
+import { Mic, MicOff, Send, Sparkles, Volume2, Bot } from "lucide-react";
 import { speakMunshi, preloadSpeechVoices } from "@/lib/munshi/audio";
 import { munshiApi } from "@/lib/api-client";
 import { getTranslation } from "@/lib/munshi/i18n";
@@ -28,7 +28,6 @@ export function VoiceAssistant({ lang }: VoiceAssistantProps) {
   const [lastQuestion, setLastQuestion] = useState<string | null>(null);
   const [answer, setAnswer] = useState<MerchantAnswer | null>(null);
   const [micHint, setMicHint] = useState<string | null>(null);
-  const [voiceEngine, setVoiceEngine] = useState<"sarvam" | "browser" | null>(null);
   const recorderRef = useRef<WavRecorder | null>(null);
 
   useEffect(() => {
@@ -59,25 +58,29 @@ export function VoiceAssistant({ lang }: VoiceAssistantProps) {
       setLastQuestion(q);
       setQuery(q);
 
-      let resolved = await resolveMerchantAnswer(q, munshiLang);
-
       try {
-        const res = await munshiApi.runBrainCycle({
-          query: q,
-          merchantId: "DEMO_MERCHANT_RAMESH",
-          language: munshiLang,
-        });
-        if (res.voiceReadout && !isGenericBrainVoiceReadout(q, res.voiceReadout)) {
-          resolved = { ...resolved, reply: res.voiceReadout, source: "mdr_engine" };
+        let resolved = await resolveMerchantAnswer(q, munshiLang);
+        try {
+          const brain = await munshiApi.runBrainCycle({
+            query: q,
+            merchantId: "DEMO_MERCHANT_RAMESH",
+            language: munshiLang,
+          });
+          const brainReadout = (brain?.voiceReadout || "").trim();
+          if (brainReadout && !isGenericBrainVoiceReadout(q, brainReadout)) {
+            resolved = { ...resolved, reply: brainReadout };
+          }
+        } catch {
+          // Brain API call is optional; local ledger-backed answer is primary
         }
-      } catch {
-        /* ledger answer already computed */
-      }
 
-      setAnswer(resolved);
-      const engine = await speakMunshi(resolved.reply, munshiLang);
-      setVoiceEngine(engine);
-      setLoading(false);
+        setAnswer(resolved);
+        await speakMunshi(resolved.reply, munshiLang);
+      } catch (err) {
+        console.error("handleAsk error:", err);
+      } finally {
+        setLoading(false);
+      }
     },
     [query, munshiLang, stopListening],
   );
@@ -92,7 +95,7 @@ export function VoiceAssistant({ lang }: VoiceAssistantProps) {
     if (recorder) {
       try {
         const audioBase64 = await recorder.stop();
-        const heard = await munshiApi.transcribeVoice(audioBase64, munshiLang);
+        const heard: any = await munshiApi.transcribeVoice(audioBase64, munshiLang);
         if (heard?.error) {
           setMicHint(String(heard.error));
         }
@@ -197,30 +200,21 @@ export function VoiceAssistant({ lang }: VoiceAssistantProps) {
           <div className="size-8 rounded-full bg-[#002970] text-[#00BAF2] flex items-center justify-center shrink-0 mt-0.5 shadow-sm">
             <Bot className="size-4" />
           </div>
-          <div className="flex-1 min-w-0">
-            <div className="flex flex-wrap items-center gap-2 mb-0.5">
-              <span className="text-[11px] font-bold text-[#002970]">{t.aiResponseLabel}</span>
+          <div className="flex-1">
+            <div className="flex items-center justify-between mb-0.5">
+              <span className="text-[11px] font-bold text-[#002970] block">{t.aiResponseLabel}</span>
               {sourceLabel && (
-                <span className="inline-flex items-center gap-1 text-[9px] font-semibold uppercase tracking-wide text-emerald-800 bg-emerald-50 border border-emerald-200 rounded-full px-2 py-0.5">
-                  <Database className="size-3" />
+                <span className="text-[9px] font-semibold px-2 py-0.5 rounded-full bg-blue-50 text-[#002970] border border-blue-200">
                   {sourceLabel}
-                </span>
-              )}
-              {voiceEngine && (
-                <span className="text-[9px] text-gray-500">
-                  {voiceEngine === "sarvam" ? t.voiceTtsSarvam : t.voiceTtsBrowser}
                 </span>
               )}
             </div>
             <p className="text-xs text-gray-800 leading-relaxed font-medium">{answer.reply}</p>
           </div>
           <button
-            type="button"
-            onClick={() => {
-              void speakMunshi(answer.reply, munshiLang).then(setVoiceEngine);
-            }}
+            onClick={() => speakMunshi(answer.reply, munshiLang)}
             className="p-1.5 rounded-lg text-[#002970] hover:bg-blue-100 transition-colors shrink-0 cursor-pointer"
-            title={t.voiceReplay}
+            title="पुनः सुनें"
           >
             <Volume2 className="size-4" />
           </button>

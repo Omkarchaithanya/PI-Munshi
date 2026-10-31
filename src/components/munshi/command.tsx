@@ -86,11 +86,10 @@ export function CommandCenter() {
         key={id}
         type="button"
         onClick={() => go(id)}
-        className={`w-full flex items-center gap-3 px-4 py-2 text-[13px] text-left cursor-pointer ${
-          active
+        className={`w-full flex items-center gap-3 px-4 py-2 text-[13px] text-left cursor-pointer ${active
             ? "text-[#00baf2] bg-[#f3fbfe] border-l-2 border-[#00baf2] font-semibold"
             : "text-[#4a4a4a] border-l-2 border-transparent hover:bg-[#f7f8fa]"
-        }`}
+          }`}
       >
         <Icon className="size-4 shrink-0" />
         <span className="truncate">{label}</span>
@@ -185,9 +184,8 @@ export function CommandCenter() {
               key={id}
               type="button"
               onClick={() => go(id)}
-              className={`shrink-0 px-3 py-1 rounded-full text-xs cursor-pointer ${
-                page === id ? "bg-[#e8f7fd] text-[#0077a8] font-semibold" : "text-[#4a4a4a]"
-              }`}
+              className={`shrink-0 px-3 py-1 rounded-full text-xs cursor-pointer ${page === id ? "bg-[#e8f7fd] text-[#0077a8] font-semibold" : "text-[#4a4a4a]"
+                }`}
             >
               {label}
             </button>
@@ -218,11 +216,10 @@ export function CommandCenter() {
                     type="button"
                     disabled={running}
                     onClick={() => run()}
-                    className={`px-3 py-1.5 rounded-md text-xs border cursor-pointer ${
-                      scene === n
+                    className={`px-3 py-1.5 rounded-md text-xs border cursor-pointer ${scene === n
                         ? "bg-[#00baf2] text-white border-[#00baf2]"
                         : "bg-white text-[#1a1a1a] border-[#d9dee7]"
-                    }`}
+                      }`}
                   >
                     {label}
                   </button>

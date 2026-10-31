@@ -66,19 +66,14 @@ export interface TranslationDictionary {
   aiResponseLabel: string;
   listening: string;
   voiceHowItWorks: string;
+  voiceRetryHint: string;
+  voiceMicBlockedHint: string;
   voiceHeardLabel: string;
-  voiceTapToSpeak: string;
   voiceTapToSend: string;
+  voiceTapToSpeak: string;
   voiceSourceLedger: string;
   voiceSourceMdr: string;
   voiceSourceFallback: string;
-  voiceTtsBrowser: string;
-  voiceTtsSarvam: string;
-  voiceReplay: string;
-  voiceBrowserOnlyHint: string;
-  voiceMicBlockedHint: string;
-  voiceRetryHint: string;
-  voiceMicBusyHint: string;
 
   // Soundbox Telemetry
   soundboxStatusTitle: string;
@@ -264,21 +259,15 @@ export const I18N: Record<LangCode, TranslationDictionary> = {
     inputPlaceholder: "Type your question or click mic...",
     aiResponseLabel: "Pi Munshi Answer:",
     listening: "Listening...",
-    voiceHowItWorks:
-      "Tap mic → speak → tap mic again to send. Answers use the DEMO merchant ledger (same data as payment list), not fixed dummy rupees.",
-    voiceHeardLabel: "You asked:",
+    voiceHowItWorks: "Ask queries about your daily payments, settlements, Soundbox, or MDR rules.",
+    voiceRetryHint: "Could not record or transcribe. Please speak clearly or type your question.",
+    voiceMicBlockedHint: "Microphone access blocked. Please allow microphone permission in browser settings.",
+    voiceHeardLabel: "Heard:",
+    voiceTapToSend: "Tap to stop & send",
     voiceTapToSpeak: "Tap to speak",
-    voiceTapToSend: "Tap again to send",
-    voiceSourceLedger: "DEMO ledger",
-    voiceSourceMdr: "MDR engine",
-    voiceSourceFallback: "Offline",
-    voiceTtsBrowser: "Voice: browser TTS",
-    voiceTtsSarvam: "Voice: Sarvam Bulbul",
-    voiceReplay: "Listen again",
-    voiceBrowserOnlyHint: "Voice input needs Chrome or Edge. Type your question below.",
-    voiceMicBlockedHint: "Microphone blocked — allow mic access in browser settings.",
-    voiceRetryHint: "Could not hear you — speak again or type below.",
-    voiceMicBusyHint: "Mic busy — wait a moment and tap again.",
+    voiceSourceLedger: "Live Ledger",
+    voiceSourceMdr: "MDR Policy",
+    voiceSourceFallback: "Verified Fallback",
 
     // Soundbox Telemetry
     soundboxStatusTitle: "Soundbox Status (SOUNDBOX 4.0)",
@@ -463,21 +452,15 @@ export const I18N: Record<LangCode, TranslationDictionary> = {
     inputPlaceholder: "यहाँ सवाल टाइप करें या माइक दबाएं...",
     aiResponseLabel: "मुंशी AI उत्तर:",
     listening: "सुन रहे हैं...",
-    voiceHowItWorks:
-      "माइक दबाएं → बोलें → फिर माइक दबाकर भेजें। जवाब DEMO लेजर से (भुगतान सूची जैसा), कोई तय dummy राशि नहीं।",
-    voiceHeardLabel: "आपने पूछा:",
+    voiceHowItWorks: "अपने दैनिक भुगतान, सेटलमेंट, साउंडबॉक्स या MDR नियमों के बारे में प्रश्न पूछें।",
+    voiceRetryHint: "आवाज़ रिकॉर्ड नहीं हो सकी। कृपया स्पष्ट बोलें या लिखकर पूछें।",
+    voiceMicBlockedHint: "माइक्रोफ़ोन अनुमति बंद है। कृपया ब्राउज़र सेटिंग्स में अनुमति दें।",
+    voiceHeardLabel: "सुना गया:",
+    voiceTapToSend: "रोकने और भेजने के लिए दबाएं",
     voiceTapToSpeak: "बोलने के लिए दबाएं",
-    voiceTapToSend: "भेजने के लिए फिर दबाएं",
-    voiceSourceLedger: "DEMO लेजर",
-    voiceSourceMdr: "MDR इंजन",
-    voiceSourceFallback: "ऑफलाइन",
-    voiceTtsBrowser: "आवाज़: ब्राउज़र TTS",
-    voiceTtsSarvam: "आवाज़: Sarvam Bulbul",
-    voiceReplay: "फिर सुनें",
-    voiceBrowserOnlyHint: "आवाज़ के लिए Chrome या Edge चाहिए। नीचे टाइप करें।",
-    voiceMicBlockedHint: "माइक की अनुमति नहीं — ब्राउज़र सेटिंग में चालू करें।",
-    voiceRetryHint: "आवाज़ सुन नहीं पाए — फिर बोलें या टाइप करें।",
-    voiceMicBusyHint: "माइक व्यस्त — थोड़ी देर बाद फिर दबाएं।",
+    voiceSourceLedger: "लाइव बहीखाता",
+    voiceSourceMdr: "MDR नियम",
+    voiceSourceFallback: "प्रमाणित बैकअप",
 
     // Soundbox Telemetry
     soundboxStatusTitle: "साउंडबॉक्स स्थिति (SOUNDBOX 4.0)",
@@ -662,21 +645,15 @@ export const I18N: Record<LangCode, TranslationDictionary> = {
     inputPlaceholder: "ಇಲ್ಲಿ ಪ್ರಶ್ನೆಯನ್ನು ಟೈಪ್ ಮಾಡಿ ಅಥವಾ ಮೈಕ್ ಒತ್ತಿ...",
     aiResponseLabel: "ಮುನ್ಷಿ AI ಉತ್ತರ:",
     listening: "ಕೇಳಿಸಿಕೊಳ್ಳಲಾಗುತ್ತಿದೆ...",
-    voiceHowItWorks:
-      "ಮೈಕ್ ಒತ್ತಿ → ಮಾತನಾಡಿ → ಕಳುಹಿಸಲು ಮತ್ತೆ ಒತ್ತಿ. ಉತ್ತರಗಳು DEMO ಲೆಡ್ಜರ್‌ನಿಂದ (ಪಾವತಿ ಪಟ್ಟಿಯಂತೆ).",
-    voiceHeardLabel: "ನೀವು ಕೇಳಿದ್ದು:",
-    voiceTapToSpeak: "ಮಾತನಾಡಲು ಒತ್ತಿ",
-    voiceTapToSend: "ಕಳುಹಿಸಲು ಮತ್ತೆ ಒತ್ತಿ",
-    voiceSourceLedger: "DEMO ಲೆಡ್ಜರ್",
-    voiceSourceMdr: "MDR ಎಂಜಿನ್",
-    voiceSourceFallback: "ಆಫ್‌ಲೈನ್",
-    voiceTtsBrowser: "ಧ್ವನಿ: ಬ್ರೌಸರ್ TTS",
-    voiceTtsSarvam: "ಧ್ವನಿ: Sarvam Bulbul",
-    voiceReplay: "ಮತ್ತೆ ಕೇಳಿ",
-    voiceBrowserOnlyHint: "ಧ್ವನಿ ಇನ್‌ಪುಟ್ Chrome/Edge ನಲ್ಲಿ. ಕೆಳಗೆ ಟೈಪ್ ಮಾಡಿ.",
-    voiceMicBlockedHint: "ಮೈಕ್ ಅನುಮತಿ ನಿರಾಕರಿಸಲಾಗಿದೆ.",
-    voiceRetryHint: "ಕೇಳಲು ಸಾಧ್ಯವಾಗಲಿಲ್ಲ — ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.",
-    voiceMicBusyHint: "ಮೈಕ್ ಬ್ಯುಸಿ — ಸ್ವಲ್ಪ ನಂತರ ಒತ್ತಿ.",
+    voiceHowItWorks: "ನಿಮ್ಮ ದಿನನಿತ್ಯದ ಪಾವತಿಗಳು, ಸೆಟಲ್‌ಮೆಂಟ್‌ಗಳು, ಸೌಂಡ್‌ಬಾಕ್ಸ್ ಅಥವಾ ಎಂಡಿಆರ್ ನಿಯಮಗಳ ಬಗ್ಗೆ ಪ್ರಶ್ನೆಗಳನ್ನು ಕೇಳಿ.",
+    voiceRetryHint: "ಧ್ವನಿಯನ್ನು ಗ್ರಹಿಸಲು ಸಾಧ್ಯವಾಗಲಿಲ್ಲ. ದಯವಿಟ್ಟು ಸ್ಪಷ್ಟವಾಗಿ ಮಾತನಾಡಿ ಅಥವಾ ಟೈಪ್ ಮಾಡಿ.",
+    voiceMicBlockedHint: "ಮೈಕ್ರೊಫೋನ್ ಅನುಮತಿಯನ್ನು ನಿರ್ಬಂಧಿಸಲಾಗಿದೆ. ದಯವಿಟ್ಟು ಬ್ರೌಸರ್ ಸೆಟ್ಟಿಂಗ್‌ಗಳಲ್ಲಿ ಅನುಮತಿಸಿ.",
+    voiceHeardLabel: "ಕೇಳಿದ್ದು:",
+    voiceTapToSend: "ನಿಲ್ಲಿಸಲು ಮತ್ತು ಕಳುಹಿಸಲು ಟ್ಯಾಪ್ ಮಾಡಿ",
+    voiceTapToSpeak: "ಮಾತನಾಡಲು ಟ್ಯಾಪ್ ಮಾಡಿ",
+    voiceSourceLedger: "ಲೈವ್ ಖಾತೆ",
+    voiceSourceMdr: "ಎಂಡಿಆರ್ ನೀತಿ",
+    voiceSourceFallback: "ದೃಢೀಕೃತ ಬ್ಯಾಕಪ್",
 
     // Soundbox Telemetry
     soundboxStatusTitle: "ಸೌಂಡ್‌ಬಾಕ್ಸ್ ಸ್ಥಿತಿ (SOUNDBOX 4.0)",

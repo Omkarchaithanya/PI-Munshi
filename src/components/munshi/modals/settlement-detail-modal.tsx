@@ -66,8 +66,8 @@ export function SettlementDetailModal({ isOpen, onClose, lang, onSettled }: Sett
         lang === "kn-IN"
           ? "ಸೆಟಲ್ಮೆಂಟ್ ಯಶಸ್ವಿಯಾಗಿದೆ. ಹಣವನ್ನು ನಿಮ್ಮ ಬ್ಯಾಂಕ್ ಖಾತೆಗೆ ಕಳುಹಿಸಲಾಗಿದೆ."
           : lang === "en-IN"
-          ? "Settlement successful. Funds transferred to your bank account."
-          : "सेटलमेंट सफल रहा। राशि आपके बैंक खाते में भेज दी गई है।";
+            ? "Settlement successful. Funds transferred to your bank account."
+            : "सेटलमेंट सफल रहा। राशि आपके बैंक खाते में भेज दी गई है।";
       speak(phrase, lang);
       setSettledResult(res);
       onSettled?.();

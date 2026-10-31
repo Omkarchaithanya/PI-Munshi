@@ -19,14 +19,12 @@ import { useMunshi } from "@/lib/munshi/store";
 import { inrFormat } from "@/lib/munshi/backend";
 import { munshiApi } from "@/lib/api-client";
 import { speak } from "@/lib/munshi/audio";
-import { getTranslation } from "@/lib/munshi/i18n";
 
 interface JudgeViewProps {
   lang: string;
 }
 
 export function JudgeView({ lang }: JudgeViewProps) {
-  const t = getTranslation(lang);
   const okfDocs = useMunshi((s) => s.okfDocs);
   const activeOkfDoc = useMunshi((s) => s.activeOkfDoc);
   const setActiveOkfDoc = useMunshi((s) => s.setActiveOkfDoc);
@@ -61,21 +59,8 @@ export function JudgeView({ lang }: JudgeViewProps) {
   const handleNightlyDream = async () => {
     try {
       const res = await munshiApi.consolidateSettlement("DEMO_MERCHANT_RAMESH", "DEMO");
-      setDreamingMsg(
-        lang === "kn-IN"
-          ? `ರಾತ್ರಿ ಡ್ರೀಮಿಂಗ್ ಪೂರ್ಣಗೊಂಡಿದೆ: ₹${res.totalSettled} ಸೆಟಲ್‌ಮೆಂಟ್ ಒಟ್ಟುಗೂಡಿಸಲಾಗಿದೆ (UTR: ${res.utr})`
-          : lang === "en-IN"
-          ? `Nightly dreaming completed: ₹${res.totalSettled} settlement consolidated (UTR: ${res.utr})`
-          : `नाइटली ड्रीमिंग संपन्न: ₹${res.totalSettled} सेटलमेंट कंसोलिडेट हुआ (UTR: ${res.utr})`
-      );
-      speak(
-        lang === "kn-IN"
-          ? "ರಾತ್ರಿ ಡ್ರೀಮಿಂಗ್ ಯಶಸ್ವಿಯಾಗಿ ಪೂರ್ಣಗೊಂಡಿದೆ."
-          : lang === "en-IN"
-          ? "Nightly dreaming completed successfully."
-          : "नाइटली ड्रीमिंग सफलतापूर्वक संपन्न हुई।",
-        lang
-      );
+      setDreamingMsg(`नाइटली ड्रीमिंग संपन्न: ₹${res.totalSettled} सेटलमेंट कंसोलिडेट हुआ (UTR: ${res.utr})`);
+      speak("नाइटली ड्रीमिंग सफलतापूर्वक संपन्न हुई।", lang);
       setTimeout(() => setDreamingMsg(null), 5000);
     } catch (err: any) {
       console.error(err);
@@ -89,17 +74,17 @@ export function JudgeView({ lang }: JudgeViewProps) {
           <div className="flex flex-wrap items-center gap-2 mb-1.5">
             <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-[#e8f7fd] text-[#0077a8] text-xs font-semibold">
               <ShieldCheck className="size-3" />
-              Google Cloud {t.okfBadge} Knowledge Store
+              Google Cloud OKF v0.2 Knowledge Store
             </span>
             <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-800 text-xs font-semibold border border-emerald-200">
               ✓ 48/48 Test Suite Passed (100%)
             </span>
           </div>
           <h2 className="text-lg font-semibold tracking-tight text-[#1a1a1a]">
-            {t.judgeTitle}
+            जज एवं सिस्टम आर्किटेक्चर कंसोल (Judge / Engine)
           </h2>
           <p className="text-xs text-[#6b7280] mt-1 max-w-xl">
-            {t.judgeSub}
+            5 ऑप्ट-इन ट्रस्ट सिग्नल्स, आउटलाइन्स FSM शील्ड, 3-रंग कॉग्निशन लैडर एवं रीइन्फोर्समेंट लर्निंग।
           </p>
         </div>
 
@@ -109,7 +94,7 @@ export function JudgeView({ lang }: JudgeViewProps) {
           className="flex items-center gap-2 px-4 py-3 rounded-2xl bg-[#00BAF2] hover:bg-[#00a8dc] text-[#001738] font-black text-xs sm:text-sm shadow-md transition-all active:scale-95 cursor-pointer shrink-0"
         >
           <Zap className="size-4" />
-          {t.nightlyDreamBtn}
+          नाइटली ड्रीमिंग चलाएं (Nightly Dream)
         </button>
       </section>
 
@@ -121,7 +106,7 @@ export function JudgeView({ lang }: JudgeViewProps) {
           </div>
           <div>
             <span className="text-[11px] font-bold text-gray-500 uppercase tracking-wide block">
-              {t.statSystemLoad}
+              सिस्टम लोड (SPS)
             </span>
             <span className="text-xl sm:text-2xl font-black text-[#002970] mt-0.5 block font-mono">
               {spsRate}/s
@@ -135,7 +120,7 @@ export function JudgeView({ lang }: JudgeViewProps) {
           </div>
           <div>
             <span className="text-[11px] font-bold text-gray-500 uppercase tracking-wide block">
-              {t.statCanaryZ}
+              कैनरी Z-स्कोर
             </span>
             <span className="text-xl sm:text-2xl font-black text-emerald-600 mt-0.5 block font-mono">
               {canaryZ.toFixed(2)}σ
@@ -149,7 +134,7 @@ export function JudgeView({ lang }: JudgeViewProps) {
           </div>
           <div>
             <span className="text-[11px] font-bold text-gray-500 uppercase tracking-wide block">
-              {t.statCostPerCall}
+              प्रति कॉल टोकन लागत
             </span>
             <span className="text-xl sm:text-2xl font-black text-amber-600 mt-0.5 block font-mono">
               ₹{costInr.toFixed(3)}
@@ -163,10 +148,10 @@ export function JudgeView({ lang }: JudgeViewProps) {
           </div>
           <div>
             <span className="text-[11px] font-bold text-gray-500 uppercase tracking-wide block">
-              {t.statAutonomyLevel}
+              स्वायत्तता स्तर
             </span>
             <span className="text-xl sm:text-2xl font-black text-purple-700 mt-0.5 block font-mono">
-              L2 ({t.rung3Status})
+              L2 (अर्जित)
             </span>
           </div>
         </div>
@@ -188,7 +173,7 @@ export function JudgeView({ lang }: JudgeViewProps) {
               <div className="flex items-center gap-2">
                 <ShieldCheck className="size-4 text-[#00BAF2]" />
                 <h3 className="text-sm font-black text-[#002970] uppercase tracking-wide">
-                  {t.fiveTrustSignalsTitle}
+                  Google Cloud OKF v0.2 ट्रस्ट सिग्नल्स
                 </h3>
               </div>
               <button
@@ -197,26 +182,26 @@ export function JudgeView({ lang }: JudgeViewProps) {
                 className="flex items-center gap-1.5 px-3 py-1 rounded-xl bg-[#00BAF2] text-[#001738] font-bold text-xs hover:bg-[#00a8dc] transition-colors cursor-pointer"
               >
                 <RefreshCw className="size-3.5" />
-                {t.cragValidateBtn}
+                CRAG सत्यापित करें
               </button>
             </div>
 
             <div className="grid grid-cols-1 gap-4 mt-4 text-xs">
               <div className="p-4 rounded-2xl bg-[#F0F9FF] border border-blue-100 space-y-2">
                 <span className="font-extrabold text-[#002970] block">
-                  {t.activePolicyFile}
+                  सक्रिय नीति फ़ाइल: {activeOkfDoc.filename}
                 </span>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-gray-700 pt-1">
-                  <p><strong>{t.provenanceLabel}:</strong> {activeOkfDoc.meta?.sources?.[0]?.authority || "Reserve Bank of India & NPCI"}</p>
-                  <p><strong>{t.trustTierLabel}:</strong> <span className="text-emerald-700 font-bold">{activeOkfDoc.meta?.trust?.verified?.tier || "tier-1-verified"}</span></p>
-                  <p><strong>{t.freshnessLabel}:</strong> {activeOkfDoc.meta?.freshness?.effective_date || "2026-10-15"}</p>
-                  <p><strong>{t.lifecycleLabel}:</strong> <span className="text-blue-700 font-bold uppercase">{activeOkfDoc.meta?.status || "STABLE"}</span></p>
+                  <p><strong>1. उद्गम (Provenance):</strong> {activeOkfDoc.meta?.sources?.[0]?.authority || "Reserve Bank of India & NPCI"}</p>
+                  <p><strong>2. ट्रस्ट टीयर:</strong> <span className="text-emerald-700 font-bold">{activeOkfDoc.meta?.trust?.verified?.tier || "tier-1-verified"}</span></p>
+                  <p><strong>3. ताज़गी (Freshness):</strong> {activeOkfDoc.meta?.freshness?.effective_date || "2026-10-15"} तक मान्य</p>
+                  <p><strong>4. लाइफसाइकिल:</strong> <span className="text-blue-700 font-bold uppercase">{activeOkfDoc.meta?.status || "STABLE"}</span></p>
                 </div>
               </div>
 
               <div className="p-4 rounded-2xl bg-gray-50 border border-gray-100 space-y-2">
                 <span className="font-extrabold text-[#002970] block">
-                  {t.attestationLabel}
+                  5. क्रिप्टोग्राफिक SHA-256 बाइट अटेस्टेशन हैश:
                 </span>
                 <span className="font-mono text-[11px] break-all text-gray-800 bg-white p-2.5 rounded-xl block border border-gray-200">
                   {activeOkfDoc.meta?.attestation?.upstream_sha256 || "9a7f3c1b82d40e6e7193b2a0c8419fec502476b7e614bb5333f2187b5a8d7904"}
@@ -224,19 +209,19 @@ export function JudgeView({ lang }: JudgeViewProps) {
 
                 <div className="pt-2">
                   <div className="flex justify-between items-center text-xs mb-1">
-                    <span className="font-bold text-gray-700">{t.cragConfidenceScore}</span>
+                    <span className="font-bold text-gray-700">CRAG कॉन्फिडेंस स्कोर:</span>
                     <span className="font-mono font-bold text-emerald-600">
-                      {((cragResult?.confidence || 0.99) * 100).toFixed(0)}%
+                      {((cragResult?.confidence || 0.98) * 100).toFixed(0)}%
                     </span>
                   </div>
                   <div className="w-full bg-gray-200 h-2 rounded-full overflow-hidden">
                     <div
                       className="bg-emerald-500 h-full rounded-full transition-all"
-                      style={{ width: `${(cragResult?.confidence || 0.99) * 100}%` }}
+                      style={{ width: `${(cragResult?.confidence || 0.98) * 100}%` }}
                     />
                   </div>
                   <span className="text-[11px] text-emerald-700 font-semibold block mt-1.5">
-                    {t.highConfidenceVerified}
+                    ✓ HIGH_CONFIDENCE_AUTHORITATIVE (फेल-क्लोज्ड सत्यापित)
                   </span>
                 </div>
               </div>
@@ -251,10 +236,10 @@ export function JudgeView({ lang }: JudgeViewProps) {
             <div className="pb-3 border-b border-gray-100">
               <h3 className="text-sm font-black text-[#002970] uppercase tracking-wide flex items-center gap-2">
                 <Lock className="size-4 text-[#00BAF2]" />
-                {t.fsmShieldTitle}
+                आउटलाइन्स लेक्सिकल FSM शील्ड (Adversarial Shield)
               </h3>
               <p className="text-[11px] text-gray-500 mt-0.5">
-                {t.fsmShieldSub}
+                प्रॉम्प्ट इंजेक्शन एवं अनधिकृत मनी वर्ब का तत्काल गणितीय अवरोध
               </p>
             </div>
 
@@ -263,7 +248,7 @@ export function JudgeView({ lang }: JudgeViewProps) {
                 type="text"
                 value={promptInput}
                 onChange={(e) => setPromptInput(e.target.value)}
-                placeholder="Enter adversarial prompt..."
+                placeholder="हमलावर प्रॉम्प्ट दर्ज करें..."
                 className="w-full rounded-xl border border-gray-200 px-3 py-2 text-xs font-mono focus:border-[#00BAF2] focus:outline-hidden"
               />
               <button
@@ -272,7 +257,7 @@ export function JudgeView({ lang }: JudgeViewProps) {
                 className="w-full py-2.5 px-4 rounded-xl bg-red-600 hover:bg-red-700 text-white font-bold text-xs transition-colors flex items-center justify-center gap-2 cursor-pointer shadow-xs"
               >
                 <ShieldAlert className="size-4" />
-                {t.testPromptInjectionBtn}
+                प्रॉम्प्ट इंजेक्शन टेस्ट करें
               </button>
 
               {fsmResult && (
@@ -289,7 +274,7 @@ export function JudgeView({ lang }: JudgeViewProps) {
                     ) : (
                       <CheckCircle2 className="size-4 text-emerald-600" />
                     )}
-                    {fsmResult.blocked ? "ATTACK BLOCKED" : "VALID (PASSED)"}
+                    {fsmResult.blocked ? "आक्रमण अवरुद्ध (ATTACK BLOCKED)" : "मान्य ट्रांसमिशन (PASSED)"}
                   </div>
                   <p className="font-mono text-[11px] leading-relaxed">{fsmResult.reason}</p>
                 </div>
@@ -302,36 +287,36 @@ export function JudgeView({ lang }: JudgeViewProps) {
             <div className="pb-3 border-b border-gray-100 flex items-center justify-between">
               <h3 className="text-sm font-black text-[#002970] uppercase tracking-wide flex items-center gap-2">
                 <Layers className="size-4 text-[#00BAF2]" />
-                {t.ceecilLadderTitle}
+                CEEcil 3-रंग कॉग्निशन लैडर
               </h3>
               <span className="text-[10px] font-bold bg-blue-50 text-[#002970] px-2 py-0.5 rounded-md">
-                {t.singleLoopOpev}
+                सिंगल-लूप O-P-E-V
               </span>
             </div>
 
             <div className="mt-3.5 space-y-2.5 text-xs">
               <div className="p-3 rounded-xl bg-gray-50 border border-gray-100 flex justify-between items-center">
                 <div>
-                  <span className="font-bold text-[#002970] block">{t.rung1Title}</span>
-                  <span className="text-[10px] text-gray-500">{t.rung1Desc}</span>
+                  <span className="font-bold text-[#002970] block">रंग 1: रिफ्लेक्स कन्फर्म</span>
+                  <span className="text-[10px] text-gray-500">0 LLM टोकन • 180ms विलंबता</span>
                 </div>
-                <span className="text-emerald-600 font-bold font-mono">{t.rung1Accuracy}</span>
+                <span className="text-emerald-600 font-bold font-mono">100% सटीक</span>
               </div>
 
               <div className="p-3 rounded-xl bg-gray-50 border border-gray-100 flex justify-between items-center">
                 <div>
-                  <span className="font-bold text-[#002970] block">{t.rung2Title}</span>
-                  <span className="text-[10px] text-gray-500">{t.rung2Desc}</span>
+                  <span className="font-bold text-[#002970] block">रंग 2: पॉलिसी आर्बिट्रेट</span>
+                  <span className="text-[10px] text-gray-500">~450 टोकन • CRAG इवैल्यूएशन</span>
                 </div>
-                <span className="text-blue-600 font-bold font-mono">{t.rung2Autonomy}</span>
+                <span className="text-blue-600 font-bold font-mono">L2 स्वायत्तता</span>
               </div>
 
               <div className="p-3 rounded-xl bg-gray-50 border border-gray-100 flex justify-between items-center">
                 <div>
-                  <span className="font-bold text-[#002970] block">{t.rung3Title}</span>
-                  <span className="text-[10px] text-gray-500">{t.rung3Desc}</span>
+                  <span className="font-bold text-[#002970] block">रंग 3: VCG मैकेनिज्म डिजाइन</span>
+                  <span className="text-[10px] text-gray-500">फ्लो प्रो बहु-पक्षीय अनुबंध मेनू</span>
                 </div>
-                <span className="text-purple-600 font-bold font-mono">{t.rung3Status}</span>
+                <span className="text-purple-600 font-bold font-mono">सत्यापित</span>
               </div>
             </div>
           </div>
@@ -344,11 +329,11 @@ export function JudgeView({ lang }: JudgeViewProps) {
           <div className="flex items-center gap-2">
             <FileCode className="size-4 text-[#00BAF2]" />
             <h3 className="text-sm font-black text-[#002970] uppercase tracking-wide">
-              {t.walTitleBadge}
+              राइट-अहेड लॉग (WAL) एवं ऑडिट ट्रेल्स
             </h3>
           </div>
           <span className="text-xs text-gray-500 font-mono bg-gray-50 px-2.5 py-1 rounded-full border border-gray-200">
-            {t.idempotencyGuaranteed}
+            आइडमपोटेंसी गारंटीकृत
           </span>
         </div>
 
