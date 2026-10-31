@@ -69,12 +69,12 @@ export class SarvamAdapter implements ISarvamAdapter {
         };
       }
     } else {
-      // DEMO mode fallback: honest demo transcription
       return {
-        transcript: "मेरा आज का सेटलमेंट कितना हुआ है? (Ramesh Voice Demo)",
+        transcript: '',
         languageCode,
-        confidence: 0.98,
-        isDemo: true,
+        confidence: 0,
+        isDemo: false,
+        error: audioBuffer.length === 0 ? 'No audio captured' : 'Sarvam API key not configured',
       };
     }
   }

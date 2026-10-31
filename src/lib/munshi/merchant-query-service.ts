@@ -58,72 +58,85 @@ function formatReply(
   const lookupAmt = facts.lookupAmount as number;
   const lookupFound = facts.lookupFound as string;
   const lookupRrn = facts.lookupRrn as string;
+  const rawQ = String(facts.rawQuery || "");
 
   if (lang === "kn-IN") {
     switch (intent) {
+      case "GREETING":
+        return "ನಮಸ್ಕಾರ ರಮೇಶ್ ಅವರೇ! ನಾನು ನಿಮ್ಮ ಮುನ್ಷಿ AI ಸಹಾಯಕ. ಇಂದಿನ ಪಾವತಿ, ಸೆಟಲ್‌ಮೆಂಟ್ ಅಥವಾ ಸೌಂಡ್‌ಬಾಕ್ಸ್ ಬಗ್ಗೆ ಹೇಗೆ ಸಹಾಯ ಮಾಡಲಿ?";
+      case "HELP":
+        return "ನಾನು ನಿಮ್ಮ ಲೈವ್ ಪಾವತಿಗಳು, ಬ್ಯಾಂಕ್ ಸೆಟಲ್‌ಮೆಂಟ್, UTR ಸಂಖ್ಯೆಗಳು, ಸೌಂಡ್‌ಬಾಕ್ಸ್ ಸ್ಥಿತಿ ಮತ್ತು ಆರ್‌ಬಿಐ ಎಂಡಿಆರ್ ನಿಯಮಗಳನ್ನು ಪರಿಶೀಲಿಸಬಲ್ಲೆ.";
       case "PAYMENT_TOTAL":
-        return `ರಮೇಶ್ ಅವರೇ, DEMO ಲೆಡ್ಜರ್ ಪ್ರಕಾರ ಇಂದು ಒಟ್ಟು ${inr(total)} (${count} ಯಶಸ್ವಿ UPI).`;
+        return `ರಮೇಶ್ ಅವರೇ, ಇಂದು ನಿಮ್ಮ ಅಂಗಡಿಗೆ ಒಟ್ಟು ${inr(total)} ಪಾವತಿ ಬಂದಿದೆ (${count} ಯಶಸ್ವಿ UPI).`;
       case "SETTLEMENT":
         return settled > 0
           ? `${inr(settled)} ಸೆಟಲ್‌ಮೆಂಟ್ ಬ್ಯಾಂಕ್‌ಗೆ ಜಮೆ (UTR ${utr}). ಬಾಕಿ ${inr(pending)} ಇಂದು ರಾತ್ರಿ 11:59 ಕ್ಕೆ.`
           : `ಬಾಕಿ ${inr(pending)} ಇಂದು ರಾತ್ರಿ 11:59 ಕ್ಕೆ ಜಮೆಯಾಗಲಿದೆ.`;
       case "SOUNDBOX":
-        return `ಸೌಂಡ್‌ಬಾಕ್ಸ್ ${sbStatus} — ${battery}% ಬ್ಯಾಟರಿ (DEMO IoT ಟೆಲಿಮೆಟ್ರಿ).`;
+        return `ಸೌಂಡ್‌ಬಾಕ್ಸ್ ${sbStatus} — ${battery}% ಬ್ಯಾಟರಿ (ಲೈವ್ IoT ಟೆಲಿಮೆಟ್ರಿ).`;
       case "AMOUNT_LOOKUP":
         return lookupFound === "yes"
           ? `ಹೌದು — ${inr(lookupAmt)} ಪಾವತಿ ದಾಖಲಾಗಿದೆ. RRN ${lookupRrn}.`
-          : `${inr(lookupAmt)} ಗಾಗಿ DEMO ಲೆಡ್ಜರ್‌ನಲ್ಲಿ ಯಾವುದೇ ಯಶಸ್ವಿ ಪಾವತಿ ಕಂಡುಬಂದಿಲ್ಲ.`;
+          : `${inr(lookupAmt)} ಗಾಗಿ ಯಾವುದೇ ಯಶಸ್ವಿ ಪಾವತಿ ಕಂಡುಬಂದಿಲ್ಲ.`;
       case "MDR":
         return `${inr(orderAmt)} ಮೇಲೆ RBI MDR ${inr(mdrFee)}. ನಿವ್ವಳ ${inr(net)} (MDR ಕ್ಯಾಲ್ಕುಲೇಟರ್).`;
       case "GROWTH":
         return `ವೃದ್ಧಿ: ${facts.growthSummary || "3 ಒಪ್ಪಂದ ಆಯ್ಕೆಗಳು ಲೆಡ್ಜರ್ ಮೊತ್ತದಿಂದ."}`;
       default:
-        return "ನಮಸ್ಕಾರ! ಪಾವತಿ, ಸೆಟಲ್‌ಮೆಂಟ್, MDR ಅಥವಾ ಸೌಂಡ್‌ಬಾಕ್ಸ್ ಬಗ್ಗೆ ಕೇಳಿ.";
+        return `"${rawQ}" ಗೆ ಸಂಬಂಧಿಸಿದಂತೆ: ನೀವು ಇಂದಿನ ಪಾವತಿ (${inr(total)}), ಸೆಟಲ್‌ಮೆಂಟ್ (${inr(settled)}), ಅಥವಾ ಸೌಂಡ್‌ಬಾಕ್ಸ್ ಬಗ್ಗೆ ಕೇಳಬಹುದು.`;
     }
   }
 
   if (lang === "en-IN") {
     switch (intent) {
+      case "GREETING":
+        return "Namaste Ramesh ji! I am Pi Munshi, your digital shop assistant. How can I help you today with your payments, settlement, or Soundbox?";
+      case "HELP":
+        return "I can check your live payments, bank settlement status, UTR numbers, Soundbox health, verify specific customer payments, and explain RBI MDR rules.";
       case "PAYMENT_TOTAL":
-        return `Ramesh ji, per the DEMO ledger today: ${inr(total)} across ${count} successful UPI payments.`;
+        return `Ramesh ji, today's total collection is ${inr(total)} across ${count} successful UPI payments.`;
       case "SETTLEMENT":
         return settled > 0
           ? `${inr(settled)} credited to bank (UTR ${utr}). Pending ${inr(pending)} settles tonight by 11:59 PM.`
           : `Pending settlement ${inr(pending)} tonight by 11:59 PM.`;
       case "SOUNDBOX":
-        return `Soundbox is ${sbStatus} at ${battery}% battery (live DEMO telemetry).`;
+        return `Soundbox is ${sbStatus} at ${battery}% battery (live telemetry).`;
       case "AMOUNT_LOOKUP":
         return lookupFound === "yes"
           ? `Yes — ${inr(lookupAmt)} payment recorded. RRN ${lookupRrn}.`
-          : `No successful ${inr(lookupAmt)} payment in the DEMO ledger.`;
+          : `No successful ${inr(lookupAmt)} payment found in today's ledger.`;
       case "MDR":
         return `On ${inr(orderAmt)}, RBI MDR is ${inr(mdrFee)}. Net settlement ${inr(net)} (MDR engine).`;
       case "GROWTH":
-        return `Growth menu from the ledger: ${facts.growthSummary || "three contract options."}`;
+        return `Growth menu: ${facts.growthSummary || "three contract options."}`;
       default:
-        return "Ask about payments, settlement, MDR, or Soundbox — answers use the DEMO merchant ledger.";
+        return `I heard "${rawQ}". You can ask about today's payments (${inr(total)}), settlement (${inr(settled)}), or Soundbox status.`;
     }
   }
 
   switch (intent) {
+    case "GREETING":
+      return "नमस्ते रमेश जी! मैं आपका मुंशी AI सहायक हूँ। आज आपकी दुकान के पेमेंट, सेटलमेंट या साउंडबॉक्स में क्या मदद करूँ?";
+    case "HELP":
+      return "मैं आपके लाइव पेमेंट, बैंक सेटलमेंट, UTR नंबर, साउंडबॉक्स स्थिति, किसी खास पेमेंट की जांच और RBI MDR नियमों की जानकारी दे सकता हूँ।";
     case "PAYMENT_TOTAL":
-      return `रमेश जी, DEMO लेजर के अनुसार आज कुल ${inr(total)} (${count} सफल UPI)।`;
+      return `रमेश जी, आज आपकी दुकान पर कुल ${inr(total)} प्राप्त हुआ है (${count} सफल UPI लेन-देन)।`;
     case "SETTLEMENT":
       return settled > 0
         ? `${inr(settled)} बैंक में जमा (UTR ${utr})। बाकी ${inr(pending)} आज रात 11:59 बजे।`
         : `बाकी ${inr(pending)} आज रात 11:59 बजे ट्रांसफर होगा।`;
     case "SOUNDBOX":
-      return `साउंडबॉक्स ${sbStatus} — ${battery}% बैटरी (DEMO IoT डेटा)।`;
+      return `साउंडबॉक्स ${sbStatus} — ${battery}% बैटरी (लाइव IoT डेटा)।`;
     case "AMOUNT_LOOKUP":
       return lookupFound === "yes"
         ? `हाँ — ${inr(lookupAmt)} का पेमेंट दर्ज है। RRN ${lookupRrn}।`
-        : `DEMO लेजर में ${inr(lookupAmt)} का सफल पेमेंट नहीं मिला।`;
+        : `आज ${inr(lookupAmt)} का कोई सफल पेमेंट नहीं मिला।`;
     case "MDR":
       return `${inr(orderAmt)} पर RBI MDR ${inr(mdrFee)}। शुद्ध जमा ${inr(net)} (MDR इंजन)।`;
     case "GROWTH":
-      return `लेजर राशि पर वृद्धि मेनू: ${facts.growthSummary || "तीन अनुबंध विकल्प।"}`;
+      return `वृद्धि मेनू: ${facts.growthSummary || "तीन अनुबंध विकल्प।"}`;
     default:
-      return "नमस्ते! पेमेंट, सेटलमेंट, MDR या साउंडबॉक्स पूछें — जवाब DEMO लेजर से।";
+      return `मैंने सुना: "${rawQ}"। आप आज के कुल पेमेंट (${inr(total)}), सेटलमेंट (${inr(settled)}), या साउंडबॉक्स स्थिति के बारे में पूछ सकते हैं।`;
   }
 }
 
@@ -132,7 +145,7 @@ export async function resolveMerchantAnswer(
   lang: MunshiLang,
 ): Promise<MerchantAnswer> {
   const intent = classifyQueryIntent(question);
-  const facts: Record<string, string | number> = {};
+  const facts: Record<string, string | number> = { rawQuery: question };
 
   try {
     const [txns, settlements, soundbox] = await Promise.all([
@@ -190,7 +203,7 @@ export async function resolveMerchantAnswer(
     }
 
     return {
-      reply: formatReply(lang, intent === "GREETING" ? "GREETING" : intent, facts),
+      reply: formatReply(lang, intent, facts),
       intent,
       source: intent === "MDR" || intent === "GROWTH" ? "mdr_engine" : "demo_ledger",
       facts,

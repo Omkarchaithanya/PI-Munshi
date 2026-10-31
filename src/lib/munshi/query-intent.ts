@@ -7,12 +7,20 @@ export type QueryIntent =
   | "AMOUNT_LOOKUP"
   | "MDR"
   | "GROWTH"
-  | "GREETING";
+  | "GREETING"
+  | "HELP"
+  | "UNKNOWN";
 
 export function classifyQueryIntent(question: string): QueryIntent {
   const q = question.trim();
   if (!q) return "GREETING";
 
+  if (/^(hi|hello|hey|namaste|नमस्ते|ನಮಸ್ಕಾರ|halo|good\s*(morning|afternoon|evening)|kaise\s*ho)[\s!.,?]*$/i.test(q)) {
+    return "GREETING";
+  }
+  if (/help|what\s*(can|do)\s*you\s*do|who\s*are\s*you|मदद|सहाय|क्या\s*कर\s*सकते|ಯಾರು/i.test(q)) {
+    return "HELP";
+  }
   if (/loan|working capital|vriddhi|growth|menu of contract|लोन|कर्ज|ऋण|ವೃದ್ಧಿ|ಸಾಲ/i.test(q)) {
     return "GROWTH";
   }
@@ -31,7 +39,7 @@ export function classifyQueryIntent(question: string): QueryIntent {
   if (/payment|received|total|today|kitna|aaya|आया|पेमें|भुगतान|ಪಾವತಿ|ಎಷ್ಟು|ಹಣ ಬಂದ|how much/i.test(q)) {
     return "PAYMENT_TOTAL";
   }
-  return "GREETING";
+  return "UNKNOWN";
 }
 
 /** Pull a rupee amount from natural language (e.g. "₹3500", "3500 rupees"). */
